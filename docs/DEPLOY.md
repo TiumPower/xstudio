@@ -38,6 +38,14 @@ MAIL_FROM=Team Workspace <no-reply@xstudio.czin.net>
 cap production deploy
 ```
 
+Server clone thẳng từ `git@github.com:vietlee/xstudio.git` bằng **SSH agent
+forwarding** (`forward_agent: true` trong `config/deploy/production.rb`), nên máy
+chạy lệnh deploy phải có khoá GitHub nạp sẵn trong ssh-agent:
+
+```bash
+ssh-add -l   # phải thấy khoá; nếu trống thì ssh-add ~/.ssh/id_ed25519
+```
+
 ## 3. nginx + TLS (làm tay, một lần)
 
 ```bash

@@ -7,6 +7,7 @@ Toàn bộ giao diện, email và thông báo lỗi **bằng tiếng Việt**. T
 (`15.000.000 ₫`), ngày `dd/mm/yyyy`, múi giờ `Asia/Ho_Chi_Minh`.
 
 - Sản phẩm: <https://xstudio.czin.net>
+- Mã nguồn: <https://github.com/vietlee/xstudio>
 - Tài liệu yêu cầu: `docs/SRS-Team-Workspace.md`
 
 ## Stack
