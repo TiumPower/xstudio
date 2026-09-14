@@ -7,6 +7,9 @@ class User < ApplicationRecord
 
   has_one_attached :avatar
 
+  belongs_to :invited_by, class_name: "User", optional: true
+  has_many   :invitees, class_name: "User", foreign_key: :invited_by_id, dependent: :nullify
+
   has_many :owned_projects,      class_name: "Project", foreign_key: :owner_id,   dependent: :nullify
   has_many :project_memberships, dependent: :destroy
   has_many :projects,            through: :project_memberships

@@ -6,7 +6,7 @@
   <div class="text-[12.5px] font-medium mb-1.5 <%= 'text-white/70' unless dark %>"
        style="<%= 'color:var(--ink-2)' unless dark %>"><%= label %></div>
   <div class="x-money text-[26px] leading-tight mb-2"
-       style="<%= dark ? 'color:#fff' : (tone == :bad ? 'color:var(--bad)' : tone == :good ? 'color:var(--good)' : 'color:var(--ink)') %>">
+       style="<%= dark ? 'color:#fff' : (value.negative? || tone == :bad ? 'color:var(--bad)' : tone == :good ? 'color:var(--good)' : 'color:var(--ink)') %>">
     <%= format_vnd(value) %>
   </div>
   <div class="flex items-center gap-1.5 text-[12px]">

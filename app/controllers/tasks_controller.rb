@@ -21,12 +21,7 @@ class TasksController < ApplicationController
              end
   end
 
-  def show
-    respond_to do |format|
-      format.html
-      format.turbo_stream
-    end
-  end
+  def show; end
 
   def new
     @task = Task.new(priority: :medium, project_id: params[:project_id])
@@ -41,10 +36,7 @@ class TasksController < ApplicationController
       apply_labels
       log_activity("created", trackable: @task, project: @project, summary: "đã tạo công việc #{@task.code}")
       Notifications::Dispatch.task_assigned(@task, actor: current_user) if @task.assignee_id
-      respond_to do |format|
-        format.turbo_stream { @columns = @project.board_columns.ordered }
-        format.html { redirect_back fallback_location: project_board_path(@project), notice: "Đã tạo #{@task.code}." }
-      end
+      redirect_back fallback_location: project_board_path(@project), notice: "Đã tạo #{@task.code}."
     else
       redirect_back fallback_location: project_board_path(@project),
                     alert: @task.errors.full_messages.to_sentence
@@ -94,8 +86,8 @@ class TasksController < ApplicationController
   def quick_update
     if @task.update(task_params)
       respond_to do |format|
-        format.turbo_stream
         format.json { render json: { ok: true } }
+        format.html { redirect_back fallback_location: task_path(@task) }
       end
     else
       render json: { error: { message: @task.errors.full_messages.to_sentence } }, status: :unprocessable_entity
