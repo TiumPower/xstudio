@@ -1,5 +1,5 @@
 <%= form_with model: transaction, url: (transaction.persisted? ? transaction_path(transaction) : transactions_path),
-              local: true, multipart: true do |f| %>
+              local: true, multipart: true, data: { controller: "transaction-form" } do |f| %>
   <%= hidden_field_tag :return_to, params[:return_to] %>
 
   <% if transaction.errors.any? %>
@@ -12,7 +12,7 @@
       <% [["income", "Thu", "var(--good)", "var(--good-soft)"], ["expense", "Chi", "var(--bad)", "var(--bad-soft)"]].each do |value, label, color, soft| %>
         <label class="flex items-center justify-center gap-2 h-[42px] rounded-[10px] border cursor-pointer font-semibold text-[14px] transition has-[:checked]:border-2"
                style="border-color:var(--line)">
-          <%= f.radio_button :kind, value, class: "x-check", onchange: "this.closest('form').querySelectorAll('[data-kind-group]').forEach(g=>g.hidden = g.dataset.kindGroup !== this.value)" %>
+          <%= f.radio_button :kind, value, class: "x-check", data: { action: "change->transaction-form#sync" } %>
           <span style="color:<%= color %>"><%= label %></span>
         </label>
       <% end %>
@@ -36,11 +36,10 @@
     <div class="x-field">
       <label>Danh mục</label>
       <% TransactionCategory.kinds.keys.each do |kind| %>
-        <div data-kind-group="<%= kind %>" <%= "hidden" unless transaction.kind.to_s == kind %>>
+        <div data-kind="<%= kind %>" data-transaction-form-target="group" hidden>
           <%= select_tag "transaction[category_id]",
                          options_from_collection_for_select(@categories.select { |c| c.kind == kind }, :id, :name, transaction.category_id),
-                         include_blank: "— chọn danh mục —", class: "x-select",
-                         disabled: transaction.kind.to_s != kind, id: "category_#{kind}" %>
+                         include_blank: "— chọn danh mục —", class: "x-select", id: "category_#{kind}" %>
         </div>
       <% end %>
     </div>
