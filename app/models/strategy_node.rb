@@ -1,5 +1,6 @@
 class StrategyNode < ApplicationRecord
   include Discard::Model
+  include BroadcastsTreeChanges
 
   MAX_DEPTH = 6 # không kể gốc (FR-TREE-02)
 

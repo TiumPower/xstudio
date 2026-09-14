@@ -9,6 +9,7 @@ class StrategyNodesController < ApplicationController
     end
 
     @node = @tree.strategy_nodes.new(node_params)
+    @node.broadcast_actor_id = current_user.id
     @node.parent     = parent
     @node.title      = @node.title.presence || "Nút mới"
     @node.created_by = current_user
@@ -146,7 +147,11 @@ class StrategyNodesController < ApplicationController
   private
 
   def load_tree = @tree = StrategyTree.kept.find_by!(slug: params[:strategy_tree_slug])
-  def load_node = @node = @tree.strategy_nodes.kept.find(params[:id])
+  def load_node
+    @node = @tree.strategy_nodes.kept.find(params[:id])
+    @node.broadcast_actor_id = current_user.id
+    @node
+  end
 
   def node_params
     params.require(:strategy_node).permit(:title, :note, :color, :icon, :status, :owner_id, :collapsed)

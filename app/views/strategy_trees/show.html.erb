@@ -17,8 +17,12 @@
      data-tree-ai-remaining-value="<%= @ai_remaining %>"
      data-tree-members-value="<%= @members.map { |m| { id: m.id, name: m.display_name } }.to_json %>"
      data-tree-focus-value="<%= params[:node] %>"
+     data-tree-current-user-value="<%= current_user.id %>"
      class="-mx-5 lg:-mx-7 -mt-5 lg:-mt-6 -mb-24 lg:-mb-6 flex flex-col"
      style="height:calc(100vh - 56px)">
+
+  <%= turbo_stream_from @tree, :events %>
+  <div id="tree_events" class="hidden" data-tree-target="events"></div>
 
   <%= render "toolbar" %>
 

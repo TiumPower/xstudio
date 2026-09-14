@@ -14,11 +14,12 @@ export default class extends Controller {
     "zoomBar", "zoomLabel", "minimap", "minimapSvg", "empty", "hint", "search",
     "statusFilter", "ownerFilter", "aiCounter",
     "pasteOverlay", "pasteInput", "pastePreview", "pasteCount",
-    "deleteOverlay", "deleteTitle", "deleteCount", "deleteCount2"
+    "deleteOverlay", "deleteTitle", "deleteCount", "deleteCount2", "events"
   ]
   static values = {
     data: Object, view: String, maxLevel: Number, maxDepth: Number,
-    urls: Object, aiEnabled: Boolean, aiRemaining: Number, members: Array, focus: String
+    urls: Object, aiEnabled: Boolean, aiRemaining: Number, members: Array, focus: String,
+    currentUser: Number
   }
 
   // ---- Vòng đời ---------------------------------------------------------
@@ -36,6 +37,7 @@ export default class extends Controller {
     this.seedCollapsed(this.root)
     this.bindGlobalKeys()
     this.bindPanZoom()
+    this.watchRemoteChanges()
     this.render()
 
     if (this.focusValue) {
@@ -48,6 +50,40 @@ export default class extends Controller {
 
   disconnect() {
     document.removeEventListener("keydown", this.onKey)
+    this.eventObserver?.disconnect()
+  }
+
+  // ---- FR-TREE-41 — thay đổi của người khác hiện sang trong vài giây --------
+  watchRemoteChanges() {
+    if (!this.hasEventsTarget) return
+
+    this.eventObserver = new MutationObserver((records) => {
+      records.forEach((record) => {
+        record.addedNodes.forEach((element) => {
+          if (!element.dataset || element.dataset.treeEvent === undefined) return
+          const actorId = Number(element.dataset.actorId)
+          const nodeId  = Number(element.dataset.nodeId)
+          const title   = element.dataset.nodeTitle
+          const actor   = element.dataset.actorName
+          element.remove()
+          if (actorId === this.currentUserValue) return // thao tác của chính mình
+
+          // Nếu đang sửa đúng nút vừa bị người khác đổi thì cảnh báo, đừng
+          // âm thầm nạp đè lên những gì người dùng đang gõ dở.
+          if (nodeId === this.selectedId && this.panelHasFocus()) {
+            this.toast(`Nút “${title}” vừa được ${actor || "người khác"} cập nhật. Tải lại để xem bản mới.`, "warn")
+            return
+          }
+          clearTimeout(this.remoteTimer)
+          this.remoteTimer = setTimeout(() => this.reload(), 700)
+        })
+      })
+    })
+    this.eventObserver.observe(this.eventsTarget, { childList: true })
+  }
+
+  panelHasFocus() {
+    return this.panelBodyTarget.contains(document.activeElement)
   }
 
   seedCollapsed(node, depth = 0) {
