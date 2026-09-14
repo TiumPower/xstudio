@@ -17,10 +17,27 @@
         <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 2.5v9M2.5 7h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         <span class="hidden sm:inline">Tạo mới</span>
       </button>
-      <div class="absolute right-0 mt-2 w-[196px] x-card p-1.5 z-50" hidden data-dropdown-target="menu">
-        <%= link_to "Dự án mới",     new_project_path,     class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
-        <%= link_to "Công việc mới", new_task_path,        class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
-        <%= link_to "Giao dịch mới", new_transaction_path, class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
+      <div class="absolute right-0 mt-2 w-[236px] x-card p-1.5 z-50" hidden data-dropdown-target="menu">
+        <% if (project = current_project) %>
+          <%# Đang ở trong một dự án thì tạo mới phải gắn sẵn dự án đó. %>
+          <div class="px-3 pt-1.5 pb-1 x-eyebrow">Trong <%= project.code %></div>
+          <%= link_to new_task_path(project_id: project.id),
+                      class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" do %>
+            Công việc mới
+          <% end %>
+          <%= link_to new_transaction_path(project_id: project.id, return_to: project_transactions_path(project)),
+                      class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" do %>
+            Giao dịch mới
+          <% end %>
+          <div class="x-divider my-1.5"></div>
+          <div class="px-3 pt-0.5 pb-1 x-eyebrow">Toàn workspace</div>
+        <% end %>
+
+        <%= link_to "Dự án mới", new_project_path, class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
+        <% unless current_project %>
+          <%= link_to "Công việc mới", new_task_path,        class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
+          <%= link_to "Giao dịch mới", new_transaction_path, class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
+        <% end %>
       </div>
     </div>
 

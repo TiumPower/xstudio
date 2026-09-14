@@ -3,12 +3,18 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate_user!
   before_action :set_sentry_context
-  helper_method :current_workspace, :unread_notifications_count, :my_open_overdue_count
+  helper_method :current_workspace, :unread_notifications_count, :my_open_overdue_count,
+                :current_project
 
   rescue_from Pundit::NotAuthorizedError, with: :deny_access
 
   def current_workspace
     @current_workspace ||= Workspace.current
+  end
+
+  # Dự án đang mở, nếu có — để nút "Tạo mới" trên thanh trên gắn sẵn dự án đó.
+  def current_project
+    @project if defined?(@project) && @project.is_a?(Project) && @project.persisted?
   end
 
   def unread_notifications_count
