@@ -128,6 +128,8 @@ Rails.application.configure do
     config.action_mailer.raise_delivery_errors = false
   end
 
+  config.action_cable.allowed_request_origins = ["https://#{host}"]
+
   config.hosts << host
   config.hosts << /.*\.czin\.net/
 
