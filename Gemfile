@@ -39,7 +39,7 @@ gem "groupdate"
 # ActionText ships with Rails; Trix comes from the actiontext gem install.
 
 # Soft delete
-gem "discard", "~> 1.3"
+gem "discard", "~> 2.0"
 
 # Xuất Excel sổ thu chi
 gem "caxlsx"
