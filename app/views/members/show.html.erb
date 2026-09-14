@@ -19,7 +19,7 @@
 
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
     <div class="x-card">
-      <div class="x-card-head"><h2 class="x-h3">Dự án tham gia</h2><span class="x-muted"><%= @projects.size %></span></div>
+      <div class="x-card-head"><h2 class="x-h3 x-section-title">Dự án tham gia</h2><span class="x-muted"><%= @projects.size %></span></div>
       <div class="p-2">
         <% if @projects.empty? %>
           <p class="x-muted text-center py-6">Chưa tham gia dự án nào.</p>
@@ -36,7 +36,7 @@
     </div>
 
     <div class="x-card">
-      <div class="x-card-head"><h2 class="x-h3">Công việc đang mở</h2><span class="x-muted"><%= @open_tasks.size %></span></div>
+      <div class="x-card-head"><h2 class="x-h3 x-section-title">Công việc đang mở</h2><span class="x-muted"><%= @open_tasks.size %></span></div>
       <div class="p-2">
         <% if @open_tasks.empty? %>
           <p class="x-muted text-center py-6">Không còn công việc nào đang mở.</p>

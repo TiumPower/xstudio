@@ -8,7 +8,7 @@
 
 <div class="max-w-[820px] space-y-4">
   <div class="x-card">
-    <div class="x-card-head"><h2 class="x-h3">Thông tin cá nhân</h2></div>
+    <div class="x-card-head"><h2 class="x-h3 x-section-title">Thông tin cá nhân</h2></div>
     <div class="p-5">
       <%= form_with model: current_user, url: profile_path, method: :patch, local: true, multipart: true do |f| %>
         <div class="flex items-center gap-4 mb-5">
@@ -45,7 +45,7 @@
   </div>
 
   <div class="x-card">
-    <div class="x-card-head"><h2 class="x-h3">Đổi mật khẩu</h2></div>
+    <div class="x-card-head"><h2 class="x-h3 x-section-title">Đổi mật khẩu</h2></div>
     <div class="p-5">
       <%= form_with url: password_profile_path, method: :patch, local: true do %>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-x-5">
@@ -69,7 +69,7 @@
   </div>
 
   <div class="x-card">
-    <div class="x-card-head"><h2 class="x-h3">Nhận thông báo</h2></div>
+    <div class="x-card-head"><h2 class="x-h3 x-section-title">Nhận thông báo</h2></div>
     <div class="p-5">
       <%= form_with url: notifications_profile_path, method: :patch, local: true do %>
         <label class="flex items-center gap-2.5 mb-4 p-3 rounded-[10px] cursor-pointer" style="background:var(--bg)">

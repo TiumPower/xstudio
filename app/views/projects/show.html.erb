@@ -22,7 +22,7 @@
 
   <% if @project.description.present? %>
     <div class="x-card">
-      <div class="x-card-head"><h2 class="x-h3">Mô tả dự án</h2></div>
+      <div class="x-card-head"><h2 class="x-h3 x-section-title">Mô tả dự án</h2></div>
       <div class="p-5 text-[13.5px] leading-relaxed" style="color:var(--ink-2)"><%= simple_format(@project.description) %></div>
     </div>
   <% end %>
@@ -30,7 +30,7 @@
   <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
     <div class="x-card">
       <div class="x-card-head">
-        <h2 class="x-h3">Công việc sắp đến hạn</h2>
+        <h2 class="x-h3 x-section-title">Công việc sắp đến hạn</h2>
         <%= link_to "Xem tất cả →", project_tasks_path(@project), class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
       </div>
       <div class="p-2">
@@ -53,7 +53,7 @@
 
     <div class="x-card">
       <div class="x-card-head">
-        <h2 class="x-h3">Hoạt động gần đây</h2>
+        <h2 class="x-h3 x-section-title">Hoạt động gần đây</h2>
         <%= link_to "Xem tất cả →", project_activities_path(@project), class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
       </div>
       <div class="p-2"><%= render "shared/activity_list", activities: @recent_activities, compact: true %></div>
@@ -61,7 +61,7 @@
   </div>
 
   <div class="x-card">
-    <div class="x-card-head"><h2 class="x-h3">Bình luận dự án</h2></div>
+    <div class="x-card-head"><h2 class="x-h3 x-section-title">Bình luận dự án</h2></div>
     <div class="p-5"><%= render "comments/section", commentable: @project %></div>
   </div>
 </div>

@@ -21,7 +21,7 @@
 
     <% if @projects.any? %>
       <div class="x-card">
-        <div class="x-card-head"><h2 class="x-h3">Dự án</h2><span class="x-muted"><%= @projects.size %></span></div>
+        <div class="x-card-head"><h2 class="x-h3 x-section-title">Dự án</h2><span class="x-muted"><%= @projects.size %></span></div>
         <div class="p-2">
           <% @projects.each do |p| %>
             <%= link_to project_path(p), class: "flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-[var(--bg)]" do %>
@@ -36,7 +36,7 @@
 
     <% if @tasks.any? %>
       <div class="x-card">
-        <div class="x-card-head"><h2 class="x-h3">Công việc</h2><span class="x-muted"><%= @tasks.size %></span></div>
+        <div class="x-card-head"><h2 class="x-h3 x-section-title">Công việc</h2><span class="x-muted"><%= @tasks.size %></span></div>
         <div class="p-2">
           <% @tasks.each { |task| %><%= render "shared/task_row", task: task, show_project: true %><% } %>
         </div>
@@ -45,7 +45,7 @@
 
     <% if @transactions.any? %>
       <div class="x-card">
-        <div class="x-card-head"><h2 class="x-h3">Giao dịch</h2><span class="x-muted"><%= @transactions.size %></span></div>
+        <div class="x-card-head"><h2 class="x-h3 x-section-title">Giao dịch</h2><span class="x-muted"><%= @transactions.size %></span></div>
         <div class="p-2">
           <% @transactions.each do |t| %>
             <%= link_to edit_transaction_path(t), class: "flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-[var(--bg)]",
@@ -62,7 +62,7 @@
 
     <% if @nodes.any? %>
       <div class="x-card">
-        <div class="x-card-head"><h2 class="x-h3">Nút định hướng</h2><span class="x-muted"><%= @nodes.size %></span></div>
+        <div class="x-card-head"><h2 class="x-h3 x-section-title">Nút định hướng</h2><span class="x-muted"><%= @nodes.size %></span></div>
         <div class="p-2">
           <% @nodes.each do |node| %>
             <%= link_to strategy_tree_path(node.strategy_tree, node: node.id),
