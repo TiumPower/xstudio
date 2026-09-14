@@ -25,7 +25,7 @@
             </div>
             <div>
               <label class="x-label block mb-1.5">Logo</label>
-              <%= f.file_field :logo, accept: "image/*", class: "text-[13px]" %>
+              <%= vn_file_field(f, :logo, accept: "image/*", button_label: "Chọn ảnh…", empty_text: "Chưa chọn ảnh") %>
             </div>
           </div>
 

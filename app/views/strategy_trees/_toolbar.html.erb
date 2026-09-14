@@ -36,7 +36,7 @@
   <!-- Thanh công cụ -->
   <div class="flex flex-wrap items-center gap-2 px-5 lg:px-7 py-2.5">
     <div class="x-seg flex-none">
-      <% { "mindmap" => "Sơ đồ tư duy", "vertical" => "Cây dọc", "outline" => "Danh sách phân cấp" }.each do |key, label| %>
+      <% { "mindmap" => "Sơ đồ", "vertical" => "Cây dọc", "outline" => "Danh sách" }.each do |key, label| %>
         <%= link_to label, strategy_tree_path(@tree, view: key, level: @max_level),
                     class: (@view == key ? "is-active" : "") %>
       <% end %>
@@ -46,17 +46,17 @@
       <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" width="13" height="13" viewBox="0 0 16 16" fill="none">
         <circle cx="7" cy="7" r="5" stroke="#8A98AC" stroke-width="1.5"/><path d="M11 11l3 3" stroke="#8A98AC" stroke-width="1.5" stroke-linecap="round"/>
       </svg>
-      <input type="search" placeholder="Tìm trong cây" class="x-input h-9 pl-8 w-[176px] text-[13px]"
+      <input type="search" placeholder="Tìm trong cây" class="x-input h-9 pl-8 w-[150px] text-[13px]"
              data-tree-target="search" data-action="input->tree#search keydown->tree#searchNext">
     </div>
 
     <select class="x-select h-9 w-auto text-[13px] flex-none" data-tree-target="statusFilter" data-action="change->tree#filter">
-      <option value="">Lọc: Trạng thái</option>
+      <option value="">Trạng thái</option>
       <% StrategyNode.statuses.keys.each { |s| %><option value="<%= s %>"><%= t("node_statuses.#{s}") %></option><% } %>
     </select>
 
     <select class="x-select h-9 w-auto text-[13px] flex-none" data-tree-target="ownerFilter" data-action="change->tree#filter">
-      <option value="">Lọc: Người phụ trách</option>
+      <option value="">Phụ trách</option>
       <% @members.each { |m| %><option value="<%= m.id %>"><%= m.display_name %></option><% } %>
     </select>
 
@@ -66,31 +66,44 @@
       <% end %>
     </select>
 
-    <button class="x-btn x-btn-ghost x-btn-sm flex-none" data-action="tree#expandAll">Mở tất cả</button>
-    <button class="x-btn x-btn-ghost x-btn-sm flex-none" data-action="tree#collapseAll">Thu tất cả</button>
+    <%# Mở/Thu đi thành một cặp để không bị tách ra hai hàng khi màn hình hẹp. %>
+    <div class="x-seg flex-none">
+      <button type="button" data-action="tree#expandAll">Mở tất cả</button>
+      <button type="button" data-action="tree#collapseAll">Thu tất cả</button>
+    </div>
 
     <div class="ml-auto flex items-center gap-2 flex-none">
       <% if @ai_enabled %>
         <button class="x-btn x-btn-primary x-btn-sm" data-action="tree#suggest">
-          ✨ Gợi ý nhánh con
+          ✨ Gợi ý
           <span class="x-num text-[11px] px-1.5 py-0.5 rounded-full ml-0.5" style="background:rgba(255,255,255,.2)"
-                data-tree-target="aiCounter"><%= @ai_remaining %></span>
+                data-tree-target="aiCounter" title="Số lượt gợi ý còn lại hôm nay"><%= @ai_remaining %></span>
         </button>
       <% else %>
-        <span class="x-chip" title="Đặt ANTHROPIC_API_KEY trong .env để bật">✨ AI chưa cấu hình</span>
+        <span class="x-chip" title="Đặt ANTHROPIC_API_KEY trong .env để bật">✨ AI chưa bật</span>
       <% end %>
 
+      <%# Xuất / Phiên bản / Trình bày gom vào một menu để thanh công cụ đủ
+          một hàng ở 1280px — nút ✨ Gợi ý là thứ dùng nhiều nhất nên để ngoài. %>
       <div class="relative" data-controller="dropdown">
-        <button class="x-btn x-btn-ghost x-btn-sm" data-action="dropdown#toggle">Xuất ▾</button>
-        <div class="absolute right-0 mt-2 w-[196px] x-card p-1.5 z-50" hidden data-dropdown-target="menu">
-          <button class="block w-full text-left px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" data-action="tree#exportPng">Ảnh PNG</button>
-          <%= link_to "Markdown outline", export_markdown_strategy_tree_path(@tree),
+        <button class="x-btn x-btn-ghost x-btn-icon" data-action="dropdown#toggle" aria-label="Thao tác khác">⋯</button>
+        <div class="absolute right-0 mt-2 w-[220px] x-card p-1.5 z-50" hidden data-dropdown-target="menu">
+          <button type="button" class="block w-full text-left px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]"
+                  data-action="tree#exportPng">Xuất ảnh PNG</button>
+          <%= link_to "Xuất Markdown", export_markdown_strategy_tree_path(@tree),
                       class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
+          <div class="x-divider my-1.5"></div>
+          <%= link_to "Ảnh chụp phiên bản", strategy_tree_strategy_snapshots_path(@tree),
+                      class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
+          <button type="button" class="block w-full text-left px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]"
+                  data-action="tree#presentation">Chế độ trình bày <span class="x-muted">F</span></button>
+          <div class="x-divider my-1.5"></div>
+          <%= button_to "Xoá cây này", strategy_tree_path(@tree), method: :delete,
+                        form: { data: { turbo_confirm: "Xoá cây “#{@tree.name}” và toàn bộ nút bên trong?" } },
+                        class: "w-full text-left px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bad-soft)]",
+                        style: "color:var(--bad)" %>
         </div>
       </div>
-
-      <%= link_to "Phiên bản", strategy_tree_strategy_snapshots_path(@tree), class: "x-btn x-btn-ghost x-btn-sm" %>
-      <button class="x-btn x-btn-ghost x-btn-icon" data-action="tree#presentation" title="Chế độ trình bày (F)">⛶</button>
     </div>
   </div>
 </div>

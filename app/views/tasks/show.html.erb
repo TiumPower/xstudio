@@ -70,7 +70,7 @@
           <p class="x-muted mb-3">Chưa có tệp nào.</p>
         <% end %>
         <%= form_with model: @task, url: task_path(@task), method: :patch, local: true, multipart: true, class: "flex items-center gap-2" do |f| %>
-          <%= f.file_field :files, multiple: true, class: "text-[12.5px]" %>
+          <%= vn_file_field(f, :files, multiple: true) %>
           <%= f.submit "Tải lên", class: "x-btn x-btn-ghost x-btn-sm cursor-pointer flex-none" %>
         <% end %>
       </div>

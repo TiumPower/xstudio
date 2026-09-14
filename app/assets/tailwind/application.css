@@ -181,6 +181,9 @@ body {
 
   .x-check { width: 16px; height: 16px; accent-color: var(--brand); cursor: pointer; }
 
+  /* Input file gốc được giấu; nút + tên tệp do file_input_controller vẽ. */
+  .x-file-native { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+
   /* ---------- Bảng ---------- */
   .x-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
   .x-table thead th {

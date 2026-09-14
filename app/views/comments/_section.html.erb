@@ -22,7 +22,7 @@
     </div>
     <div class="flex items-center gap-2.5 mt-2.5">
       <button class="x-btn x-btn-primary x-btn-sm">Gửi bình luận</button>
-      <input type="file" name="comment[files][]" multiple class="text-[12px]">
+      <%= vn_file_field_tag("comment[files][]", multiple: true, button_label: "Đính kèm…") %>
     </div>
     <script type="application/json" data-mention-target="people"><%= raw mentionable_people_json %></script>
   <% end %>

@@ -69,7 +69,7 @@
 
     <div class="x-field md:col-span-2">
       <label>Chứng từ đính kèm</label>
-      <%= f.file_field :receipts, multiple: true, class: "text-[13px]" %>
+      <%= vn_file_field(f, :receipts, multiple: true, button_label: "Chọn chứng từ…") %>
       <% if transaction.receipts.attached? %>
         <div class="flex flex-wrap gap-1.5 mt-2">
           <% transaction.receipts.each do |file| %>
