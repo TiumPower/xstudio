@@ -1,7 +1,9 @@
 lock "~> 3.18"
 
 set :application, "xstudio"
-set :repo_url,    "git@github.com:vietlee/xstudio.git"
+# Repo bare trên chính server (giống Bơi Đạt). Đổi sang GitHub bằng
+# REPO_URL=git@github.com:vietlee/xstudio.git cap production deploy
+set :repo_url,    ENV.fetch("REPO_URL", "/home/deploy/repos/xstudio.git")
 
 set :deploy_to,   "/var/www/xstudio"
 set :branch,      ENV.fetch("BRANCH", "main")
