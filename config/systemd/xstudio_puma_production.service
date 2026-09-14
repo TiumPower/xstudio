@@ -20,7 +20,9 @@ Environment=RAILS_ENV=production
 EnvironmentFile=/var/www/xstudio/shared/.env
 
 ExecStart=/home/deploy/.rbenv/bin/rbenv exec bundle exec puma -e production -C config/puma.rb
-ExecReload=/bin/kill -USR1 $MAINPID
+# USR2 = hot restart: puma giữ nguyên listening socket khi nạp release mới,
+# nên `systemctl --user reload` không tạo khoảng 502 như `restart`.
+ExecReload=/bin/kill -USR2 $MAINPID
 
 RestartSec=1
 Restart=on-failure
