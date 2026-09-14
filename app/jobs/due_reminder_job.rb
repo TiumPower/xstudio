@@ -8,7 +8,7 @@ class DueReminderJob < ApplicationJob
       Notifications::Dispatch.task_due_soon(task)
     end
 
-    Task.kept.open_tasks.where("due_date < ?", Date.current).includes(:assignee, :project).find_each do |task|
+    Task.kept.open_tasks.where("tasks.due_date < ?", Date.current).includes(:assignee, :project).find_each do |task|
       next if already_notified?(task, "task_overdue")
       Notifications::Dispatch.task_overdue(task)
     end
@@ -21,6 +21,6 @@ class DueReminderJob < ApplicationJob
     return true if task.assignee_id.blank?
     Notification.where(user_id: task.assignee_id, event_type: event_type)
                 .where("url = ?", Rails.application.routes.url_helpers.task_path(task))
-                .where("created_at >= ?", Time.zone.now.beginning_of_day).exists?
+                .where("notifications.created_at >= ?", Time.zone.now.beginning_of_day).exists?
   end
 end

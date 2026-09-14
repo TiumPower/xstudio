@@ -1,0 +1,18 @@
+<%# Khung popup dùng chung. Gọi trong một turbo_frame_tag "modal". %>
+<div class="x-overlay" data-controller="modal" data-action="click->modal#backdrop">
+  <div class="absolute inset-0 grid place-items-center p-4">
+    <div class="x-modal <%= local_assigns[:width] || 'max-w-[760px]' %>">
+      <div class="x-card-head sticky top-0 bg-white z-10">
+        <div>
+          <h2 class="x-h3"><%= title %></h2>
+          <% if local_assigns[:subtitle].present? %>
+            <p class="x-muted mt-0.5"><%= subtitle %></p>
+          <% end %>
+        </div>
+        <button type="button" class="w-8 h-8 rounded-lg grid place-items-center hover:bg-[var(--bg)] text-[17px] leading-none"
+                style="color:var(--ink-3)" data-action="modal#close" aria-label="Đóng">&times;</button>
+      </div>
+      <div class="p-5"><%= yield %></div>
+    </div>
+  </div>
+</div>

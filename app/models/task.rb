@@ -27,7 +27,7 @@ class Task < ApplicationRecord
   before_save       :sync_status_with_column
 
   scope :open_tasks, -> { kept.where(status: statuses[:open]) }
-  scope :overdue,    -> { open_tasks.where("due_date < ?", Date.current) }
+  scope :overdue,    -> { open_tasks.where("tasks.due_date < ?", Date.current) }
   scope :ordered,    -> { order(:position, :id) }
 
   PRIORITY_COLORS = { "low" => "#94A3B8", "medium" => "#0EA5E9", "high" => "#D98324", "urgent" => "#C8322B" }.freeze

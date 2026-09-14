@@ -1,5 +1,19 @@
-<header class="x-topbar flex items-center gap-3 px-5 lg:px-7">
-  <h1 class="x-h3 flex-none"><%= content_for(:page_title).presence || t("nav.dashboard") %></h1>
+<header class="x-topbar flex items-center gap-2.5 px-5 lg:px-7">
+  <%# Nút Quay lại có ở mọi màn hình trừ trang chủ. Trang nào biết "cha" của
+      mình thì đặt content_for(:back_path); còn lại lùi theo lịch sử. %>
+  <% unless current_page?(root_path) %>
+    <%= link_to (content_for(:back_path).presence || root_path),
+                class: "x-btn x-btn-ghost x-btn-icon flex-none", title: "Quay lại",
+                aria: { label: "Quay lại" },
+                data: { controller: "back", action: "back#go" } do %>
+      <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor"
+           stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 4l-5 5 5 5"/>
+      </svg>
+    <% end %>
+  <% end %>
+
+  <h1 class="x-h3 flex-none truncate max-w-[280px]"><%= content_for(:page_title).presence || t("nav.dashboard") %></h1>
 
   <div class="flex-1 flex justify-center px-2">
     <%= form_with url: search_path, method: :get, class: "w-full max-w-[420px] relative", data: { turbo_frame: "_top" } do %>
@@ -25,8 +39,9 @@
                       class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" do %>
             Công việc mới
           <% end %>
-          <%= link_to new_transaction_path(project_id: project.id, return_to: project_transactions_path(project)),
-                      class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" do %>
+          <%= link_to new_transaction_path(project_id: project.id),
+                      class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]",
+                      data: { turbo_frame: "modal" } do %>
             Giao dịch mới
           <% end %>
           <div class="x-divider my-1.5"></div>
@@ -36,7 +51,8 @@
         <%= link_to "Dự án mới", new_project_path, class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
         <% unless current_project %>
           <%= link_to "Công việc mới", new_task_path,        class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
-          <%= link_to "Giao dịch mới", new_transaction_path, class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
+          <%= link_to "Giao dịch mới", new_transaction_path, class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]",
+                      data: { turbo_frame: "modal" } %>
         <% end %>
       </div>
     </div>

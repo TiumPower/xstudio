@@ -1,7 +1,17 @@
-<% page_title "Giao dịch mới" %>
-<div class="max-w-[760px]">
-  <div class="x-card">
-    <div class="x-card-head"><h2 class="x-h3">Ghi giao dịch mới</h2></div>
-    <div class="p-5"><%= render "form", transaction: @transaction %></div>
+<% if turbo_frame_request? %>
+  <%= turbo_frame_tag "modal" do %>
+    <%= render layout: "shared/modal",
+               locals: { title: "Ghi giao dịch mới",
+                         subtitle: @transaction.project ? "Cho dự án #{@transaction.project.code} · #{@transaction.project.name}" : "Chung workspace" } do %>
+      <%= render "form", transaction: @transaction %>
+    <% end %>
+  <% end %>
+<% else %>
+  <% page_title "Giao dịch mới" %>
+  <div class="max-w-[760px]">
+    <div class="x-card">
+      <div class="x-card-head"><h2 class="x-h3">Ghi giao dịch mới</h2></div>
+      <div class="p-5"><%= render "form", transaction: @transaction %></div>
+    </div>
   </div>
-</div>
+<% end %>

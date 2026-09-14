@@ -128,7 +128,7 @@ module Reporting
       users.values.map do |user|
         open = counts[[user.id, "open"]] || counts[[user.id, 0]] || 0
         done = counts[[user.id, "done"]] || counts[[user.id, 1]] || 0
-        overdue = Task.kept.open_tasks.where(assignee_id: user.id).where("due_date < ?", Date.current).count
+        overdue = Task.kept.open_tasks.where(assignee_id: user.id).where("tasks.due_date < ?", Date.current).count
         { user: user, open: open, done: done, overdue: overdue, total: open + done }
       end.sort_by { |r| -r[:open] }.first(10)
     end
@@ -137,7 +137,7 @@ module Reporting
     def my_tasks
       scope = Task.kept.open_tasks.where(assignee_id: @user.id)
       {
-        overdue:   scope.where("due_date < ?", Date.current).count,
+        overdue:   scope.where("tasks.due_date < ?", Date.current).count,
         today:     scope.where(due_date: Date.current).count,
         this_week: scope.where(due_date: Date.current..Date.current.end_of_week).count,
         recent:    scope.includes(:project).order(Arel.sql("due_date NULLS LAST")).limit(5).to_a

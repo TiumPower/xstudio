@@ -47,7 +47,7 @@ class TransactionsController < ApplicationController
     if @transaction.save
       log_activity("created", trackable: @transaction, project: @transaction.project,
                    summary: "đã ghi #{@transaction.kind_label.downcase} #{helpers.format_vnd(@transaction.amount)}")
-      redirect_to(params[:return_to].presence || transactions_path, notice: "Đã ghi giao dịch.")
+      close_modal_or_redirect("Đã ghi giao dịch.")
     else
       load_form_data
       render :new, status: :unprocessable_entity
@@ -65,7 +65,7 @@ class TransactionsController < ApplicationController
     if @transaction.update(transaction_params)
       log_activity("updated", trackable: @transaction, project: @transaction.project,
                    summary: "đã sửa giao dịch #{helpers.format_vnd(@transaction.amount)}")
-      redirect_to(params[:return_to].presence || transactions_path, notice: "Đã lưu giao dịch.")
+      close_modal_or_redirect("Đã lưu giao dịch.")
     else
       load_form_data
       render :edit, status: :unprocessable_entity
@@ -81,6 +81,19 @@ class TransactionsController < ApplicationController
   end
 
   private
+
+  # Form mở trong popup thì đóng popup rồi nạp lại trang đang đứng — người dùng
+  # không bị văng khỏi dự án đang xem. Mở ở trang riêng thì điều hướng như cũ.
+  def close_modal_or_redirect(notice)
+    flash[:notice] = notice
+    if turbo_frame_request?
+      back = params[:return_to].presence || request.referer.presence || transactions_path
+      render turbo_stream: [turbo_stream.update("modal", ""),
+                            turbo_stream.action(:redirect, back)]
+    else
+      redirect_to(params[:return_to].presence || transactions_path)
+    end
+  end
 
   def load_transaction = @transaction = Transaction.kept.find(params[:id])
 

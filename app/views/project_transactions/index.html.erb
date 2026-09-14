@@ -25,15 +25,15 @@
   <div class="x-card overflow-hidden">
     <div class="x-card-head">
       <h2 class="x-h3">Giao dịch của dự án</h2>
-      <%= link_to "+ Giao dịch mới", new_transaction_path(project_id: @project.id, return_to: project_transactions_path(@project)),
-                  class: "x-btn x-btn-primary x-btn-sm" %>
+      <%= link_to "+ Giao dịch mới", new_transaction_path(project_id: @project.id),
+                  class: "x-btn x-btn-primary x-btn-sm", data: { turbo_frame: "modal" } %>
     </div>
 
     <% if @transactions.empty? %>
       <%= render "shared/empty", icon: "₫", title: "Chưa có giao dịch nào cho dự án này",
                  body: "Ghi khoản thu hoặc chi đầu tiên.",
                  action_label: "+ Giao dịch mới",
-                 action_path: new_transaction_path(project_id: @project.id, return_to: project_transactions_path(@project)) %>
+                 action_path: new_transaction_path(project_id: @project.id), turbo_frame: "modal" %>
     <% else %>
       <div class="overflow-x-auto x-scroll-thin">
         <table class="x-table min-w-[780px]">

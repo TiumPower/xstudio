@@ -32,7 +32,7 @@ class ProjectsController < ApplicationController
   def show
     @tab = "overview"
     @upcoming_tasks = @project.tasks.kept.open_tasks.where.not(due_date: nil)
-                              .where("due_date <= ?", 14.days.from_now).includes(:assignee)
+                              .where("tasks.due_date <= ?", 14.days.from_now).includes(:assignee)
                               .order(:due_date).limit(8)
     @recent_activities = @project.activities.newest.includes(:user).limit(10)
   end

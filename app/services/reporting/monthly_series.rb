@@ -9,7 +9,7 @@ module Reporting
 
     def call
       first = (@months - 1).months.ago.beginning_of_month.to_date
-      scope = Transaction.kept.where("occurred_on >= ?", first)
+      scope = Transaction.kept.where("transactions.occurred_on >= ?", first)
       scope = scope.where(project_id: @project.id) if @project
       scope = scope.joins(:project).where(projects: { project_type: @project_type }) if @project_type
 

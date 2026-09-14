@@ -1,10 +1,20 @@
-<% page_title "Sửa giao dịch" %>
-<div class="max-w-[760px]">
-  <div class="x-card">
-    <div class="x-card-head">
-      <h2 class="x-h3">Sửa giao dịch</h2>
-      <span class="x-muted">Tạo bởi <%= @transaction.created_by&.display_name || "—" %> · <%= time_ago(@transaction.created_at) %></span>
+<% if turbo_frame_request? %>
+  <%= turbo_frame_tag "modal" do %>
+    <%= render layout: "shared/modal",
+               locals: { title: "Sửa giao dịch",
+                         subtitle: "Tạo bởi #{@transaction.created_by&.display_name || '—'} · #{time_ago(@transaction.created_at)}" } do %>
+      <%= render "form", transaction: @transaction %>
+    <% end %>
+  <% end %>
+<% else %>
+  <% page_title "Sửa giao dịch" %>
+  <div class="max-w-[760px]">
+    <div class="x-card">
+      <div class="x-card-head">
+        <h2 class="x-h3">Sửa giao dịch</h2>
+        <span class="x-muted">Tạo bởi <%= @transaction.created_by&.display_name || "—" %> · <%= time_ago(@transaction.created_at) %></span>
+      </div>
+      <div class="p-5"><%= render "form", transaction: @transaction %></div>
     </div>
-    <div class="p-5"><%= render "form", transaction: @transaction %></div>
   </div>
-</div>
+<% end %>

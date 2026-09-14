@@ -208,8 +208,11 @@ body {
     padding: 6px 13px; border-radius: 8px; font-size: 13px; font-weight: 600;
     color: var(--ink-2); text-decoration: none; border: 0; background: transparent; cursor: pointer; transition: .14s;
   }
-  .x-seg > a:hover, .x-seg > button:hover { color: var(--ink); }
-  .x-seg > .is-active { background: var(--nav); color: #fff; box-shadow: var(--shadow); }
+  .x-seg > a:hover, .x-seg > button:hover { color: var(--ink); background: rgba(13,27,46,.05); }
+  /* Mục đang chọn có nền navy — phải khoá chữ trắng, kể cả khi hover, nếu không
+     quy tắc :hover ở trên (specificity cao hơn) làm chữ đen trên nền đen. */
+  .x-seg > .is-active,
+  .x-seg > .is-active:hover { background: var(--nav); color: #fff; box-shadow: var(--shadow); }
 
   /* ---------- Tabs ---------- */
   .x-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
@@ -218,7 +221,8 @@ body {
     text-decoration: none; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: .14s;
   }
   .x-tabs > a:hover { color: var(--ink); }
-  .x-tabs > a.is-active { color: var(--brand); border-bottom-color: var(--brand); }
+  .x-tabs > a.is-active,
+  .x-tabs > a.is-active:hover { color: var(--brand); border-bottom-color: var(--brand); }
 
   /* ---------- Sidebar ---------- */
   .x-nav { background: var(--nav); color: var(--nav-ink); }
@@ -228,7 +232,8 @@ body {
     font-size: 13.5px; font-weight: 500; color: var(--nav-ink); text-decoration: none; transition: .14s;
   }
   .x-nav-item:hover { background: var(--nav-2); color: #fff; }
-  .x-nav-item.is-active { background: var(--nav-active); color: #fff; font-weight: 600; }
+  .x-nav-item.is-active,
+  .x-nav-item.is-active:hover { background: var(--nav-active); color: #fff; font-weight: 600; }
   .x-nav-item svg { flex: none; opacity: .85; }
   .x-nav-item.is-active svg { opacity: 1; }
 

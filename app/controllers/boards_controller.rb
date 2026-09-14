@@ -11,7 +11,7 @@ class BoardsController < ApplicationController
     scope = scope.where(priority: params[:priority])       if params[:priority].present?
     scope = scope.joins(:labels).where(labels: { id: params[:label_id] }) if params[:label_id].present?
     case params[:due]
-    when "overdue"   then scope = scope.where("due_date < ?", Date.current)
+    when "overdue"   then scope = scope.where("tasks.due_date < ?", Date.current)
     when "this_week" then scope = scope.where(due_date: Date.current..Date.current.end_of_week)
     when "none"      then scope = scope.where(due_date: nil)
     end

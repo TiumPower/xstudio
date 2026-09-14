@@ -58,8 +58,9 @@
           <button class="x-btn x-btn-ghost x-btn-icon" data-action="dropdown#toggle" aria-label="Thao tác khác">⋯</button>
           <div class="absolute right-0 mt-2 w-[208px] x-card p-1.5 z-50" hidden data-dropdown-target="menu">
             <%= link_to "+ Công việc mới", new_task_path(project_id: @project.id), class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
-            <%= link_to "+ Giao dịch mới", new_transaction_path(project_id: @project.id, return_to: project_transactions_path(@project)),
-                        class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
+            <%= link_to "+ Giao dịch mới", new_transaction_path(project_id: @project.id),
+                        class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]",
+                        data: { turbo_frame: "modal" } %>
             <div class="x-divider my-1.5"></div>
             <% if @project.archived? %>
               <%= button_to "Bỏ lưu trữ", unarchive_project_path(@project), method: :patch,

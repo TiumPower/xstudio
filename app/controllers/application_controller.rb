@@ -26,7 +26,7 @@ class ApplicationController < ActionController::Base
     return 0 unless user_signed_in?
     @my_open_overdue_count ||= Task.kept.open_tasks
                                    .where(assignee_id: current_user.id)
-                                   .where("due_date < ?", Date.current).count
+                                   .where("tasks.due_date < ?", Date.current).count
   end
 
   protected

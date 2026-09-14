@@ -1,46 +1,120 @@
-<div class="x-card p-3.5 space-y-3">
-  <%= form_with url: transactions_path, method: :get, class: "flex flex-wrap items-center gap-2" do %>
-    <div class="x-seg">
-      <%= link_to "Tất cả", transactions_path(request.query_parameters.except("kind")), class: (params[:kind].blank? ? "is-active" : "") %>
-      <%= link_to "Chỉ Thu", transactions_path(request.query_parameters.merge(kind: "income")), class: (params[:kind] == "income" ? "is-active" : "") %>
-      <%= link_to "Chỉ Chi", transactions_path(request.query_parameters.merge(kind: "expense")), class: (params[:kind] == "expense" ? "is-active" : "") %>
+<%# Thanh lọc sổ thu chi.
+    Ngoài mặt chỉ để 4 thứ dùng nhiều nhất: lọc theo loại, ô tìm, nút Bộ lọc,
+    và hành động chính. Mọi điều kiện còn lại nằm trong panel Bộ lọc, và
+    những gì đang bật hiện thành chip có thể gỡ từng cái. %>
+<% base = request.query_parameters %>
+<div class="x-card p-3">
+  <div class="flex flex-wrap items-center gap-2">
+    <div class="x-seg flex-none">
+      <%= link_to "Tất cả", transactions_path(base.except("kind")), class: (params[:kind].blank? ? "is-active" : "") %>
+      <%= link_to "Thu",    transactions_path(base.merge(kind: "income")),  class: (params[:kind] == "income" ? "is-active" : "") %>
+      <%= link_to "Chi",    transactions_path(base.merge(kind: "expense")), class: (params[:kind] == "expense" ? "is-active" : "") %>
     </div>
 
-    <div class="x-seg">
-      <%= link_to "Tất cả nguồn", transactions_path(request.query_parameters.except("project_scope")), class: (params[:project_scope].blank? ? "is-active" : "") %>
-      <%= link_to "Thuộc dự án", transactions_path(request.query_parameters.merge(project_scope: "project")), class: (params[:project_scope] == "project" ? "is-active" : "") %>
-      <%= link_to "Chung workspace", transactions_path(request.query_parameters.merge(project_scope: "general")), class: (params[:project_scope] == "general" ? "is-active" : "") %>
+    <%= form_with url: transactions_path, method: :get, class: "flex-1 min-w-[180px] max-w-[320px] relative" do %>
+      <% base.except("q").each { |k, v| concat hidden_field_tag(k, v, id: nil) } %>
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <circle cx="7" cy="7" r="5" stroke="#8A98AC" stroke-width="1.5"/><path d="M11 11l3 3" stroke="#8A98AC" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <%= text_field_tag :q, params[:q], placeholder: "Tìm diễn giải, đối tác…", class: "x-input h-9 pl-8.5 text-[13px]", style: "padding-left:32px" %>
+    <% end %>
+
+    <div class="relative flex-none" data-controller="dropdown">
+      <button type="button" class="x-btn x-btn-ghost x-btn-sm" data-action="dropdown#toggle">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <path d="M2 4h12M4.5 8h7M6.5 12h3"/>
+        </svg>
+        Bộ lọc
+        <% if @filter.active_count.positive? %>
+          <span class="x-num text-[11px] font-bold px-1.5 py-0.5 rounded-full"
+                style="background:var(--brand);color:#fff"><%= @filter.active_count %></span>
+        <% end %>
+      </button>
+
+      <div class="absolute right-0 mt-2 w-[330px] x-card p-4 z-50" hidden data-dropdown-target="menu">
+        <%= form_with url: transactions_path, method: :get, class: "space-y-3.5" do %>
+          <%= hidden_field_tag :kind, params[:kind], id: nil %>
+          <%= hidden_field_tag :q,    params[:q],    id: nil %>
+
+          <div>
+            <label class="x-label block mb-1.5">Kỳ</label>
+            <div class="flex gap-1.5 mb-2">
+              <% { "month" => "Tháng này", "quarter" => "Quý này", "year" => "Năm nay" }.each do |key, label| %>
+                <% range = key == "month" ? Date.current.all_month : (key == "quarter" ? Date.current.all_quarter : Date.current.all_year) %>
+                <%= link_to label, transactions_path(base.merge(from: range.first, to: range.last)),
+                            class: "flex-1 text-center px-2 py-1.5 rounded-lg text-[12px] font-semibold",
+                            style: (@filter.period_preset == key ? "background:var(--nav);color:#fff" : "background:var(--bg);color:var(--ink-2)") %>
+              <% end %>
+            </div>
+            <div class="flex items-center gap-2">
+              <%= date_field_tag :from, @filter.from, class: "x-input h-9 text-[13px]", id: nil %>
+              <span class="x-muted">–</span>
+              <%= date_field_tag :to, @filter.to, class: "x-input h-9 text-[13px]", id: nil %>
+            </div>
+          </div>
+
+          <div>
+            <label class="x-label block mb-1.5">Nguồn</label>
+            <%= select_tag :project_scope,
+                           options_for_select([["Tất cả", ""], ["Thuộc dự án", "project"], ["Chung workspace", "general"]], params[:project_scope]),
+                           class: "x-select h-9 text-[13px]", id: nil %>
+          </div>
+
+          <div>
+            <label class="x-label block mb-1.5">Dự án</label>
+            <%= select_tag :project_id,
+                           options_from_collection_for_select(@projects, :id, ->(p) { "#{p.code} · #{p.name}" }, params[:project_id]),
+                           include_blank: "Mọi dự án", class: "x-select h-9 text-[13px]", id: nil %>
+          </div>
+
+          <div>
+            <label class="x-label block mb-1.5">Danh mục</label>
+            <%= select_tag :category_id,
+                           options_from_collection_for_select(@categories, :id, ->(c) { "#{c.kind_income? ? 'Thu' : 'Chi'} · #{c.name}" }, params[:category_id]),
+                           include_blank: "Mọi danh mục", class: "x-select h-9 text-[13px]", id: nil %>
+          </div>
+
+          <div>
+            <label class="x-label block mb-1.5">Khoảng số tiền (₫)</label>
+            <div class="flex items-center gap-2">
+              <%= text_field_tag :min_amount, params[:min_amount], placeholder: "từ", inputmode: "numeric",
+                                 class: "x-input h-9 text-[13px] x-money-input", id: nil,
+                                 data: { controller: "money-input", action: "input->money-input#input" } %>
+              <span class="x-muted">–</span>
+              <%= text_field_tag :max_amount, params[:max_amount], placeholder: "đến", inputmode: "numeric",
+                                 class: "x-input h-9 text-[13px] x-money-input", id: nil,
+                                 data: { controller: "money-input", action: "input->money-input#input" } %>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 pt-1">
+            <button class="x-btn x-btn-primary x-btn-sm flex-1">Áp dụng</button>
+            <%= link_to "Xoá hết", transactions_path, class: "x-btn x-btn-ghost x-btn-sm" %>
+          </div>
+        <% end %>
+      </div>
     </div>
 
-    <%= hidden_field_tag :kind, params[:kind] %>
-    <%= hidden_field_tag :project_scope, params[:project_scope] %>
+    <div class="flex-none flex items-center gap-2 ml-auto">
+      <%= link_to "Xuất Excel", export_transactions_path(base.merge(format: :xlsx)), class: "x-btn x-btn-ghost x-btn-sm" %>
+      <%= link_to "+ Giao dịch mới", new_transaction_path, class: "x-btn x-btn-primary x-btn-sm",
+                  data: { turbo_frame: "modal" } %>
+    </div>
+  </div>
 
-    <input type="date" name="from" value="<%= @filter.from %>" class="x-input h-9 w-auto text-[13px]">
-    <span class="x-muted">–</span>
-    <input type="date" name="to" value="<%= @filter.to %>" class="x-input h-9 w-auto text-[13px]">
-
-    <%= select_tag :project_id, options_from_collection_for_select(@projects, :id, ->(p) { "#{p.code} · #{p.name}" }, params[:project_id]),
-                   include_blank: "Mọi dự án", class: "x-select h-9 w-auto text-[13px]" %>
-    <%= select_tag :category_id, options_from_collection_for_select(@categories, :id, ->(c) { "#{c.kind_income? ? 'Thu' : 'Chi'} · #{c.name}" }, params[:category_id]),
-                   include_blank: "Mọi danh mục", class: "x-select h-9 w-auto text-[13px]" %>
-    <%= text_field_tag :q, params[:q], placeholder: "Tìm diễn giải…", class: "x-input h-9 w-[168px] text-[13px]" %>
-    <button class="x-btn x-btn-ghost x-btn-sm">Áp dụng</button>
-
-    <div class="ml-auto flex items-center gap-2">
-      <%= link_to "Xuất Excel", export_transactions_path(request.query_parameters.merge(format: :xlsx)), class: "x-btn x-btn-ghost x-btn-sm" %>
-      <%= link_to "+ Giao dịch mới", new_transaction_path, class: "x-btn x-btn-primary x-btn-sm" %>
+  <% chips = @filter.active_chips %>
+  <% if chips.any? %>
+    <div class="flex flex-wrap items-center gap-1.5 mt-2.5 pt-2.5 border-t" style="border-color:var(--line-2)">
+      <span class="x-muted flex-none">Đang lọc:</span>
+      <% chips.each do |label, value, keys| %>
+        <span class="x-chip">
+          <span style="color:var(--ink-3)"><%= label %>:</span> <%= value %>
+          <%= link_to "×", transactions_path(base.except(*keys.map(&:to_s))),
+                      class: "ml-0.5 font-bold hover:opacity-60", style: "color:var(--ink-3)",
+                      title: "Bỏ điều kiện #{label.downcase}" %>
+        </span>
+      <% end %>
+      <%= link_to "Xoá hết", transactions_path, class: "x-chip x-chip-bad ml-1" %>
     </div>
   <% end %>
-
-  <div class="flex flex-wrap items-center gap-1.5">
-    <% @filter.active_chips.each do |label, value, keys| %>
-      <span class="x-chip">
-        <span style="color:var(--ink-3)"><%= label %>:</span> <%= value %>
-        <% unless keys == [:from, :to] %>
-          <%= link_to "×", transactions_path(request.query_parameters.except(*keys.map(&:to_s))),
-                      class: "ml-1 font-bold", style: "color:var(--ink-3)" %>
-        <% end %>
-      </span>
-    <% end %>
-  </div>
 </div>

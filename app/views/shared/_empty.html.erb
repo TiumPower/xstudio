@@ -5,6 +5,7 @@
   <h3><%= title %></h3>
   <p><%= local_assigns[:body] %></p>
   <% if local_assigns[:action_label] && local_assigns[:action_path] %>
-    <%= link_to action_label, action_path, class: "x-btn x-btn-primary" %>
+    <%= link_to action_label, action_path, class: "x-btn x-btn-primary",
+                data: (local_assigns[:turbo_frame] ? { turbo_frame: local_assigns[:turbo_frame] } : {}) %>
   <% end %>
 </div>

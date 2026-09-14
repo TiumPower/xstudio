@@ -6,7 +6,7 @@
     <% counts = @project.tasks.kept.group(:status).count %>
     <% open_count = counts["open"] || counts[0] || 0 %>
     <% done_count = counts["done"] || counts[1] || 0 %>
-    <% overdue = @project.tasks.kept.open_tasks.where("due_date < ?", Date.current).count %>
+    <% overdue = @project.tasks.kept.open_tasks.where("tasks.due_date < ?", Date.current).count %>
     <% subs = [@project.tasks.kept.sum(:done_subtasks_count), @project.tasks.kept.sum(:subtasks_count)] %>
     <% [["Tổng công việc", open_count + done_count, "var(--ink)"],
         ["Đang làm", open_count, "var(--brand)"],

@@ -42,7 +42,8 @@
         <div class="x-card-head"><h2 class="x-h3">Giao dịch</h2><span class="x-muted"><%= @transactions.size %></span></div>
         <div class="p-2">
           <% @transactions.each do |t| %>
-            <%= link_to edit_transaction_path(t), class: "flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-[var(--bg)]" do %>
+            <%= link_to edit_transaction_path(t), class: "flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-[var(--bg)]",
+                        data: { turbo_frame: "modal" } do %>
               <span class="x-chip <%= t.kind_income? ? 'x-chip-good' : 'x-chip-bad' %> flex-none"><%= t.kind_label %></span>
               <span class="flex-1 truncate text-[13.5px]"><%= t.description.presence || t.counterparty %></span>
               <span class="x-num text-[12px]" style="color:var(--ink-3)"><%= l(t.occurred_on) %></span>

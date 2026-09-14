@@ -49,7 +49,7 @@
     <% if @transactions.empty? %>
       <%= render "shared/empty", icon: "₫", title: "Không có giao dịch nào khớp bộ lọc",
                  body: "Thử nới rộng khoảng ngày hoặc bỏ bớt điều kiện lọc.",
-                 action_label: "+ Giao dịch mới", action_path: new_transaction_path %>
+                 action_label: "+ Giao dịch mới", action_path: new_transaction_path, turbo_frame: "modal" %>
     <% else %>
       <div class="overflow-x-auto x-scroll-thin">
         <table class="x-table min-w-[1020px]">
@@ -90,8 +90,9 @@
                 </td>
                 <td class="text-right whitespace-nowrap">
                   <% if current_user.role_admin? || t.created_by_id == current_user.id %>
-                    <%= link_to "Sửa", edit_transaction_path(t, return_to: request.fullpath),
-                                class: "text-[12.5px] font-semibold", style: "color:var(--brand)" %>
+                    <%= link_to "Sửa", edit_transaction_path(t),
+                                class: "text-[12.5px] font-semibold", style: "color:var(--brand)",
+                                data: { turbo_frame: "modal" } %>
                   <% end %>
                 </td>
               </tr>
