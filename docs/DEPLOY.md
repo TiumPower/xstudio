@@ -72,11 +72,14 @@ sudo systemctl enable --now sidekiq-xstudio
 ## 5. Khởi tạo dữ liệu
 
 ```bash
-cap production deploy:seed      # danh mục thu chi + tài khoản quản trị đầu tiên
+cap production deploy:seed      # danh mục thu chi + dữ liệu demo (chỉ khi CSDL trống)
 ```
 
-Sau đó đổi mật khẩu tài khoản quản trị và mời thành viên thật qua
+Sau đó đổi email/mật khẩu tài khoản quản trị và mời thành viên thật qua
 **Thành viên → Mời thành viên**.
+
+Lệnh này **an toàn khi chạy lại**: nếu CSDL đã có người dùng, nó chỉ cập nhật
+cấu hình workspace và danh mục thu chi, không đụng tới tài khoản nào.
 
 ## Việc chạy theo lịch
 

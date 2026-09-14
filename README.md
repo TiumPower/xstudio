@@ -36,6 +36,10 @@ bin/dev            # web + tailwind watch, cổng 3012
 
 Đăng nhập demo: `na@xstudio.vn` / `xstudio2026`
 
+> `db:seed` chỉ tạo dữ liệu demo khi CSDL còn trống. Trên CSDL đã có người dùng,
+> nó chỉ cập nhật cấu hình workspace và danh mục thu chi. Ép nạp demo:
+> `SEED_DEMO=1 rails db:seed`.
+
 Email ở local mở bằng `letter_opener` (tự bật tab trình duyệt).
 Sidekiq: `bundle exec sidekiq` (cần Redis ở `redis://localhost:6379/2`).
 

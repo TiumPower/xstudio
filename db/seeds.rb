@@ -1,5 +1,14 @@
-# Dữ liệu mẫu — dựng lại đúng bối cảnh trong bản thiết kế (Xstudio).
-# Chạy lại được nhiều lần: mọi bản ghi đều find_or_create.
+# Khởi tạo dữ liệu. Hai phần tách bạch:
+#
+#   1. Phần LUÔN chạy — cấu hình workspace + danh mục thu chi. An toàn với
+#      CSDL đang có người dùng thật.
+#   2. Phần DEMO — thành viên/dự án/công việc/thu chi/cây mẫu. Chỉ chạy khi CSDL
+#      còn trống, hoặc khi ép bằng SEED_DEMO=1.
+#
+# Vì sao phải chặn: nếu không, chạy lại `deploy:seed` trên production sẽ dựng lại
+# tài khoản quản trị demo (na@xstudio.vn / xstudio2026) — một cửa hậu không ai
+# ngờ tới trên hệ thống đang dùng thật.
+SEED_DEMO = ENV["SEED_DEMO"] == "1" || User.count.zero?
 
 puts "→ Workspace"
 ws = Workspace.current
@@ -9,6 +18,13 @@ ws.update!(name: "Team Workspace", tagline: "Xstudio",
 
 puts "→ Danh mục thu chi"
 TransactionCategory.seed_defaults!
+
+unless SEED_DEMO
+  puts "\nCSDL đã có #{User.count} người dùng — bỏ qua toàn bộ dữ liệu demo."
+  puts "Muốn nạp demo thì chạy: SEED_DEMO=1 rails db:seed"
+  puts "✓ Xong (chỉ cập nhật workspace và danh mục thu chi)."
+  exit
+end
 
 puts "→ Thành viên"
 PEOPLE = [
