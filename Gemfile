@@ -12,7 +12,7 @@ gem "tailwindcss-rails"
 # pubsub không nạp được và mọi broadcast im lặng thất bại.
 gem "redis", "~> 5.4"
 gem "rack-attack"
-gem "connection_pool", "~> 2.4"
+gem "connection_pool", "~> 3.0"
 
 # --- Xstudio / Team Workspace stack (mirrors Loyalty / Estate) ---
 # Authentication & authorization

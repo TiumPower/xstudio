@@ -132,7 +132,7 @@ GEM
     childprocess (5.1.0)
       logger (~> 1.5)
     concurrent-ruby (1.3.8)
-    connection_pool (2.5.5)
+    connection_pool (3.0.2)
     crass (1.0.7)
     cronex (0.15.0)
       tzinfo
@@ -470,7 +470,7 @@ DEPENDENCIES
   caxlsx
   caxlsx_rails
   chartkick
-  connection_pool (~> 2.4)
+  connection_pool (~> 3.0)
   debug
   devise
   devise-i18n
