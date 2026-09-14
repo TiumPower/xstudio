@@ -1,0 +1,31 @@
+# Puma cho Xstudio — systemd USER unit của người dùng `deploy`.
+#   ~/.config/systemd/user/xstudio_puma_production.service
+#
+# Bản do capistrano3-puma sinh ra đặt biến môi trường ngay trong ExecStart,
+# systemd không chấp nhận. Bản này dùng Environment= + EnvironmentFile như
+# Estate và Bơi Đạt. `cap production puma:install` sẽ ghi đè, nên sau khi chạy
+# lệnh đó phải chép lại tệp này lên.
+[Unit]
+Description=Puma HTTP Server cho Xstudio (production)
+After=syslog.target network.target
+
+[Service]
+Type=simple
+WatchdogSec=10
+WorkingDirectory=/var/www/xstudio/current
+
+Environment=RBENV_ROOT=/home/deploy/.rbenv
+Environment=RBENV_VERSION=3.2.2
+Environment=RAILS_ENV=production
+EnvironmentFile=/var/www/xstudio/shared/.env
+
+ExecStart=/home/deploy/.rbenv/bin/rbenv exec bundle exec puma -e production -C config/puma.rb
+ExecReload=/bin/kill -USR1 $MAINPID
+
+RestartSec=1
+Restart=on-failure
+
+SyslogIdentifier=xstudio_puma_production
+
+[Install]
+WantedBy=default.target
