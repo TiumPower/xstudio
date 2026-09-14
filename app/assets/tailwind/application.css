@@ -76,7 +76,8 @@ body {
   .x-num { font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
   .x-mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; letter-spacing: .02em; }
   .x-code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; color: var(--ink-3); letter-spacing: .04em; }
-  .x-money { font-variant-numeric: tabular-nums; font-weight: 600; letter-spacing: -.01em; }
+  /* Số tiền không bao giờ được xuống dòng, kể cả ký hiệu ₫. */
+  .x-money { font-variant-numeric: tabular-nums; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; }
   .x-in  { color: var(--good); }
   .x-out { color: var(--bad); }
   .x-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
