@@ -28,24 +28,19 @@
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div class="x-card p-4 flex items-center gap-4">
-      <span class="x-chip x-chip-brand flex-none">Thuộc dự án</span>
-      <div class="flex-1 text-[12.5px]" style="color:var(--ink-2)">
-        <span class="x-in font-semibold">+ <%= format_vnd(@split[:project_income]) %></span>
-        <span class="mx-1">·</span>
-        <span class="x-out font-semibold">− <%= format_vnd(@split[:project_expense]) %></span>
+    <% [["Thuộc dự án", "x-chip-brand", @split[:project_income], @split[:project_expense]],
+        ["Chung workspace", "", @split[:general_income], @split[:general_expense]]].each do |label, chip, income, expense| %>
+      <div class="x-card p-4">
+        <div class="flex items-center justify-between gap-3 mb-2.5">
+          <span class="x-chip <%= chip %>"><%= label %></span>
+          <span class="x-money text-[15px]"><%= format_vnd(income - expense, signed: true) %></span>
+        </div>
+        <div class="flex items-center gap-4 text-[12.5px]">
+          <span><span style="color:var(--ink-3)">Thu</span> <span class="x-money x-in">+ <%= format_vnd(income) %></span></span>
+          <span><span style="color:var(--ink-3)">Chi</span> <span class="x-money x-out">− <%= format_vnd(expense) %></span></span>
+        </div>
       </div>
-      <span class="x-money text-[14px]"><%= format_vnd(@split[:project_income] - @split[:project_expense], signed: true) %></span>
-    </div>
-    <div class="x-card p-4 flex items-center gap-4">
-      <span class="x-chip flex-none">Chung workspace</span>
-      <div class="flex-1 text-[12.5px]" style="color:var(--ink-2)">
-        <span class="x-in font-semibold">+ <%= format_vnd(@split[:general_income]) %></span>
-        <span class="mx-1">·</span>
-        <span class="x-out font-semibold">− <%= format_vnd(@split[:general_expense]) %></span>
-      </div>
-      <span class="x-money text-[14px]"><%= format_vnd(@split[:general_income] - @split[:general_expense], signed: true) %></span>
-    </div>
+    <% end %>
   </div>
 
   <%= render "filters" %>
