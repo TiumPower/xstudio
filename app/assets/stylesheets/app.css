@@ -1,0 +1,6 @@
+/* Tinh chỉnh nhỏ nằm ngoài Tailwind build (Trix, in ấn). */
+@media print {
+  aside, header, .x-no-print { display: none !important; }
+  main { padding: 0 !important; }
+  .x-card { box-shadow: none !important; break-inside: avoid; }
+}

@@ -1,0 +1,41 @@
+<% page_title "Chi tiết dự án" %>
+<%= render "projects/header" %>
+
+<div class="mt-4 space-y-3.5">
+  <%= form_with url: project_board_path(@project), method: :get, class: "flex flex-wrap items-center gap-2" do %>
+    <%= select_tag :assignee_id, options_from_collection_for_select(@project.members, :id, :display_name, params[:assignee_id]),
+                   include_blank: "Người thực hiện", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+    <%= select_tag :priority, options_for_select(Task.priorities.keys.map { |k| [t("priorities.#{k}"), k] }, params[:priority]),
+                   include_blank: "Độ ưu tiên", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+    <% if @labels.any? %>
+      <%= select_tag :label_id, options_from_collection_for_select(@labels, :id, :name, params[:label_id]),
+                     include_blank: "Nhãn", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+    <% end %>
+    <%= select_tag :due, options_for_select([["Quá hạn", "overdue"], ["Tuần này", "this_week"], ["Không hạn", "none"]], params[:due]),
+                   include_blank: "Hạn", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+    <% if params.values_at(:assignee_id, :priority, :label_id, :due).any?(&:present?) %>
+      <%= link_to "Xoá lọc", project_board_path(@project), class: "x-btn x-btn-ghost x-btn-sm" %>
+    <% end %>
+    <span class="ml-auto x-muted">Kéo–thả thẻ để đổi cột · lưu ngay</span>
+  <% end %>
+
+  <div class="x-board x-scroll-thin" data-controller="kanban"
+       data-kanban-move-url-value="<%= move_task_path(code: "__CODE__") %>"
+       data-kanban-reorder-url-value="<%= reorder_project_board_columns_path(@project) %>">
+    <% @columns.each do |column| %>
+      <%= render "column", column: column, tasks: (@tasks_by_column[column.id] || []) %>
+    <% end %>
+
+    <div class="w-[260px] flex-none">
+      <%= form_with url: project_board_columns_path(@project), method: :post, class: "x-card p-3" do %>
+        <input type="text" name="board_column[name]" placeholder="+ Thêm cột mới"
+               class="x-input h-9 text-[13px] mb-2" required>
+        <div class="flex items-center gap-2">
+          <input type="color" name="board_column[color]" value="#6B7A8F"
+                 class="h-9 w-[44px] rounded-[9px] border cursor-pointer flex-none" style="border-color:var(--line)">
+          <button class="x-btn x-btn-ghost x-btn-sm flex-1">Thêm cột</button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

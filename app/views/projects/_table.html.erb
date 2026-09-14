@@ -1,0 +1,37 @@
+<div class="overflow-x-auto x-scroll-thin">
+  <table class="x-table min-w-[900px]">
+    <thead>
+      <tr>
+        <th>Dự án</th><th>Loại hình</th><th>Trạng thái</th><th>Phụ trách</th>
+        <th class="w-[120px]">Tiến độ</th><th>Hạn</th>
+        <th class="text-right">Thu</th><th class="text-right">Chi</th><th class="text-right">Lợi nhuận</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% projects.each do |project| %>
+        <% t = stats[project.id] || { income: 0, expense: 0, profit: 0 } %>
+        <tr class="x-row-link" onclick="location.href='<%= project_path(project) %>'">
+          <td>
+            <div class="font-semibold text-[13.5px]"><%= project.name %></div>
+            <div class="x-code"><%= project.code %><%= " · #{project.client_name}" if project.client_name.present? %></div>
+          </td>
+          <td><%= project_type_chip(project) %></td>
+          <td><%= project_status_chip(project) %></td>
+          <td class="whitespace-nowrap"><%= project.owner&.display_name || "—" %></td>
+          <td>
+            <div class="flex items-center gap-2">
+              <div class="x-progress flex-1 min-w-[50px]"><span style="width:<%= project.progress %>%"></span></div>
+              <span class="x-num text-[12px] font-semibold"><%= project.progress %>%</span>
+            </div>
+          </td>
+          <td class="whitespace-nowrap">
+            <span class="x-num <%= 'x-out font-semibold' if project.overdue? %>"><%= project.due_date ? l(project.due_date) : "—" %></span>
+          </td>
+          <td class="x-td-num"><span class="x-money x-in"><%= format_vnd(t[:income]) %></span></td>
+          <td class="x-td-num"><span class="x-money x-out"><%= format_vnd(t[:expense]) %></span></td>
+          <td class="x-td-num"><span class="x-money <%= t[:profit].negative? ? 'x-out' : 'x-in' %>"><%= format_vnd(t[:profit], signed: true) %></span></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

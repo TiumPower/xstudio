@@ -1,0 +1,9 @@
+Bản tin ngày <%= l(Date.current) %> — chào <%= @user.full_name %>
+
+<% [["QUÁ HẠN", @overdue], ["ĐẾN HẠN HÔM NAY", @due_today], ["ĐẾN HẠN TUẦN NÀY", @due_week]].each do |title, tasks| %>
+<% next if tasks.empty? %>
+<%= title %> (<%= tasks.size %>)
+<% tasks.first(10).each do |t| %>- <%= t.code %> · <%= t.title %><%= " (hạn #{l(t.due_date)})" if t.due_date %>
+<% end %>
+<% end %>
+Mở Việc của tôi: https://<%= @host %>/viec-cua-toi

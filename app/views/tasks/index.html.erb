@@ -1,0 +1,83 @@
+<% page_title "Chi tiết dự án" %>
+<%= render "projects/header" %>
+
+<div class="mt-4 space-y-3.5" data-controller="bulk">
+  <%= form_with url: project_tasks_path(@project), method: :get, class: "flex flex-wrap items-center gap-2" do %>
+    <%= select_tag :assignee_id, options_from_collection_for_select(@project.members, :id, :display_name, params[:assignee_id]),
+                   include_blank: "Người thực hiện", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+    <%= select_tag :priority, options_for_select(Task.priorities.keys.map { |k| [t("priorities.#{k}"), k] }, params[:priority]),
+                   include_blank: "Độ ưu tiên", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+    <%= select_tag :column_id, options_from_collection_for_select(@project.board_columns.ordered, :id, :name, params[:column_id]),
+                   include_blank: "Cột", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+    <%= select_tag :sort, options_for_select([["Theo cột", ""], ["Hạn gần nhất", "due"], ["Độ ưu tiên", "priority"], ["Mới tạo", "created"]], params[:sort]),
+                   class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+    <%= text_field_tag :q, params[:q], placeholder: "Tìm công việc…", class: "x-input h-9 w-[180px] text-[13px]" %>
+    <label class="flex items-center gap-2 text-[13px] cursor-pointer" style="color:var(--ink-2)">
+      <%= check_box_tag :show_cancelled, "1", params[:show_cancelled] == "1", class: "x-check", onchange: "this.form.requestSubmit()" %>
+      Hiện cả việc đã huỷ
+    </label>
+  <% end %>
+
+  <%= form_with url: bulk_update_tasks_path, method: :patch, class: "x-card overflow-hidden" do %>
+    <div class="px-4 py-2.5 flex flex-wrap items-center gap-2 border-b hidden" style="border-color:var(--line-2);background:var(--brand-soft)"
+         data-bulk-target="bar">
+      <span class="text-[13px] font-semibold" style="color:var(--brand-ink)">
+        Đã chọn <span data-bulk-target="count">0</span> công việc
+      </span>
+      <%= select_tag :board_column_id, options_from_collection_for_select(@project.board_columns.ordered, :id, :name),
+                     include_blank: "Chuyển cột…", class: "x-select h-8 w-auto text-[12.5px]" %>
+      <%= select_tag :assignee_id, options_from_collection_for_select(@project.members, :id, :display_name),
+                     include_blank: "Đổi người thực hiện…", class: "x-select h-8 w-auto text-[12.5px]" %>
+      <%= select_tag :priority, options_for_select(Task.priorities.keys.map { |k| [t("priorities.#{k}"), k] }),
+                     include_blank: "Đổi độ ưu tiên…", class: "x-select h-8 w-auto text-[12.5px]" %>
+      <button class="x-btn x-btn-primary x-btn-sm">Áp dụng</button>
+    </div>
+
+    <% if @tasks.empty? %>
+      <%= render "shared/empty", icon: "≡", title: "Chưa có công việc nào",
+                 body: "Thêm công việc đầu tiên cho dự án này.",
+                 action_label: "Mở Kanban", action_path: project_board_path(@project) %>
+    <% else %>
+      <div class="overflow-x-auto x-scroll-thin">
+        <table class="x-table min-w-[900px]">
+          <thead>
+            <tr>
+              <th class="w-9"><input type="checkbox" class="x-check" data-action="bulk#toggleAll"></th>
+              <th>Công việc</th><th>Cột</th><th>Người thực hiện</th>
+              <th>Ưu tiên</th><th>Hạn</th><th>Việc con</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @tasks.each do |task| %>
+              <tr>
+                <td><%= check_box_tag "codes[]", task.code, false, class: "x-check", data: { action: "bulk#toggle", bulk_target: "box" } %></td>
+                <td>
+                  <%= link_to task_path(task), class: "block" do %>
+                    <div class="font-medium text-[13.5px]"><%= task.title %></div>
+                    <div class="x-code"><%= task.code %></div>
+                  <% end %>
+                </td>
+                <td>
+                  <span class="x-chip" style="background:<%= task.board_column&.color || '#6B7A8F' %>1A;color:<%= task.board_column&.color || '#6B7A8F' %>">
+                    <%= task.board_column&.name || "—" %>
+                  </span>
+                </td>
+                <td>
+                  <div class="flex items-center gap-2">
+                    <%= avatar_for task.assignee, size: :sm %>
+                    <span class="text-[13px] truncate"><%= task.assignee&.display_name || t("common.unassigned") %></span>
+                  </div>
+                </td>
+                <td><%= priority_chip(task) %></td>
+                <td class="whitespace-nowrap">
+                  <span class="x-num <%= 'x-out font-semibold' if task.overdue? %>"><%= task.due_date ? l(task.due_date) : "—" %></span>
+                </td>
+                <td class="x-num" style="color:var(--ink-3)"><%= task.subtasks_count.positive? ? task.subtask_summary : "—" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  <% end %>
+</div>

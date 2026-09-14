@@ -1,0 +1,94 @@
+<%= form_with model: transaction, url: (transaction.persisted? ? transaction_path(transaction) : transactions_path),
+              local: true, multipart: true do |f| %>
+  <%= hidden_field_tag :return_to, params[:return_to] %>
+
+  <% if transaction.errors.any? %>
+    <div class="x-toast x-toast-bad mb-4"><div><%= transaction.errors.full_messages.to_sentence %></div></div>
+  <% end %>
+
+  <div class="x-field">
+    <label>Loại giao dịch</label>
+    <div class="grid grid-cols-2 gap-2.5">
+      <% [["income", "Thu", "var(--good)", "var(--good-soft)"], ["expense", "Chi", "var(--bad)", "var(--bad-soft)"]].each do |value, label, color, soft| %>
+        <label class="flex items-center justify-center gap-2 h-[42px] rounded-[10px] border cursor-pointer font-semibold text-[14px] transition has-[:checked]:border-2"
+               style="border-color:var(--line)">
+          <%= f.radio_button :kind, value, class: "x-check", onchange: "this.closest('form').querySelectorAll('[data-kind-group]').forEach(g=>g.hidden = g.dataset.kindGroup !== this.value)" %>
+          <span style="color:<%= color %>"><%= label %></span>
+        </label>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5">
+    <div class="x-field">
+      <label>Số tiền (₫) <span style="color:var(--bad)">*</span></label>
+      <%= f.text_field :amount, value: (transaction.amount ? number_with_delimiter(transaction.amount, delimiter: ".") : nil),
+                       class: "x-input x-money-input", inputmode: "numeric", placeholder: "15.000.000",
+                       data: { controller: "money-input", action: "input->money-input#input" } %>
+      <p class="x-hint">Nhập số nguyên, tự động phân cách nghìn.</p>
+    </div>
+
+    <div class="x-field">
+      <label>Ngày giao dịch <span style="color:var(--bad)">*</span></label>
+      <%= f.date_field :occurred_on, class: "x-input" %>
+    </div>
+
+    <div class="x-field">
+      <label>Danh mục</label>
+      <% TransactionCategory.kinds.keys.each do |kind| %>
+        <div data-kind-group="<%= kind %>" <%= "hidden" unless transaction.kind.to_s == kind %>>
+          <%= select_tag "transaction[category_id]",
+                         options_from_collection_for_select(@categories.select { |c| c.kind == kind }, :id, :name, transaction.category_id),
+                         include_blank: "— chọn danh mục —", class: "x-select",
+                         disabled: transaction.kind.to_s != kind, id: "category_#{kind}" %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="x-field">
+      <label>Thuộc về</label>
+      <%= f.select :project_id,
+                   options_from_collection_for_select(@projects, :id, ->(p) { "#{p.code} · #{p.name}" }, transaction.project_id),
+                   { include_blank: "Chung workspace (không gắn dự án)" }, class: "x-select" %>
+      <p class="x-hint">Để trống nếu là chi phí/thu nhập chung của cả đội.</p>
+    </div>
+
+    <div class="x-field md:col-span-2">
+      <label>Diễn giải</label>
+      <%= f.text_field :description, class: "x-input", placeholder: "Thanh toán server AWS tháng 9" %>
+    </div>
+
+    <div class="x-field">
+      <label>Đối tác / Nhà cung cấp</label>
+      <%= f.text_field :counterparty, class: "x-input", placeholder: "Amazon Web Services" %>
+    </div>
+
+    <div class="x-field">
+      <label>Phương thức</label>
+      <%= f.select :payment_method, Transaction.payment_methods.keys.map { |k| [t("payment_methods.#{k}"), k] }, {}, class: "x-select" %>
+    </div>
+
+    <div class="x-field md:col-span-2">
+      <label>Chứng từ đính kèm</label>
+      <%= f.file_field :receipts, multiple: true, class: "text-[13px]" %>
+      <% if transaction.receipts.attached? %>
+        <div class="flex flex-wrap gap-1.5 mt-2">
+          <% transaction.receipts.each do |file| %>
+            <%= link_to "📎 #{file.filename.to_s.truncate(28)}", rails_blob_path(file, disposition: "attachment"),
+                        class: "x-chip x-chip-brand", target: "_blank", rel: "noopener" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-2.5 pt-1">
+    <%= f.submit(transaction.persisted? ? "Lưu giao dịch" : "Ghi giao dịch", class: "x-btn x-btn-primary cursor-pointer") %>
+    <%= link_to "Huỷ", (params[:return_to].presence || transactions_path), class: "x-btn x-btn-ghost" %>
+    <% if transaction.persisted? && (current_user.role_admin? || transaction.created_by_id == current_user.id) %>
+      <%= button_to "Xoá giao dịch", transaction_path(transaction), method: :delete,
+                    form: { data: { turbo_confirm: "Xoá giao dịch này?" }, class: "ml-auto" },
+                    class: "x-btn x-btn-sm", style: "color:var(--bad);background:var(--bad-soft)" %>
+    <% end %>
+  </div>
+<% end %>

@@ -1,0 +1,29 @@
+<% content_for :title, "Đăng nhập" %>
+<h1 class="x-h2 mb-1">Đăng nhập</h1>
+<p class="x-sub mb-6">Công cụ làm việc nội bộ của đội.</p>
+
+<%= form_with model: resource, url: session_path(resource_name), local: true do |f| %>
+  <div class="x-field">
+    <%= f.label :email, "Email" %>
+    <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "x-input", placeholder: "ban@xstudio.vn" %>
+  </div>
+
+  <div class="x-field">
+    <%= f.label :password, "Mật khẩu" %>
+    <%= f.password_field :password, autocomplete: "current-password", class: "x-input", placeholder: "••••••••" %>
+  </div>
+
+  <div class="flex items-center justify-between mb-5">
+    <label class="flex items-center gap-2 text-[13px] cursor-pointer" style="color:var(--ink-2)">
+      <%= f.check_box :remember_me, class: "x-check" %>
+      Duy trì đăng nhập
+    </label>
+    <%= link_to "Quên mật khẩu?", new_password_path(resource_name), class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
+  </div>
+
+  <%= f.submit "Đăng nhập", class: "x-btn x-btn-primary x-btn-lg x-btn-block cursor-pointer" %>
+<% end %>
+
+<p class="x-muted text-center mt-5 leading-relaxed">
+  Không có đăng ký công khai. Quản trị viên sẽ gửi lời mời qua email.
+</p>

@@ -1,0 +1,4 @@
+<% target = @comment.commentable %>
+<%= turbo_stream.replace comments_dom_id(target) do %>
+  <%= render "comments/section", commentable: target %>
+<% end %>

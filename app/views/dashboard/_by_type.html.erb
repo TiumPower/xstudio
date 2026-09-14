@@ -1,0 +1,27 @@
+<% max = [rows.flat_map { |r| [r[:income], r[:expense]] }.max.to_i, 1].max %>
+<% rows.each do |row| %>
+  <div>
+    <div class="flex items-center justify-between mb-2">
+      <span class="x-chip <%= row[:type] == 'product_sales' ? 'x-chip-ps' : 'x-chip-dx' %>"><%= row[:label] %></span>
+      <span class="x-money text-[13px]" style="color:<%= row[:profit].negative? ? 'var(--bad)' : 'var(--good)' %>">
+        <%= format_vnd(row[:profit], signed: true) %>
+      </span>
+    </div>
+    <div class="space-y-1.5">
+      <div class="flex items-center gap-2.5">
+        <span class="w-6 text-[11px] flex-none" style="color:var(--ink-3)">Thu</span>
+        <div class="flex-1 h-[18px] rounded-md overflow-hidden" style="background:var(--bg)">
+          <div class="h-full rounded-md" style="width:<%= (row[:income] * 100.0 / max).round(1) %>%;background:var(--good)"></div>
+        </div>
+        <span class="x-money text-[12px] w-[112px] text-right flex-none x-in"><%= format_vnd(row[:income]) %></span>
+      </div>
+      <div class="flex items-center gap-2.5">
+        <span class="w-6 text-[11px] flex-none" style="color:var(--ink-3)">Chi</span>
+        <div class="flex-1 h-[18px] rounded-md overflow-hidden" style="background:var(--bg)">
+          <div class="h-full rounded-md" style="width:<%= (row[:expense] * 100.0 / max).round(1) %>%;background:#E8A39E"></div>
+        </div>
+        <span class="x-money text-[12px] w-[112px] text-right flex-none x-out"><%= format_vnd(row[:expense]) %></span>
+      </div>
+    </div>
+  </div>
+<% end %>

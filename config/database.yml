@@ -1,0 +1,21 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  host: <%= ENV.fetch("DATABASE_HOST", "localhost") %>
+  username: <%= ENV.fetch("DATABASE_USER", ENV["USER"]) %>
+  password: <%= ENV.fetch("DATABASE_PASSWORD", "") %>
+
+development:
+  <<: *default
+  database: xstudio_development
+
+test:
+  <<: *default
+  database: xstudio_test
+
+production:
+  <<: *default
+  database: <%= ENV.fetch("DATABASE_NAME", "xstudio_production") %>
+  username: <%= ENV.fetch("DATABASE_USER", "xstudio") %>
+  password: <%= ENV["DATABASE_PASSWORD"] %>

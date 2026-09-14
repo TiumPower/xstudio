@@ -1,0 +1,32 @@
+<% content_for :title, "Kích hoạt tài khoản" %>
+<h1 class="x-h2 mb-1">Chào mừng bạn!</h1>
+<p class="x-sub mb-6">
+  <%= @user.invited_by&.display_name || "Quản trị viên" %> đã mời bạn vào
+  <strong style="color:var(--ink)"><%= current_workspace.name %></strong>.
+  Đặt mật khẩu để bắt đầu.
+</p>
+
+<%= form_with model: @user, url: invitation_path(token: params[:token]), method: :patch, local: true do |f| %>
+  <div class="x-field">
+    <label>Email</label>
+    <input type="email" value="<%= @user.email %>" class="x-input" disabled style="background:var(--bg);color:var(--ink-3)">
+  </div>
+  <div class="x-field">
+    <%= f.label :full_name, "Họ và tên" %>
+    <%= f.text_field :full_name, autofocus: true, class: "x-input", placeholder: "Nguyễn Văn A" %>
+  </div>
+  <div class="x-field">
+    <%= f.label :job_title, "Chức danh" %>
+    <%= f.text_field :job_title, class: "x-input", placeholder: "Kỹ sư dữ liệu" %>
+  </div>
+  <div class="x-field">
+    <%= f.label :password, "Mật khẩu" %>
+    <%= f.password_field :password, class: "x-input", autocomplete: "new-password" %>
+    <p class="x-hint">Tối thiểu 8 ký tự, có cả chữ và số.</p>
+  </div>
+  <div class="x-field">
+    <%= f.label :password_confirmation, "Nhập lại mật khẩu" %>
+    <%= f.password_field :password_confirmation, class: "x-input", autocomplete: "new-password" %>
+  </div>
+  <%= f.submit "Kích hoạt tài khoản", class: "x-btn x-btn-primary x-btn-lg x-btn-block cursor-pointer" %>
+<% end %>

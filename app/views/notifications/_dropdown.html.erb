@@ -1,0 +1,30 @@
+<div class="max-h-[420px] overflow-auto x-scroll-thin">
+  <div class="flex items-center justify-between px-4 py-2.5 border-b sticky top-0 bg-white z-10" style="border-color:var(--line-2)">
+    <span class="font-semibold text-[13.5px]"><%= t("nav.notifications") %></span>
+    <%= button_to "Đánh dấu đã đọc", read_all_notifications_path, method: :patch,
+                  class: "text-[12px] font-semibold hover:underline", style: "color:var(--brand)" %>
+  </div>
+
+  <% if notifications.empty? %>
+    <p class="x-muted text-center py-8">Không có thông báo nào.</p>
+  <% else %>
+    <% notifications.each do |n| %>
+      <%= link_to (n.url.presence || "#"), class: "flex items-start gap-2.5 px-4 py-3 hover:bg-[var(--bg)] border-b",
+                  style: "border-color:var(--line-2);#{'background:var(--brand-soft)' unless n.read?}" do %>
+        <%= avatar_for n.actor, size: :sm %>
+        <div class="min-w-0 flex-1">
+          <div class="text-[13px] font-medium leading-snug x-clamp-2"><%= n.title %></div>
+          <% if n.body.present? %>
+            <div class="text-[12px] mt-0.5 x-clamp-1" style="color:var(--ink-3)"><%= n.body %></div>
+          <% end %>
+          <div class="text-[11.5px] mt-1" style="color:var(--ink-3)"><%= time_ago(n.created_at) %></div>
+        </div>
+        <% unless n.read? %><i class="w-2 h-2 rounded-full flex-none mt-1.5" style="background:var(--brand)"></i><% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <div class="px-4 py-2.5 text-center border-t" style="border-color:var(--line-2)">
+    <%= link_to "Xem tất cả thông báo", notifications_path, class: "text-[12.5px] font-semibold", style: "color:var(--brand)" %>
+  </div>
+</div>

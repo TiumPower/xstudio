@@ -1,0 +1,255 @@
+vi:
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      short: "%d/%m"
+      long: "%d tháng %m năm %Y"
+    day_names: [Chủ nhật, Thứ hai, Thứ ba, Thứ tư, Thứ năm, Thứ sáu, Thứ bảy]
+    abbr_day_names: [CN, T2, T3, T4, T5, T6, T7]
+    month_names: [~, Tháng 1, Tháng 2, Tháng 3, Tháng 4, Tháng 5, Tháng 6, Tháng 7, Tháng 8, Tháng 9, Tháng 10, Tháng 11, Tháng 12]
+    abbr_month_names: [~, Th1, Th2, Th3, Th4, Th5, Th6, Th7, Th8, Th9, Th10, Th11, Th12]
+    order: ["day", "month", "year"]
+  time:
+    formats:
+      default: "%d/%m/%Y %H:%M"
+      short: "%d/%m %H:%M"
+      long: "%H:%M ngày %d/%m/%Y"
+      time_only: "%H:%M"
+    am: "sáng"
+    pm: "chiều"
+  number:
+    format:
+      separator: ","
+      delimiter: "."
+      precision: 0
+    currency:
+      format:
+        format: "%n %u"
+        unit: "₫"
+        separator: ","
+        delimiter: "."
+        precision: 0
+  support:
+    array:
+      words_connector: ", "
+      two_words_connector: " và "
+      last_word_connector: " và "
+
+  datetime:
+    distance_in_words:
+      less_than_x_seconds:
+        one: "vài giây"
+        other: "%{count} giây"
+      x_seconds:
+        one: "1 giây"
+        other: "%{count} giây"
+      less_than_x_minutes:
+        one: "chưa tới 1 phút"
+        other: "chưa tới %{count} phút"
+      x_minutes:
+        one: "1 phút"
+        other: "%{count} phút"
+      about_x_hours:
+        one: "khoảng 1 giờ"
+        other: "khoảng %{count} giờ"
+      x_days:
+        one: "1 ngày"
+        other: "%{count} ngày"
+      about_x_months:
+        one: "khoảng 1 tháng"
+        other: "khoảng %{count} tháng"
+      x_months:
+        one: "1 tháng"
+        other: "%{count} tháng"
+      about_x_years:
+        one: "khoảng 1 năm"
+        other: "khoảng %{count} năm"
+      over_x_years:
+        one: "hơn 1 năm"
+        other: "hơn %{count} năm"
+      almost_x_years:
+        one: "gần 1 năm"
+        other: "gần %{count} năm"
+
+  # ---- Thuật ngữ chuẩn hoá (Phụ lục A) ----------------------------------
+  app:
+    name: "Team Workspace"
+    tagline: "Xstudio"
+  nav:
+    dashboard: "Tổng quan"
+    projects: "Dự án"
+    my_tasks: "Việc của tôi"
+    finance: "Thu chi"
+    members: "Thành viên"
+    strategy: "Định hướng"
+    activity: "Nhật ký hoạt động"
+    settings: "Cài đặt"
+    profile: "Hồ sơ cá nhân"
+    notifications: "Thông báo"
+    logout: "Đăng xuất"
+
+  project_types:
+    product_sales: "Sản phẩm & Kinh doanh"
+    digital_transformation: "Chuyển đổi số"
+  project_types_long:
+    product_sales: "Sản phẩm & Kinh doanh"
+    digital_transformation: "Chuyển đổi số (Data & AI)"
+  project_statuses:
+    planning: "Lên kế hoạch"
+    in_progress: "Đang thực hiện"
+    on_hold: "Tạm dừng"
+    completed: "Hoàn thành"
+    cancelled: "Huỷ"
+  priorities:
+    low: "Thấp"
+    medium: "Trung bình"
+    high: "Cao"
+    urgent: "Khẩn cấp"
+  task_statuses:
+    open: "Đang mở"
+    done: "Hoàn thành"
+    cancelled: "Huỷ"
+  node_statuses:
+    idea: "Ý tưởng"
+    pursuing: "Đang theo đuổi"
+    paused: "Tạm gác"
+    achieved: "Đã đạt"
+    dropped: "Bỏ"
+  payment_methods:
+    cash: "Tiền mặt"
+    bank_transfer: "Chuyển khoản"
+    card: "Thẻ"
+    other: "Khác"
+  transaction_kinds:
+    income: "Thu"
+    expense: "Chi"
+  user_roles:
+    admin: "Quản trị"
+    member: "Thành viên"
+  user_statuses:
+    invited: "Chờ kích hoạt"
+    active: "Đang hoạt động"
+    disabled: "Đã vô hiệu hoá"
+
+  common:
+    save: "Lưu"
+    cancel: "Huỷ"
+    delete: "Xoá"
+    edit: "Sửa"
+    create: "Tạo"
+    close: "Đóng"
+    search: "Tìm kiếm"
+    filter: "Lọc"
+    all: "Tất cả"
+    none: "Không có"
+    back: "Quay lại"
+    confirm: "Xác nhận"
+    yes: "Có"
+    no: "Không"
+    loading: "Đang tải…"
+    no_data: "Chưa có dữ liệu"
+    required: "bắt buộc"
+    optional: "tuỳ chọn"
+    view_all: "Xem tất cả"
+    unassigned: "Chưa giao"
+    no_due_date: "Không hạn"
+    general_workspace: "Chung workspace"
+
+  errors:
+    messages:
+      needs_letter_and_digit: "phải có ít nhất 8 ký tự, gồm cả chữ và số"
+      before_start_date: "không được trước ngày bắt đầu"
+      not_a_project_member: "chưa là thành viên của dự án này"
+      too_far_in_future: "không được ở tương lai quá 1 năm"
+      too_deep: "vượt quá 6 cấp cho phép"
+      cycle: "không thể đặt một nút làm con của chính nhánh con của nó"
+
+  activerecord:
+    models:
+      user: "Thành viên"
+      project: "Dự án"
+      task: "Công việc"
+      subtask: "Việc con"
+      comment: "Bình luận"
+      transaction: "Giao dịch"
+      transaction_category: "Danh mục"
+      board_column: "Cột"
+      label: "Nhãn"
+      strategy_tree: "Cây định hướng"
+      strategy_node: "Nút"
+    attributes:
+      user:
+        email: "Email"
+        password: "Mật khẩu"
+        password_confirmation: "Xác nhận mật khẩu"
+        current_password: "Mật khẩu hiện tại"
+        full_name: "Họ và tên"
+        job_title: "Chức danh"
+        phone: "Số điện thoại"
+        avatar: "Ảnh đại diện"
+        role: "Vai trò"
+        status: "Trạng thái"
+      project:
+        name: "Tên dự án"
+        code: "Mã dự án"
+        description: "Mô tả"
+        project_type: "Loại hình"
+        status: "Trạng thái"
+        client_name: "Khách hàng"
+        start_date: "Ngày bắt đầu"
+        due_date: "Ngày kết thúc dự kiến"
+        owner: "Người phụ trách"
+        color: "Màu nhãn"
+      task:
+        title: "Tiêu đề"
+        description: "Mô tả"
+        priority: "Độ ưu tiên"
+        assignee: "Người thực hiện"
+        start_date: "Ngày bắt đầu"
+        due_date: "Hạn hoàn thành"
+        estimated_hours: "Ước lượng (giờ)"
+        labels: "Nhãn"
+        files: "Tệp đính kèm"
+      transaction:
+        kind: "Loại"
+        amount: "Số tiền"
+        occurred_on: "Ngày giao dịch"
+        category: "Danh mục"
+        project: "Thuộc về"
+        description: "Diễn giải"
+        counterparty: "Đối tác / Nhà cung cấp"
+        payment_method: "Phương thức"
+        receipts: "Chứng từ"
+      strategy_node:
+        title: "Tiêu đề"
+        note: "Ghi chú"
+        status: "Trạng thái"
+        owner: "Người phụ trách"
+        color: "Màu"
+        icon: "Biểu tượng"
+    errors:
+      messages:
+        record_invalid: "Dữ liệu chưa hợp lệ: %{errors}"
+        taken: "đã được dùng"
+        blank: "không được để trống"
+  errors_format:
+    format: "%{attribute} %{message}"
+
+  devise:
+    failure:
+      invalid: "Email hoặc mật khẩu không đúng."
+      not_found_in_database: "Email hoặc mật khẩu không đúng."
+      locked: "Tài khoản đang tạm khoá do đăng nhập sai nhiều lần. Vui lòng thử lại sau 15 phút."
+      disabled_account: "Tài khoản của bạn đã bị vô hiệu hoá. Liên hệ quản trị viên."
+      not_activated: "Tài khoản chưa kích hoạt. Vui lòng mở email lời mời để đặt mật khẩu."
+      unauthenticated: "Vui lòng đăng nhập để tiếp tục."
+      timeout: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại."
+    sessions:
+      signed_in: "Đăng nhập thành công."
+      signed_out: "Đã đăng xuất."
+    passwords:
+      send_instructions: "Nếu email tồn tại, hướng dẫn đặt lại mật khẩu đã được gửi."
+      updated_not_active: "Mật khẩu đã được đặt lại. Hãy đăng nhập."
+      updated: "Đã đổi mật khẩu. Bạn đang đăng nhập."
+      no_token: "Liên kết không hợp lệ."
+      send_paranoid_instructions: "Nếu email tồn tại, hướng dẫn đặt lại mật khẩu đã được gửi."

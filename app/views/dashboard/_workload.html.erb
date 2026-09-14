@@ -1,0 +1,20 @@
+<% if rows.empty? %>
+  <p class="x-muted text-center py-6">Chưa có công việc nào được giao.</p>
+<% else %>
+  <% max = [rows.map { |r| r[:total] }.max, 1].max %>
+  <div class="space-y-3">
+    <% rows.each do |row| %>
+      <div class="flex items-center gap-3">
+        <%= avatar_for row[:user], size: :sm %>
+        <span class="w-[92px] flex-none truncate text-[12.5px] font-medium"><%= row[:user].display_name %></span>
+        <div class="flex-1 h-[20px] rounded-md overflow-hidden flex" style="background:var(--bg)">
+          <div class="h-full" style="width:<%= (row[:open] * 100.0 / max).round(1) %>%;background:var(--brand)" title="Đang mở: <%= row[:open] %>"></div>
+          <div class="h-full" style="width:<%= (row[:done] * 100.0 / max).round(1) %>%;background:#BFE3CD" title="Hoàn thành: <%= row[:done] %>"></div>
+        </div>
+        <span class="x-num text-[12px] font-semibold w-6 text-right"><%= row[:open] %></span>
+        <span class="x-num text-[12px] font-semibold w-6 text-right <%= row[:overdue].positive? ? 'x-out' : '' %>"
+              style="<%= 'color:var(--ink-3)' if row[:overdue].zero? %>"><%= row[:overdue] %></span>
+      </div>
+    <% end %>
+  </div>
+<% end %>

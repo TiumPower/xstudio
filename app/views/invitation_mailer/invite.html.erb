@@ -1,0 +1,20 @@
+<h1 style="margin:0 0 12px;font-size:19px;font-weight:700;">Bạn được mời vào <%= @workspace.name %></h1>
+<p style="margin:0 0 8px;font-size:14px;line-height:1.7;color:#46566C;">
+  Chào <strong style="color:#0D1B2E;"><%= @user.full_name %></strong>,
+</p>
+<p style="margin:0 0 20px;font-size:14px;line-height:1.7;color:#46566C;">
+  <%= @user.invited_by&.display_name || "Quản trị viên" %> đã mời bạn vào không gian làm việc
+  <strong style="color:#0D1B2E;"><%= @workspace.name %></strong>.
+  Bấm nút bên dưới để đặt mật khẩu và bắt đầu.
+</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px;">
+  <tr><td style="background:#2E6BC0;border-radius:10px;">
+    <a href="<%= @url %>" style="display:inline-block;padding:12px 24px;color:#fff;font-weight:600;font-size:14px;text-decoration:none;">
+      Kích hoạt tài khoản
+    </a>
+  </td></tr>
+</table>
+<p style="margin:0;font-size:12.5px;line-height:1.7;color:#8A98AC;">
+  Liên kết có hiệu lực trong <strong>7 ngày</strong>. Nếu nút không bấm được, sao chép địa chỉ sau vào trình duyệt:<br>
+  <span style="word-break:break-all;color:#2E6BC0;"><%= @url %></span>
+</p>

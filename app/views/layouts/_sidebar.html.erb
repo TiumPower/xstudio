@@ -1,0 +1,48 @@
+<aside class="x-nav w-[240px] flex-none hidden lg:flex flex-col sticky top-0 h-screen">
+  <%= link_to root_path, class: "flex items-center gap-3 px-5 h-[68px] flex-none" do %>
+    <div class="w-8 h-8 rounded-[9px] grid place-items-center text-white font-bold text-[15px] flex-none"
+         style="background:linear-gradient(150deg,#3E7AC9,#2E6BC0)">
+      <% if current_workspace.logo.attached? %>
+        <%= image_tag current_workspace.logo.variant(resize_to_fill: [64, 64]), class: "w-full h-full object-cover rounded-[9px]" %>
+      <% else %>X<% end %>
+    </div>
+    <div class="min-w-0">
+      <div class="text-white font-bold text-[14px] leading-tight truncate"><%= current_workspace.name %></div>
+      <div class="text-[11.5px] leading-tight truncate" style="color:var(--nav-ink-2)"><%= current_workspace.tagline.presence || "Xstudio" %></div>
+    </div>
+  <% end %>
+
+  <nav class="flex-1 overflow-y-auto pt-2 x-scroll-thin">
+    <%= nav_link t("nav.dashboard"),  root_path,          icon: :dashboard, match: :exact %>
+    <%= nav_link t("nav.projects"),   projects_path,      icon: :projects %>
+    <%= nav_link t("nav.my_tasks"),   my_tasks_path,      icon: :check, badge: my_open_overdue_count %>
+    <%= nav_link t("nav.finance"),    transactions_path,  icon: :money %>
+    <%= nav_link t("nav.members"),    members_path,       icon: :members %>
+    <%= nav_link t("nav.strategy"),   strategy_trees_path, icon: :tree %>
+    <%= nav_link t("nav.activity"),   activities_path,    icon: :activity %>
+  </nav>
+
+  <div class="flex-none pb-3">
+    <div class="mx-5 mb-3 h-px" style="background:#17304E"></div>
+    <%= nav_link t("nav.settings"), settings_path, icon: :settings %>
+    <%= link_to profile_path, class: "flex items-center gap-2.5 mx-3 mt-2 px-2.5 py-2.5 rounded-[10px] hover:bg-[var(--nav-2)] transition" do %>
+      <%= avatar_for current_user, size: :md %>
+      <div class="min-w-0 flex-1">
+        <div class="text-white text-[13px] font-semibold truncate"><%= current_user.display_name %></div>
+        <div class="text-[11.5px] truncate" style="color:var(--nav-ink-2)"><%= t("user_roles.#{current_user.role}") %></div>
+      </div>
+    <% end %>
+  </div>
+</aside>
+
+<!-- Điều hướng trên di động -->
+<div class="lg:hidden fixed bottom-0 inset-x-0 z-40 x-nav border-t border-[#17304E] flex">
+  <% [[t("nav.dashboard"), root_path, :dashboard], [t("nav.projects"), projects_path, :projects],
+      [t("nav.my_tasks"), my_tasks_path, :check], [t("nav.finance"), transactions_path, :money],
+      [t("nav.strategy"), strategy_trees_path, :tree]].each do |label, path, icon| %>
+    <%= link_to path, class: "flex-1 flex flex-col items-center gap-1 py-2.5 text-[10.5px] #{current_page?(path) ? 'text-white' : ''}",
+                style: current_page?(path) ? "" : "color:var(--nav-ink-2)" do %>
+      <%= nav_icon(icon) %><span><%= label %></span>
+    <% end %>
+  <% end %>
+</div>

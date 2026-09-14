@@ -1,0 +1,32 @@
+<% page_title t("nav.notifications") %>
+
+<div class="max-w-[760px] space-y-4">
+  <div class="flex items-center justify-between">
+    <p class="x-sub"><%= current_user.notifications.unread.count %> thông báo chưa đọc</p>
+    <%= button_to "Đánh dấu tất cả đã đọc", read_all_notifications_path, method: :patch, class: "x-btn x-btn-ghost x-btn-sm" %>
+  </div>
+
+  <div class="x-card overflow-hidden">
+    <% if @notifications.empty? %>
+      <%= render "shared/empty", icon: "🔔", title: "Chưa có thông báo nào",
+                 body: "Khi có việc liên quan tới bạn, thông báo sẽ xuất hiện ở đây." %>
+    <% else %>
+      <% @notifications.each do |n| %>
+        <%= link_to (n.url.presence || "#"), class: "flex items-start gap-3 px-4 py-3.5 hover:bg-[var(--bg)] border-b last:border-0",
+                    style: "border-color:var(--line-2);#{'background:var(--brand-soft)' unless n.read?}" do %>
+          <%= avatar_for n.actor %>
+          <div class="min-w-0 flex-1">
+            <div class="text-[13.5px] font-medium leading-snug"><%= n.title %></div>
+            <% if n.body.present? %>
+              <div class="text-[12.5px] mt-0.5" style="color:var(--ink-2)"><%= n.body %></div>
+            <% end %>
+            <div class="text-[11.5px] mt-1" style="color:var(--ink-3)">
+              <%= time_ago(n.created_at) %><%= " · đã gửi email" if n.emailed_at %>
+            </div>
+          </div>
+          <% unless n.read? %><i class="w-2 h-2 rounded-full flex-none mt-2" style="background:var(--brand)"></i><% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

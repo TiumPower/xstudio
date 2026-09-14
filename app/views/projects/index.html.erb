@@ -1,0 +1,57 @@
+<% page_title t("nav.projects") %>
+
+<div class="space-y-4">
+  <div class="flex flex-wrap items-center gap-2.5">
+    <div class="x-seg">
+      <%= link_to projects_path(request.query_parameters.merge(view: "cards")), class: (@view == "cards" ? "is-active" : "") do %>
+        <span class="inline-flex items-center gap-1.5">▤ Thẻ</span>
+      <% end %>
+      <%= link_to projects_path(request.query_parameters.merge(view: "table")), class: (@view == "table" ? "is-active" : "") do %>
+        <span class="inline-flex items-center gap-1.5">≡ Bảng</span>
+      <% end %>
+    </div>
+
+    <%= form_with url: projects_path, method: :get, class: "flex flex-wrap items-center gap-2" do %>
+      <%= hidden_field_tag :view, @view %>
+      <%= hidden_field_tag :scope, @scope %>
+      <%= select_tag :type, options_for_select(Project.project_types.keys.map { |k| [t("project_types.#{k}"), k] }, params[:type]),
+                     include_blank: "Loại hình", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+      <%= select_tag :status, options_for_select(Project.statuses.keys.map { |k| [t("project_statuses.#{k}"), k] }, params[:status]),
+                     include_blank: "Trạng thái", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+      <%= select_tag :owner_id, options_from_collection_for_select(@owners, :id, :display_name, params[:owner_id]),
+                     include_blank: "Người phụ trách", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+      <%= select_tag :sort, options_for_select([["Cập nhật gần nhất", "updated"], ["Hạn gần nhất", "due"], ["Tên A→Z", "name"]], params[:sort]),
+                     class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+      <%= text_field_tag :q, params[:q], placeholder: "Tìm tên hoặc mã…", class: "x-input h-9 w-[180px] text-[13px]" %>
+      <% if params[:type].present? || params[:status].present? || params[:owner_id].present? || params[:q].present? %>
+        <%= link_to "Xoá lọc", projects_path(view: @view, scope: @scope), class: "x-btn x-btn-ghost x-btn-sm" %>
+      <% end %>
+    <% end %>
+
+    <div class="ml-auto flex items-center gap-2.5">
+      <%= link_to (@scope == "archived" ? "Dự án đang chạy" : "Đã lưu trữ"),
+                  projects_path(view: @view, scope: @scope == "archived" ? "active" : "archived"),
+                  class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
+      <%= link_to "+ Dự án mới", new_project_path, class: "x-btn x-btn-primary x-btn-sm" %>
+    </div>
+  </div>
+
+  <div class="x-muted text-right">
+    <%= @projects.size %> dự án<%= " · #{t('common.all').downcase} bộ lọc" if false %>
+  </div>
+
+  <% if @projects.empty? %>
+    <div class="x-card">
+      <%= render "shared/empty", icon: "▤", title: "Chưa có dự án nào",
+                 body: "Tạo dự án đầu tiên để bắt đầu.", action_label: "Tạo dự án", action_path: new_project_path %>
+    </div>
+  <% elsif @view == "table" %>
+    <div class="x-card overflow-hidden"><%= render "table", projects: @projects, stats: @stats %></div>
+  <% else %>
+    <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
+      <% @projects.each do |project| %>
+        <%= render "card", project: project, totals: @stats[project.id] || { income: 0, expense: 0, profit: 0 } %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

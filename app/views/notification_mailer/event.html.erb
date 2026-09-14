@@ -1,0 +1,16 @@
+<h1 style="margin:0 0 14px;font-size:18px;font-weight:700;line-height:1.45;"><%= @notification.title %></h1>
+<% if @notification.body.present? %>
+  <p style="margin:0 0 20px;padding:12px 14px;background:#F4F6FA;border-radius:10px;font-size:13.5px;line-height:1.7;color:#46566C;">
+    <%= @notification.body %>
+  </p>
+<% end %>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 18px;">
+  <tr><td style="background:#2E6BC0;border-radius:10px;">
+    <a href="<%= @cta_url %>" style="display:inline-block;padding:11px 22px;color:#fff;font-weight:600;font-size:13.5px;text-decoration:none;">
+      Mở trong Workspace
+    </a>
+  </td></tr>
+</table>
+<% if @notification.actor %>
+  <p style="margin:0;font-size:12.5px;color:#8A98AC;">Thực hiện bởi <%= @notification.actor.display_name %>.</p>
+<% end %>

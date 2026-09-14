@@ -1,0 +1,40 @@
+<div class="x-tcard" data-task-code="<%= task.code %>" data-position="<%= task.position %>"
+     data-action="click->kanban#openTask">
+  <div class="flex items-center gap-2 mb-1.5">
+    <span class="x-code"><%= task.code %></span>
+    <span class="x-chip <%= { 'low' => '', 'medium' => 'x-chip-brand', 'high' => 'x-chip-warn', 'urgent' => 'x-chip-bad' }[task.priority] %> ml-auto">
+      <%= task.priority_label %>
+    </span>
+  </div>
+
+  <div class="text-[13.5px] font-medium leading-snug x-clamp-2 mb-2"><%= task.title %></div>
+
+  <% if task.labels.any? %>
+    <div class="flex flex-wrap gap-1.5 mb-2">
+      <% task.labels.first(3).each do |label| %>
+        <span class="x-chip text-[10.5px] py-0.5" style="background:<%= label.color %>1A;color:<%= label.color %>"><%= label.name %></span>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="flex items-center gap-2">
+    <%= avatar_for task.assignee, size: :sm %>
+    <% if task.due_date %>
+      <span class="text-[11.5px] x-num font-medium <%= 'px-1.5 py-0.5 rounded-md' if task.overdue? %>"
+            style="<%= task.overdue? ? 'background:var(--bad-soft);color:var(--bad)' : 'color:var(--ink-3)' %>">
+        <%= l(task.due_date, format: :short) %>
+      </span>
+    <% else %>
+      <span class="text-[11.5px]" style="color:var(--ink-3)">Không hạn</span>
+    <% end %>
+
+    <div class="ml-auto flex items-center gap-2.5 text-[11px]" style="color:var(--ink-3)">
+      <% if task.subtasks_count.positive? %>
+        <span class="x-num" title="Việc con">☑ <%= task.subtask_summary %></span>
+      <% end %>
+      <% if task.comments_count.positive? %>
+        <span class="x-num" title="Bình luận">💬 <%= task.comments_count %></span>
+      <% end %>
+    </div>
+  </div>
+</div>

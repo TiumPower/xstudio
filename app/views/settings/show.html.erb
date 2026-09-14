@@ -1,0 +1,91 @@
+<% page_title t("nav.settings") %>
+
+<div class="max-w-[860px] space-y-4">
+  <% unless current_user.role_admin? %>
+    <div class="x-toast x-toast-warn">Chỉ quản trị viên mới sửa được cài đặt workspace. Bạn đang xem ở chế độ chỉ đọc.</div>
+  <% end %>
+
+  <div class="x-card">
+    <div class="x-card-head"><h2 class="x-h3">Không gian làm việc</h2></div>
+    <div class="p-5">
+      <%= form_with model: @workspace, url: settings_path, method: :patch, local: true, multipart: true do |f| %>
+        <fieldset <%= "disabled" unless current_user.role_admin? %>>
+          <div class="flex items-center gap-4 mb-5">
+            <div class="w-14 h-14 rounded-[14px] grid place-items-center text-white font-bold text-[20px] flex-none overflow-hidden"
+                 style="background:linear-gradient(150deg,#3E7AC9,#2E6BC0)">
+              <% if @workspace.logo.attached? %>
+                <%= image_tag @workspace.logo.variant(resize_to_fill: [112, 112]), class: "w-full h-full object-cover" %>
+              <% else %>X<% end %>
+            </div>
+            <div>
+              <label class="x-label block mb-1.5">Logo</label>
+              <%= f.file_field :logo, accept: "image/*", class: "text-[13px]" %>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5">
+            <div class="x-field">
+              <label>Tên workspace</label>
+              <%= f.text_field :name, class: "x-input" %>
+            </div>
+            <div class="x-field">
+              <label>Dòng phụ (hiển thị dưới tên)</label>
+              <%= f.text_field :tagline, class: "x-input", placeholder: "Xstudio" %>
+            </div>
+            <div class="x-field md:col-span-2">
+              <label>Mô tả lĩnh vực của đội</label>
+              <%= f.text_area :about, rows: 3, class: "x-textarea" %>
+              <p class="x-hint">Dùng làm ngữ cảnh cho AI khi gợi ý nhánh cây định hướng.</p>
+            </div>
+            <div class="x-field">
+              <label>Múi giờ</label>
+              <%= f.text_field :timezone, class: "x-input", readonly: true, style: "background:var(--bg);color:var(--ink-3)" %>
+            </div>
+            <div class="x-field">
+              <label>Đơn vị tiền tệ</label>
+              <input type="text" value="VND (₫)" class="x-input" disabled style="background:var(--bg);color:var(--ink-3)">
+            </div>
+          </div>
+
+          <% if current_user.role_admin? %>
+            <%= f.submit "Lưu cài đặt", class: "x-btn x-btn-primary cursor-pointer" %>
+          <% end %>
+        </fieldset>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <% [["Danh mục Thu", @income_categories, "income", "x-chip-good"],
+        ["Danh mục Chi", @expense_categories, "expense", "x-chip-bad"]].each do |title, categories, kind, chip| %>
+      <div class="x-card">
+        <div class="x-card-head">
+          <h2 class="x-h3"><%= title %></h2>
+          <span class="x-chip <%= chip %>"><%= categories.size %></span>
+        </div>
+        <div class="p-4">
+          <div class="space-y-1 mb-3">
+            <% categories.each do |category| %>
+              <div class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-[var(--bg)] group">
+                <span class="flex-1 text-[13.5px] truncate"><%= category.name %></span>
+                <% if current_user.role_admin? %>
+                  <%= button_to "Ẩn", settings_transaction_category_path(category), method: :delete,
+                                form: { data: { turbo_confirm: "Ẩn danh mục “#{category.name}”? Giao dịch cũ vẫn giữ nguyên." } },
+                                class: "text-[12px] opacity-0 group-hover:opacity-100 font-semibold", style: "color:var(--bad)" %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+          <% if current_user.role_admin? %>
+            <%= form_with url: settings_transaction_categories_path, method: :post, class: "flex gap-2" do %>
+              <%= hidden_field_tag "transaction_category[kind]", kind %>
+              <input type="text" name="transaction_category[name]" placeholder="+ Danh mục mới"
+                     class="x-input h-9 text-[13px]" required>
+              <button class="x-btn x-btn-ghost x-btn-sm">Thêm</button>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

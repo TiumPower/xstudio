@@ -1,0 +1,23 @@
+[Unit]
+Description=Sidekiq cho Xstudio (Team Workspace)
+After=syslog.target network.target redis.service
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+WorkingDirectory=/var/www/xstudio/current
+Environment=RAILS_ENV=production
+Environment=MALLOC_ARENA_MAX=2
+ExecStart=/home/deploy/.rbenv/bin/rbenv exec bundle exec sidekiq -e production -C /var/www/xstudio/current/config/sidekiq.yml
+ExecReload=/bin/kill -TSTP $MAINPID
+KillSignal=SIGTERM
+TimeoutStopSec=25
+Restart=always
+RestartSec=3
+StandardOutput=append:/var/www/xstudio/shared/log/sidekiq.log
+StandardError=append:/var/www/xstudio/shared/log/sidekiq.error.log
+SyslogIdentifier=sidekiq-xstudio
+
+[Install]
+WantedBy=multi-user.target

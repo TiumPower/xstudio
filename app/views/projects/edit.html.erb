@@ -1,0 +1,10 @@
+<% page_title "Sửa dự án" %>
+<div class="max-w-[860px]">
+  <div class="x-card">
+    <div class="x-card-head">
+      <h2 class="x-h3">Sửa dự án</h2>
+      <span class="x-code"><%= @project.code %></span>
+    </div>
+    <div class="p-5"><%= render "form", project: @project %></div>
+  </div>
+</div>

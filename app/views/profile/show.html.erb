@@ -1,0 +1,123 @@
+<% page_title t("nav.profile") %>
+
+<div class="max-w-[820px] space-y-4">
+  <div class="x-card">
+    <div class="x-card-head"><h2 class="x-h3">Thông tin cá nhân</h2></div>
+    <div class="p-5">
+      <%= form_with model: current_user, url: profile_path, method: :patch, local: true, multipart: true do |f| %>
+        <div class="flex items-center gap-4 mb-5">
+          <%= avatar_for current_user, size: :xl %>
+          <div>
+            <label class="x-label block mb-1.5">Ảnh đại diện</label>
+            <%= f.file_field :avatar, accept: "image/*", class: "text-[13px]" %>
+            <p class="x-hint">Không có ảnh thì hiển thị chữ cái đầu trên nền màu sinh tự động.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5">
+          <div class="x-field">
+            <%= f.label :full_name %>
+            <%= f.text_field :full_name, class: "x-input" %>
+          </div>
+          <div class="x-field">
+            <%= f.label :job_title %>
+            <%= f.text_field :job_title, class: "x-input" %>
+          </div>
+          <div class="x-field">
+            <%= f.label :phone %>
+            <%= f.telephone_field :phone, class: "x-input" %>
+          </div>
+          <div class="x-field">
+            <label>Email</label>
+            <input type="email" value="<%= current_user.email %>" class="x-input" disabled style="background:var(--bg);color:var(--ink-3)">
+          </div>
+        </div>
+
+        <%= f.submit "Lưu hồ sơ", class: "x-btn x-btn-primary cursor-pointer" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="x-card">
+    <div class="x-card-head"><h2 class="x-h3">Đổi mật khẩu</h2></div>
+    <div class="p-5">
+      <%= form_with url: password_profile_path, method: :patch, local: true do %>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-5">
+          <div class="x-field">
+            <label>Mật khẩu hiện tại</label>
+            <input type="password" name="current_password" class="x-input" autocomplete="current-password">
+          </div>
+          <div class="x-field">
+            <label>Mật khẩu mới</label>
+            <input type="password" name="password" class="x-input" autocomplete="new-password">
+          </div>
+          <div class="x-field">
+            <label>Nhập lại mật khẩu</label>
+            <input type="password" name="password_confirmation" class="x-input" autocomplete="new-password">
+          </div>
+        </div>
+        <p class="x-hint mb-3">Tối thiểu 8 ký tự, có cả chữ và số.</p>
+        <button class="x-btn x-btn-primary">Đổi mật khẩu</button>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="x-card">
+    <div class="x-card-head"><h2 class="x-h3">Nhận thông báo</h2></div>
+    <div class="p-5">
+      <%= form_with url: notifications_profile_path, method: :patch, local: true do %>
+        <label class="flex items-center gap-2.5 mb-4 p-3 rounded-[10px] cursor-pointer" style="background:var(--bg)">
+          <input type="hidden" name="daily_digest_enabled" value="0">
+          <input type="checkbox" name="daily_digest_enabled" value="1" class="x-check" <%= "checked" if current_user.daily_digest_enabled? %>>
+          <div>
+            <div class="text-[13.5px] font-semibold">Bản tin tổng hợp hàng ngày</div>
+            <div class="x-muted">Gửi 08:00 giờ Việt Nam: việc đến hạn, việc quá hạn, hoạt động hôm trước.</div>
+          </div>
+        </label>
+
+        <table class="x-table">
+          <thead><tr><th>Loại sự kiện</th><th class="w-[92px] text-center">Trong app</th><th class="w-[92px] text-center">Email</th></tr></thead>
+          <tbody>
+            <% event_labels = {
+                 "task_assigned" => "Được giao một công việc",
+                 "added_to_project" => "Được thêm vào dự án",
+                 "mentioned" => "Bị nhắc tên (@mention) trong bình luận",
+                 "comment_added" => "Bình luận mới trên công việc của tôi",
+                 "task_status_changed" => "Công việc của tôi bị đổi trạng thái",
+                 "task_due_soon" => "Công việc sắp đến hạn (trước 1 ngày)",
+                 "task_overdue" => "Công việc đã quá hạn",
+                 "project_status_changed" => "Dự án tôi phụ trách đổi trạng thái",
+                 "invited_to_workspace" => "Được mời vào workspace"
+               } %>
+            <% Notification::EVENT_TYPES.each do |event_type| %>
+              <% setting = @settings[event_type] %>
+              <tr>
+                <td class="text-[13px]"><%= event_labels[event_type] || event_type %></td>
+                <td class="text-center">
+                  <input type="hidden" name="in_app[<%= event_type %>]" value="0">
+                  <input type="checkbox" name="in_app[<%= event_type %>]" value="1" class="x-check"
+                         <%= "checked" if setting.new_record? || setting.in_app_enabled %>>
+                </td>
+                <td class="text-center">
+                  <input type="hidden" name="email[<%= event_type %>]" value="0">
+                  <input type="checkbox" name="email[<%= event_type %>]" value="1" class="x-check"
+                         <%= "checked" if setting.new_record? || setting.email_enabled %>>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+
+        <button class="x-btn x-btn-primary mt-4">Lưu cấu hình</button>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="x-card p-5 flex items-center justify-between">
+    <div>
+      <div class="text-[13.5px] font-semibold">Đăng xuất khỏi thiết bị này</div>
+      <div class="x-muted">Phiên đăng nhập kéo dài 30 ngày khi bật “Duy trì đăng nhập”.</div>
+    </div>
+    <%= button_to t("nav.logout"), destroy_user_session_path, method: :delete, class: "x-btn x-btn-ghost" %>
+  </div>
+</div>

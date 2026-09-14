@@ -1,0 +1,93 @@
+<% page_title t("nav.dashboard") %>
+<% f = @report.financial %>
+
+<div class="space-y-4">
+  <%= render "dashboard/filters" %>
+
+  <!-- Hàng 1 — chỉ số tài chính (FR-DASH-01) -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+    <%= render "dashboard/kpi", label: "Tổng thu",  data: f[:income],  dark: true %>
+    <%= render "dashboard/kpi", label: "Tổng chi",  data: f[:expense], tone: :bad %>
+    <%= render "dashboard/kpi", label: "Lợi nhuận", data: f[:profit],  tone: :good %>
+    <%= render "dashboard/kpi", label: "Chi chung workspace", data: f[:general], hint: "Không gắn dự án" %>
+  </div>
+
+  <!-- Hàng 2 — biểu đồ -->
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+    <div class="x-card xl:col-span-2">
+      <div class="x-card-head">
+        <div class="flex items-baseline gap-2.5">
+          <h2 class="x-h3">Thu — Chi theo tháng</h2>
+          <span class="x-muted">12 tháng gần nhất</span>
+        </div>
+        <div class="flex items-center gap-3.5 text-[12px]">
+          <span class="flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-sm inline-block" style="background:var(--brand)"></i>Thu</span>
+          <span class="flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-sm inline-block" style="background:#C3D2E6"></i>Chi</span>
+        </div>
+      </div>
+      <div class="p-5"><%= render "dashboard/monthly_chart", series: @report.monthly %></div>
+    </div>
+
+    <div class="x-card">
+      <div class="x-card-head"><h2 class="x-h3">Cơ cấu chi theo danh mục</h2></div>
+      <div class="p-5"><%= render "dashboard/expense_donut", rows: @report.expense_breakdown, total: f[:expense][:value] %></div>
+    </div>
+  </div>
+
+  <!-- Hàng 3 — thu chi theo loại hình + top lợi nhuận -->
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+    <div class="x-card">
+      <div class="x-card-head"><h2 class="x-h3">Thu chi theo loại hình dự án</h2></div>
+      <div class="p-5 space-y-5"><%= render "dashboard/by_type", rows: @report.by_project_type %></div>
+    </div>
+    <div class="x-card">
+      <div class="x-card-head"><h2 class="x-h3">Top dự án theo lợi nhuận</h2></div>
+      <div class="p-2"><%= render "dashboard/profit_ranking", top: @report.top_projects, worst: @report.worst_projects %></div>
+    </div>
+  </div>
+
+  <!-- Hàng 4 — chỉ số dự án (FR-DASH-06) -->
+  <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+    <% s = @report.project_stats %>
+    <%= render "dashboard/stat", value: s[:in_progress], label: "Dự án đang thực hiện", tone: :brand, icon: "▶" %>
+    <%= render "dashboard/stat", value: s[:overdue],     label: "Dự án quá hạn",        tone: :bad,   icon: "!" %>
+    <%= render "dashboard/stat", value: s[:completed],   label: "Hoàn thành trong kỳ",  tone: :good,  icon: "✓" %>
+    <%= render "dashboard/stat", value: s[:open_tasks],  label: "Công việc đang mở",    tone: :plain, icon: "≡" %>
+  </div>
+
+  <!-- Hàng 5 — bảng dự án + việc của tôi -->
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+    <div class="x-card xl:col-span-2 overflow-hidden">
+      <div class="x-card-head">
+        <h2 class="x-h3">Tình trạng dự án</h2>
+        <%= link_to "Xem tất cả →", projects_path, class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
+      </div>
+      <%= render "dashboard/project_table", rows: @report.project_rows %>
+    </div>
+    <div class="x-card">
+      <div class="x-card-head">
+        <h2 class="x-h3">Việc của tôi</h2>
+        <%= link_to "Mở →", my_tasks_path, class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
+      </div>
+      <%= render "dashboard/my_tasks", data: @report.my_tasks %>
+    </div>
+  </div>
+
+  <!-- Hàng 6 — phân bổ công việc + hoạt động -->
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+    <div class="x-card">
+      <div class="x-card-head">
+        <h2 class="x-h3">Phân bổ công việc theo người</h2>
+        <span class="x-muted">đang mở · quá hạn</span>
+      </div>
+      <div class="p-5"><%= render "dashboard/workload", rows: @report.workload %></div>
+    </div>
+    <div class="x-card">
+      <div class="x-card-head">
+        <h2 class="x-h3">Hoạt động gần đây</h2>
+        <%= link_to "Xem tất cả →", activities_path, class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
+      </div>
+      <div class="p-2"><%= render "shared/activity_list", activities: @report.recent_activities, compact: true %></div>
+    </div>
+  </div>
+</div>

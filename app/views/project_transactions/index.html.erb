@@ -1,0 +1,61 @@
+<% page_title "Chi tiết dự án" %>
+<%= render "projects/header" %>
+
+<div class="mt-4 space-y-4">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="x-card p-5">
+      <div class="x-muted mb-1.5">Tổng thu của dự án</div>
+      <div class="x-money text-[22px] x-in"><%= format_vnd(@income) %></div>
+    </div>
+    <div class="x-card p-5">
+      <div class="x-muted mb-1.5">Tổng chi của dự án</div>
+      <div class="x-money text-[22px] x-out"><%= format_vnd(@expense) %></div>
+    </div>
+    <div class="x-card-dark p-5">
+      <div class="text-[12.5px] mb-1.5" style="color:#9BB2CE">Lợi nhuận</div>
+      <div class="x-money text-[22px] text-white"><%= format_vnd(@income - @expense, signed: true) %></div>
+    </div>
+  </div>
+
+  <div class="x-card">
+    <div class="x-card-head"><h2 class="x-h3">Thu — Chi theo tháng</h2></div>
+    <div class="p-5"><%= render "dashboard/monthly_chart", series: @monthly %></div>
+  </div>
+
+  <div class="x-card overflow-hidden">
+    <div class="x-card-head">
+      <h2 class="x-h3">Giao dịch của dự án</h2>
+      <%= link_to "+ Giao dịch mới", new_transaction_path(project_id: @project.id, return_to: project_transactions_path(@project)),
+                  class: "x-btn x-btn-primary x-btn-sm" %>
+    </div>
+
+    <% if @transactions.empty? %>
+      <%= render "shared/empty", icon: "₫", title: "Chưa có giao dịch nào cho dự án này",
+                 body: "Ghi khoản thu hoặc chi đầu tiên.",
+                 action_label: "+ Giao dịch mới",
+                 action_path: new_transaction_path(project_id: @project.id, return_to: project_transactions_path(@project)) %>
+    <% else %>
+      <div class="overflow-x-auto x-scroll-thin">
+        <table class="x-table min-w-[780px]">
+          <thead><tr><th>Ngày</th><th>Loại</th><th>Diễn giải</th><th>Danh mục</th><th>Đối tác</th><th class="text-right">Số tiền</th></tr></thead>
+          <tbody>
+            <% @transactions.each do |t| %>
+              <tr style="box-shadow:inset 3px 0 0 <%= t.kind_income? ? 'var(--good)' : 'var(--bad)' %>">
+                <td class="x-num whitespace-nowrap"><%= l(t.occurred_on) %></td>
+                <td><span class="x-chip <%= t.kind_income? ? 'x-chip-good' : 'x-chip-bad' %>"><%= t.kind_label %></span></td>
+                <td><%= blank_dash t.description %></td>
+                <td style="color:var(--ink-2)"><%= t.category&.name || "—" %></td>
+                <td style="color:var(--ink-2)"><%= blank_dash t.counterparty %></td>
+                <td class="x-td-num">
+                  <span class="x-money <%= t.kind_income? ? 'x-in' : 'x-out' %>">
+                    <%= t.kind_income? ? "+ " : "− " %><%= number_with_delimiter(t.amount, delimiter: ".") %> ₫
+                  </span>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  </div>
+</div>

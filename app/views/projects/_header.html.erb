@@ -1,0 +1,93 @@
+<% totals = { income: @project.income_total, expense: @project.expense_total } %>
+<div class="space-y-4">
+  <nav class="flex items-center gap-2 text-[13px]" style="color:var(--ink-3)">
+    <%= link_to "← #{t('nav.projects')}", projects_path, class: "font-semibold hover:underline" %>
+    <span>/</span>
+    <span class="x-code"><%= @project.code %></span>
+  </nav>
+
+  <div class="x-card p-5">
+    <div class="flex flex-wrap items-center gap-2 mb-2">
+      <%= project_type_chip(@project) %>
+      <%= project_status_chip(@project) %>
+      <% if @project.archived? %><span class="x-chip">Đã lưu trữ</span><% end %>
+      <% if @project.overdue? %><span class="x-chip x-chip-bad">Quá hạn <%= overdue_days(@project.due_date) %> ngày</span><% end %>
+      <span class="x-code ml-auto"><%= @project.code %></span>
+    </div>
+
+    <h1 class="x-h1 mb-2"><%= @project.name %></h1>
+
+    <div class="flex flex-wrap items-center gap-x-5 gap-y-1 text-[13px] mb-4" style="color:var(--ink-2)">
+      <% if @project.client_name.present? %>
+        <span>Khách hàng: <strong style="color:var(--ink)"><%= @project.client_name %></strong></span>
+      <% end %>
+      <span>Phụ trách: <strong style="color:var(--ink)"><%= @project.owner&.display_name || "—" %></strong></span>
+      <% if @project.due_date %>
+        <span>Hạn: <strong class="x-num <%= 'x-out' if @project.overdue? %>" style="color:var(--ink)"><%= l(@project.due_date) %></strong></span>
+      <% end %>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-5">
+      <div class="flex items-center gap-5 flex-wrap">
+        <div>
+          <div class="text-[11px] mb-0.5" style="color:var(--ink-3)">Thu</div>
+          <div class="x-money text-[15px] x-in"><%= format_vnd(totals[:income]) %></div>
+        </div>
+        <div>
+          <div class="text-[11px] mb-0.5" style="color:var(--ink-3)">Chi</div>
+          <div class="x-money text-[15px] x-out"><%= format_vnd(totals[:expense]) %></div>
+        </div>
+        <div>
+          <div class="text-[11px] mb-0.5" style="color:var(--ink-3)">Lợi nhuận</div>
+          <% profit = totals[:income] - totals[:expense] %>
+          <div class="x-money text-[17px]" style="color:<%= profit.negative? ? 'var(--bad)' : 'var(--ink)' %>">
+            <%= format_vnd(profit, signed: true) %>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5 rounded-[10px] px-3.5 py-2" style="background:var(--bg)">
+        <span class="text-[11.5px]" style="color:var(--ink-3)">Tiến độ</span>
+        <div class="x-progress w-[70px]"><span style="width:<%= @project.progress %>%;background:<%= @project.type_color %>"></span></div>
+        <span class="x-num text-[13px] font-bold"><%= @project.progress %>%</span>
+      </div>
+
+      <div class="ml-auto flex items-center gap-2" data-controller="dropdown">
+        <%= link_to "Sửa", edit_project_path(@project), class: "x-btn x-btn-ghost x-btn-sm" %>
+        <div class="relative">
+          <button class="x-btn x-btn-ghost x-btn-icon" data-action="dropdown#toggle" aria-label="Thao tác khác">⋯</button>
+          <div class="absolute right-0 mt-2 w-[208px] x-card p-1.5 z-50" hidden data-dropdown-target="menu">
+            <%= link_to "+ Công việc mới", new_task_path(project_id: @project.id), class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
+            <%= link_to "+ Giao dịch mới", new_transaction_path(project_id: @project.id, return_to: project_transactions_path(@project)),
+                        class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
+            <div class="x-divider my-1.5"></div>
+            <% if @project.archived? %>
+              <%= button_to "Bỏ lưu trữ", unarchive_project_path(@project), method: :patch,
+                            class: "w-full text-left px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
+            <% else %>
+              <%= button_to "Lưu trữ dự án", archive_project_path(@project), method: :patch,
+                            class: "w-full text-left px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
+            <% end %>
+            <% if current_user.role_admin? || @project.created_by_id == current_user.id %>
+              <%= button_to "Xoá dự án", project_path(@project), method: :delete,
+                            form: { data: { turbo_confirm: "Xoá dự án #{@project.code}? Công việc và giao dịch sẽ bị ẩn theo." } },
+                            class: "w-full text-left px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bad-soft)]", style: "color:var(--bad)" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="x-tabs mt-5 -mb-5 overflow-x-auto x-scroll-thin">
+      <% tabs = [["Tổng quan", project_path(@project), "overview"],
+                 ["Công việc", project_tasks_path(@project), "tasks"],
+                 ["Kanban", project_board_path(@project), "kanban"],
+                 ["Thu chi", project_transactions_path(@project), "finance"],
+                 ["Thành viên", project_members_path(@project), "members"],
+                 ["Hoạt động", project_activities_path(@project), "activity"]] %>
+      <% tabs.each do |label, path, key| %>
+        <%= link_to label, path, class: ("is-active" if @tab == key) %>
+      <% end %>
+    </div>
+  </div>
+</div>

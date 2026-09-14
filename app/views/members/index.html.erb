@@ -1,0 +1,87 @@
+<% page_title t("nav.members") %>
+
+<div class="max-w-[1080px] space-y-4">
+  <div class="flex items-center justify-between gap-3">
+    <p class="x-sub">
+      <%= @members.size %> thành viên<%= " · #{@pending} đang chờ kích hoạt" if @pending.positive? %>
+    </p>
+    <% if current_user.role_admin? %>
+      <div class="relative" data-controller="dropdown">
+        <button class="x-btn x-btn-primary x-btn-sm" data-action="dropdown#toggle">+ Mời thành viên</button>
+        <div class="absolute right-0 mt-2 w-[360px] x-card p-4 z-50" hidden data-dropdown-target="menu">
+          <%= form_with url: invite_members_path, method: :post do %>
+            <label class="x-label block mb-1.5">Email (mỗi dòng một địa chỉ)</label>
+            <textarea name="emails" rows="4" class="x-textarea text-[13px] mb-2.5"
+                      placeholder="an@xstudio.vn&#10;binh@xstudio.vn"></textarea>
+            <p class="x-hint mb-3">Người được mời nhận email đặt mật khẩu. Liên kết có hiệu lực 7 ngày.</p>
+            <button class="x-btn x-btn-primary x-btn-sm x-btn-block">Gửi lời mời</button>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="x-card overflow-hidden">
+    <div class="overflow-x-auto x-scroll-thin">
+      <table class="x-table min-w-[860px]">
+        <thead>
+          <tr><th>Thành viên</th><th>Chức danh</th><th>Vai trò</th><th>Trạng thái</th>
+              <th>Ngày tham gia</th><th class="text-right">Dự án</th><th></th></tr>
+        </thead>
+        <tbody>
+          <% @members.each do |member| %>
+            <tr>
+              <td>
+                <%= link_to member_path(member), class: "flex items-center gap-2.5" do %>
+                  <%= avatar_for member %>
+                  <div class="min-w-0">
+                    <div class="font-semibold text-[13.5px]"><%= member.display_name %></div>
+                    <div class="x-muted truncate"><%= member.email %></div>
+                  </div>
+                <% end %>
+              </td>
+              <td style="color:var(--ink-2)"><%= blank_dash member.job_title %></td>
+              <td>
+                <% if current_user.role_admin? && member.id != current_user.id %>
+                  <%= form_with url: member_path(member), method: :patch, class: "inline" do %>
+                    <%= select_tag "user[role]", options_for_select(User.roles.keys.map { |r| [t("user_roles.#{r}"), r] }, member.role),
+                                   class: "x-select h-8 w-auto text-[12.5px]", onchange: "this.form.requestSubmit()" %>
+                  <% end %>
+                <% else %>
+                  <span class="x-chip <%= 'x-chip-brand' if member.role_admin? %>"><%= t("user_roles.#{member.role}") %></span>
+                <% end %>
+              </td>
+              <td>
+                <span class="x-chip <%= { 'active' => 'x-chip-good', 'invited' => 'x-chip-warn', 'disabled' => 'x-chip-bad' }[member.status] %>">
+                  <%= t("user_statuses.#{member.status}") %>
+                </span>
+              </td>
+              <td class="x-num" style="color:var(--ink-2)">
+                <%= member.invitation_accepted_at ? l(member.invitation_accepted_at.to_date) : (member.created_at ? l(member.created_at.to_date) : "—") %>
+              </td>
+              <td class="x-td-num font-semibold"><%= @project_counts[member.id] || 0 %></td>
+              <td class="text-right whitespace-nowrap">
+                <% if current_user.role_admin? && member.id != current_user.id %>
+                  <div class="flex items-center justify-end gap-2.5">
+                    <% if member.status_invited? %>
+                      <%= button_to "Gửi lại lời mời", resend_invitation_member_path(member), method: :post,
+                                    class: "text-[12.5px] font-semibold hover:underline", style: "color:var(--brand)" %>
+                    <% end %>
+                    <% if member.status_disabled? %>
+                      <%= button_to "Kích hoạt lại", enable_member_path(member), method: :patch,
+                                    class: "text-[12.5px] font-semibold hover:underline", style: "color:var(--good)" %>
+                    <% else %>
+                      <%= button_to "Vô hiệu hoá", disable_member_path(member), method: :patch,
+                                    form: { data: { turbo_confirm: "Vô hiệu hoá #{member.display_name}? Dữ liệu cũ vẫn giữ tên." } },
+                                    class: "text-[12.5px] font-semibold hover:underline", style: "color:var(--bad)" %>
+                    <% end %>
+                  </div>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

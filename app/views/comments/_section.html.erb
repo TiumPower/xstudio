@@ -1,0 +1,29 @@
+<% comments = commentable.comments.kept.includes(:user).chronological %>
+<% post_url = commentable.is_a?(Task) ? comments_path(task_code: commentable.code) : comments_path(project_code: commentable.code) %>
+
+<div id="<%= comments_dom_id(commentable) %>">
+  <% if comments.empty? %>
+    <p class="x-muted">Chưa có bình luận nào. Hãy là người mở lời.</p>
+  <% else %>
+    <div class="space-y-4">
+      <% comments.each do |comment| %>
+        <%= render "comments/comment", comment: comment %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= form_with url: post_url, method: :post, multipart: true, class: "mt-4", data: { controller: "mention" } do %>
+    <div class="relative">
+      <textarea name="comment[body]" rows="3" class="x-textarea text-[13.5px]"
+                placeholder="Viết bình luận… gõ @ để nhắc tên thành viên"
+                data-mention-target="input" data-action="input->mention#scan keydown->mention#navigate"></textarea>
+      <div class="absolute left-3 bottom-[52px] w-[250px] x-card p-1.5 z-40 max-h-[210px] overflow-auto"
+           hidden data-mention-target="menu"></div>
+    </div>
+    <div class="flex items-center gap-2.5 mt-2.5">
+      <button class="x-btn x-btn-primary x-btn-sm">Gửi bình luận</button>
+      <input type="file" name="comment[files][]" multiple class="text-[12px]">
+    </div>
+    <script type="application/json" data-mention-target="people"><%= raw mentionable_people_json %></script>
+  <% end %>
+</div>

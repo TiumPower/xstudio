@@ -1,0 +1,96 @@
+<div class="flex-none bg-white border-b" style="border-color:var(--line)">
+  <!-- Thanh chọn cây -->
+  <div class="flex items-center gap-2 px-5 lg:px-7 py-2.5 border-b overflow-x-auto x-scroll-thin" style="border-color:var(--line-2)">
+    <span class="x-eyebrow flex-none mr-1">Cây của workspace</span>
+    <% @trees.each do |tree| %>
+      <%= link_to strategy_tree_path(tree),
+                  class: "flex-none inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[13px] font-semibold transition",
+                  style: (tree.id == @tree.id ? "background:var(--nav);color:#fff" : "background:var(--bg);color:var(--ink-2)") do %>
+        <%= tree.name %>
+        <span class="x-num text-[11px] px-1.5 py-0.5 rounded-full"
+              style="<%= tree.id == @tree.id ? 'background:rgba(255,255,255,.18)' : 'background:#fff;color:var(--ink-3)' %>">
+          <%= tree.node_count - 1 %>
+        </span>
+      <% end %>
+    <% end %>
+
+    <div class="relative flex-none" data-controller="dropdown">
+      <button class="x-btn x-btn-ghost x-btn-sm" data-action="dropdown#toggle">+ Cây mới</button>
+      <div class="absolute left-0 mt-2 w-[320px] x-card p-4 z-50" hidden data-dropdown-target="menu">
+        <%= form_with url: strategy_trees_path, method: :post do %>
+          <label class="x-label block mb-1.5">Tên cây</label>
+          <input type="text" name="strategy_tree[name]" class="x-input h-9 text-[13px] mb-3" required
+                 placeholder="Định hướng 2027">
+          <label class="x-label block mb-1.5">Bắt đầu từ</label>
+          <select name="template" class="x-select h-9 text-[13px] mb-3">
+            <option value="blank">Cây trống</option>
+            <option value="year">Mẫu định hướng năm (4 mảng)</option>
+            <option value="product">Mẫu cây sản phẩm</option>
+          </select>
+          <button class="x-btn x-btn-primary x-btn-sm x-btn-block">Tạo cây</button>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Thanh công cụ -->
+  <div class="flex flex-wrap items-center gap-2 px-5 lg:px-7 py-2.5">
+    <div class="x-seg flex-none">
+      <% { "mindmap" => "Sơ đồ tư duy", "vertical" => "Cây dọc", "outline" => "Danh sách phân cấp" }.each do |key, label| %>
+        <%= link_to label, strategy_tree_path(@tree, view: key, level: @max_level),
+                    class: (@view == key ? "is-active" : "") %>
+      <% end %>
+    </div>
+
+    <div class="relative flex-none">
+      <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" width="13" height="13" viewBox="0 0 16 16" fill="none">
+        <circle cx="7" cy="7" r="5" stroke="#8A98AC" stroke-width="1.5"/><path d="M11 11l3 3" stroke="#8A98AC" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="search" placeholder="Tìm trong cây" class="x-input h-9 pl-8 w-[176px] text-[13px]"
+             data-tree-target="search" data-action="input->tree#search keydown->tree#searchNext">
+    </div>
+
+    <select class="x-select h-9 w-auto text-[13px] flex-none" data-tree-target="statusFilter" data-action="change->tree#filter">
+      <option value="">Lọc: Trạng thái</option>
+      <% StrategyNode.statuses.keys.each { |s| %><option value="<%= s %>"><%= t("node_statuses.#{s}") %></option><% } %>
+    </select>
+
+    <select class="x-select h-9 w-auto text-[13px] flex-none" data-tree-target="ownerFilter" data-action="change->tree#filter">
+      <option value="">Lọc: Người phụ trách</option>
+      <% @members.each { |m| %><option value="<%= m.id %>"><%= m.display_name %></option><% } %>
+    </select>
+
+    <select class="x-select h-9 w-auto text-[13px] flex-none" data-action="change->tree#setLevel">
+      <% (1..StrategyNode::MAX_DEPTH).each do |n| %>
+        <option value="<%= n %>" <%= "selected" if n == @max_level %>>Cấp: <%= n %></option>
+      <% end %>
+    </select>
+
+    <button class="x-btn x-btn-ghost x-btn-sm flex-none" data-action="tree#expandAll">Mở tất cả</button>
+    <button class="x-btn x-btn-ghost x-btn-sm flex-none" data-action="tree#collapseAll">Thu tất cả</button>
+
+    <div class="ml-auto flex items-center gap-2 flex-none">
+      <% if @ai_enabled %>
+        <button class="x-btn x-btn-primary x-btn-sm" data-action="tree#suggest">
+          ✨ Gợi ý nhánh con
+          <span class="x-num text-[11px] px-1.5 py-0.5 rounded-full ml-0.5" style="background:rgba(255,255,255,.2)"
+                data-tree-target="aiCounter"><%= @ai_remaining %></span>
+        </button>
+      <% else %>
+        <span class="x-chip" title="Đặt ANTHROPIC_API_KEY trong .env để bật">✨ AI chưa cấu hình</span>
+      <% end %>
+
+      <div class="relative" data-controller="dropdown">
+        <button class="x-btn x-btn-ghost x-btn-sm" data-action="dropdown#toggle">Xuất ▾</button>
+        <div class="absolute right-0 mt-2 w-[196px] x-card p-1.5 z-50" hidden data-dropdown-target="menu">
+          <button class="block w-full text-left px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" data-action="tree#exportPng">Ảnh PNG</button>
+          <%= link_to "Markdown outline", export_markdown_strategy_tree_path(@tree),
+                      class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
+        </div>
+      </div>
+
+      <%= link_to "Phiên bản", strategy_tree_strategy_snapshots_path(@tree), class: "x-btn x-btn-ghost x-btn-sm" %>
+      <button class="x-btn x-btn-ghost x-btn-icon" data-action="tree#presentation" title="Chế độ trình bày (F)">⛶</button>
+    </div>
+  </div>
+</div>

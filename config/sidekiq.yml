@@ -1,0 +1,17 @@
+:concurrency: 5
+:queues:
+  - [critical, 3]
+  - [mailers, 2]
+  - [default, 2]
+  - [low, 1]
+
+:schedule:
+  nhac_han_cong_viec:
+    cron: "30 7 * * *"          # 07:30 giờ VN
+    class: "DueReminderJob"
+  ban_tin_hang_ngay:
+    cron: "0 8 * * *"           # 08:00 giờ VN
+    class: "DailyDigestJob"
+  anh_chup_cay_dinh_huong:
+    cron: "0 23 * * *"          # 23:00 giờ VN
+    class: "TreeSnapshotJob"

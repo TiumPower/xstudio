@@ -1,0 +1,11 @@
+<% if flash.any? %>
+  <div class="mb-4 space-y-2" data-controller="flash">
+    <% flash.each do |type, message| %>
+      <% next if message.blank? %>
+      <div class="x-toast <%= { "notice" => "x-toast-good", "success" => "x-toast-good", "alert" => "x-toast-bad", "error" => "x-toast-bad", "warning" => "x-toast-warn" }[type.to_s] %>">
+        <span class="flex-1"><%= message %></span>
+        <button type="button" class="opacity-50 hover:opacity-100" data-action="flash#dismiss" aria-label="Đóng">&times;</button>
+      </div>
+    <% end %>
+  </div>
+<% end %>

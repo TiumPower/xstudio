@@ -1,0 +1,28 @@
+<div class="p-4">
+  <div class="grid grid-cols-3 gap-2 mb-4">
+    <% [["Quá hạn", data[:overdue], "var(--bad)"], ["Hôm nay", data[:today], "var(--warn)"], ["Tuần này", data[:this_week], "var(--brand)"]].each do |label, value, color| %>
+      <div class="rounded-[10px] p-2.5 text-center" style="background:var(--bg)">
+        <div class="x-num text-[19px] font-bold leading-none mb-1" style="color:<%= value.to_i.positive? ? color : 'var(--ink-3)' %>"><%= value %></div>
+        <div class="text-[11px]" style="color:var(--ink-3)"><%= label %></div>
+      </div>
+    <% end %>
+  </div>
+
+  <% if data[:recent].empty? %>
+    <p class="x-muted text-center py-4">Bạn chưa có công việc nào đang mở. 🎉</p>
+  <% else %>
+    <div class="space-y-1">
+      <% data[:recent].each do |task| %>
+        <%= link_to task_path(task), class: "block px-2.5 py-2 rounded-lg hover:bg-[var(--bg)]" do %>
+          <div class="text-[13px] font-medium x-clamp-1 mb-0.5"><%= task.title %></div>
+          <div class="flex items-center gap-2 text-[11.5px]" style="color:var(--ink-3)">
+            <span class="x-code"><%= task.code %></span>
+            <% if task.due_date %>
+              <span class="<%= 'x-out font-semibold' if task.overdue? %>"><%= due_label(task.due_date) %></span>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

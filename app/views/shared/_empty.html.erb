@@ -1,0 +1,10 @@
+<div class="x-empty">
+  <div class="w-12 h-12 mx-auto mb-4 rounded-[14px] grid place-items-center text-[20px]" style="background:var(--bg)">
+    <%= local_assigns[:icon] || "◌" %>
+  </div>
+  <h3><%= title %></h3>
+  <p><%= local_assigns[:body] %></p>
+  <% if local_assigns[:action_label] && local_assigns[:action_path] %>
+    <%= link_to action_label, action_path, class: "x-btn x-btn-primary" %>
+  <% end %>
+</div>

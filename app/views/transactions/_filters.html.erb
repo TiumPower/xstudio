@@ -1,0 +1,46 @@
+<div class="x-card p-3.5 space-y-3">
+  <%= form_with url: transactions_path, method: :get, class: "flex flex-wrap items-center gap-2" do %>
+    <div class="x-seg">
+      <%= link_to "Tất cả", transactions_path(request.query_parameters.except("kind")), class: (params[:kind].blank? ? "is-active" : "") %>
+      <%= link_to "Chỉ Thu", transactions_path(request.query_parameters.merge(kind: "income")), class: (params[:kind] == "income" ? "is-active" : "") %>
+      <%= link_to "Chỉ Chi", transactions_path(request.query_parameters.merge(kind: "expense")), class: (params[:kind] == "expense" ? "is-active" : "") %>
+    </div>
+
+    <div class="x-seg">
+      <%= link_to "Tất cả nguồn", transactions_path(request.query_parameters.except("project_scope")), class: (params[:project_scope].blank? ? "is-active" : "") %>
+      <%= link_to "Thuộc dự án", transactions_path(request.query_parameters.merge(project_scope: "project")), class: (params[:project_scope] == "project" ? "is-active" : "") %>
+      <%= link_to "Chung workspace", transactions_path(request.query_parameters.merge(project_scope: "general")), class: (params[:project_scope] == "general" ? "is-active" : "") %>
+    </div>
+
+    <%= hidden_field_tag :kind, params[:kind] %>
+    <%= hidden_field_tag :project_scope, params[:project_scope] %>
+
+    <input type="date" name="from" value="<%= @filter.from %>" class="x-input h-9 w-auto text-[13px]">
+    <span class="x-muted">–</span>
+    <input type="date" name="to" value="<%= @filter.to %>" class="x-input h-9 w-auto text-[13px]">
+
+    <%= select_tag :project_id, options_from_collection_for_select(@projects, :id, ->(p) { "#{p.code} · #{p.name}" }, params[:project_id]),
+                   include_blank: "Mọi dự án", class: "x-select h-9 w-auto text-[13px]" %>
+    <%= select_tag :category_id, options_from_collection_for_select(@categories, :id, ->(c) { "#{c.kind_income? ? 'Thu' : 'Chi'} · #{c.name}" }, params[:category_id]),
+                   include_blank: "Mọi danh mục", class: "x-select h-9 w-auto text-[13px]" %>
+    <%= text_field_tag :q, params[:q], placeholder: "Tìm diễn giải…", class: "x-input h-9 w-[168px] text-[13px]" %>
+    <button class="x-btn x-btn-ghost x-btn-sm">Áp dụng</button>
+
+    <div class="ml-auto flex items-center gap-2">
+      <%= link_to "Xuất Excel", export_transactions_path(request.query_parameters.merge(format: :xlsx)), class: "x-btn x-btn-ghost x-btn-sm" %>
+      <%= link_to "+ Giao dịch mới", new_transaction_path, class: "x-btn x-btn-primary x-btn-sm" %>
+    </div>
+  <% end %>
+
+  <div class="flex flex-wrap items-center gap-1.5">
+    <% @filter.active_chips.each do |label, value, keys| %>
+      <span class="x-chip">
+        <span style="color:var(--ink-3)"><%= label %>:</span> <%= value %>
+        <% unless keys == [:from, :to] %>
+          <%= link_to "×", transactions_path(request.query_parameters.except(*keys.map(&:to_s))),
+                      class: "ml-1 font-bold", style: "color:var(--ink-3)" %>
+        <% end %>
+      </span>
+    <% end %>
+  </div>
+</div>

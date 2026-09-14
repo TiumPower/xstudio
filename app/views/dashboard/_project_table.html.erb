@@ -1,0 +1,51 @@
+<% if rows.empty? %>
+  <div class="x-empty">
+    <h3>Chưa có dự án nào đang chạy</h3>
+    <p>Tạo dự án đầu tiên để bắt đầu theo dõi.</p>
+    <%= link_to "Tạo dự án", new_project_path, class: "x-btn x-btn-primary" %>
+  </div>
+<% else %>
+  <div class="overflow-x-auto x-scroll-thin">
+    <table class="x-table min-w-[720px]">
+      <thead>
+        <tr>
+          <th>Dự án</th><th>Phụ trách</th><th class="w-[132px]">Tiến độ</th>
+          <th>Hạn</th><th class="text-right">Lợi nhuận</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% rows.each do |row| %>
+          <% p = row[:project] %>
+          <tr class="x-row-link" onclick="location.href='<%= project_path(p) %>'">
+            <td>
+              <div class="flex items-start gap-2.5">
+                <i class="w-1.5 h-1.5 rounded-full mt-[7px] flex-none" style="background:<%= p.type_color %>"></i>
+                <div class="min-w-0">
+                  <div class="font-semibold text-[13.5px] truncate"><%= p.name %></div>
+                  <div class="x-code"><%= p.code %></div>
+                </div>
+              </div>
+            </td>
+            <td class="whitespace-nowrap"><%= p.owner&.display_name || "—" %></td>
+            <td>
+              <div class="flex items-center gap-2">
+                <div class="x-progress flex-1 min-w-[56px]"><span style="width:<%= row[:progress] %>%"></span></div>
+                <span class="x-num text-[12px] font-semibold w-[30px] text-right"><%= row[:progress] %>%</span>
+              </div>
+            </td>
+            <td class="whitespace-nowrap">
+              <% if p.overdue? %>
+                <span class="x-chip x-chip-bad x-num"><%= l(p.due_date) %></span>
+              <% else %>
+                <span class="x-num" style="color:var(--ink-2)"><%= p.due_date ? l(p.due_date) : "—" %></span>
+              <% end %>
+            </td>
+            <td class="x-td-num">
+              <span class="x-money <%= row[:profit].negative? ? 'x-out' : 'x-in' %>"><%= format_vnd(row[:profit], signed: true) %></span>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

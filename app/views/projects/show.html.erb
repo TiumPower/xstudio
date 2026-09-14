@@ -1,0 +1,67 @@
+<% page_title "Chi tiết dự án" %>
+<%= render "header" %>
+
+<div class="mt-4 space-y-4">
+  <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+    <% counts = @project.tasks.kept.group(:status).count %>
+    <% open_count = counts["open"] || counts[0] || 0 %>
+    <% done_count = counts["done"] || counts[1] || 0 %>
+    <% overdue = @project.tasks.kept.open_tasks.where("due_date < ?", Date.current).count %>
+    <% subs = [@project.tasks.kept.sum(:done_subtasks_count), @project.tasks.kept.sum(:subtasks_count)] %>
+    <% [["Tổng công việc", open_count + done_count, "var(--ink)"],
+        ["Đang làm", open_count, "var(--brand)"],
+        ["Trễ hạn", overdue, "var(--bad)"],
+        ["Hoàn thành", done_count, "var(--good)"],
+        ["Việc con xong", "#{subs[0]}/#{subs[1]}", "var(--ink)"]].each do |label, value, color| %>
+      <div class="x-card p-4">
+        <div class="x-muted mb-1.5"><%= label %></div>
+        <div class="x-num text-[22px] font-bold leading-none" style="color:<%= color %>"><%= value %></div>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @project.description.present? %>
+    <div class="x-card">
+      <div class="x-card-head"><h2 class="x-h3">Mô tả dự án</h2></div>
+      <div class="p-5 text-[13.5px] leading-relaxed" style="color:var(--ink-2)"><%= simple_format(@project.description) %></div>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+    <div class="x-card">
+      <div class="x-card-head">
+        <h2 class="x-h3">Công việc sắp đến hạn</h2>
+        <%= link_to "Xem tất cả →", project_tasks_path(@project), class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
+      </div>
+      <div class="p-2">
+        <% if @upcoming_tasks.empty? %>
+          <p class="x-muted text-center py-6">Không có công việc nào đến hạn trong 2 tuần tới.</p>
+        <% else %>
+          <% @upcoming_tasks.each do |task| %>
+            <%= link_to task_path(task), class: "flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-[var(--bg)]" do %>
+              <%= avatar_for task.assignee, size: :sm %>
+              <span class="x-code w-[86px] flex-none hidden sm:block"><%= task.code %></span>
+              <span class="flex-1 min-w-0 truncate text-[13.5px]"><%= task.title %></span>
+              <%= priority_chip(task) %>
+              <span class="x-num text-[12px] flex-none <%= task.overdue? ? 'x-out font-semibold' : '' %>"
+                    style="<%= 'color:var(--ink-3)' unless task.overdue? %>"><%= l(task.due_date, format: :short) %></span>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="x-card">
+      <div class="x-card-head">
+        <h2 class="x-h3">Hoạt động gần đây</h2>
+        <%= link_to "Xem tất cả →", project_activities_path(@project), class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
+      </div>
+      <div class="p-2"><%= render "shared/activity_list", activities: @recent_activities, compact: true %></div>
+    </div>
+  </div>
+
+  <div class="x-card">
+    <div class="x-card-head"><h2 class="x-h3">Bình luận dự án</h2></div>
+    <div class="p-5"><%= render "comments/section", commentable: @project %></div>
+  </div>
+</div>

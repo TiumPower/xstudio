@@ -1,0 +1,21 @@
+<% compact = local_assigns.fetch(:compact, false) %>
+<% if activities.blank? %>
+  <p class="x-muted text-center py-8">Chưa có hoạt động nào.</p>
+<% else %>
+  <div class="<%= compact ? '' : 'divide-y' %>" style="<%= 'border-color:var(--line-2)' unless compact %>">
+    <% activities.each do |a| %>
+      <div class="flex items-start gap-2.5 px-3 py-2.5 <%= 'rounded-lg hover:bg-[var(--bg)]' if compact %>">
+        <%= avatar_for a.user, size: :sm %>
+        <div class="min-w-0 flex-1">
+          <div class="text-[13px] leading-snug">
+            <span class="font-semibold"><%= a.user&.display_name || "Hệ thống" %></span>
+            <span style="color:var(--ink-2)"><%= a.summary.presence || a.action %></span>
+          </div>
+          <div class="text-[11.5px] mt-0.5" style="color:var(--ink-3)">
+            <%= time_ago(a.created_at) %><%= " · #{a.project.code}" if a.project %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>

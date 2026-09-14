@@ -1,0 +1,23 @@
+<div class="px-3 pt-2 pb-1 x-eyebrow">5 dự án lãi nhất</div>
+<% if top.empty? %>
+  <p class="px-3 py-4 x-muted">Chưa có dữ liệu.</p>
+<% else %>
+  <% top.each do |row| %>
+    <%= link_to project_path(row[:project]), class: "flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[var(--bg)]" do %>
+      <i class="w-1.5 h-1.5 rounded-full flex-none" style="background:<%= row[:project].type_color %>"></i>
+      <span class="flex-1 min-w-0 truncate text-[13px] font-medium"><%= row[:project].name %></span>
+      <span class="x-money text-[12.5px] x-in"><%= format_vnd(row[:profit], signed: true) %></span>
+    <% end %>
+  <% end %>
+<% end %>
+
+<% if worst.any? %>
+  <div class="px-3 pt-3 pb-1 x-eyebrow" style="color:var(--bad)">Dự án đang lỗ</div>
+  <% worst.each do |row| %>
+    <%= link_to project_path(row[:project]), class: "flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[var(--bg)]" do %>
+      <i class="w-1.5 h-1.5 rounded-full flex-none" style="background:<%= row[:project].type_color %>"></i>
+      <span class="flex-1 min-w-0 truncate text-[13px] font-medium"><%= row[:project].name %></span>
+      <span class="x-money text-[12.5px] x-out"><%= format_vnd(row[:profit]) %></span>
+    <% end %>
+  <% end %>
+<% end %>

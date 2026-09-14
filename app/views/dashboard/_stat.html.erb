@@ -1,0 +1,10 @@
+<% colors = { brand: "var(--brand)", bad: "var(--bad)", good: "var(--good)", plain: "var(--ink-2)" } %>
+<% softs  = { brand: "var(--brand-soft)", bad: "var(--bad-soft)", good: "var(--good-soft)", plain: "var(--bg)" } %>
+<div class="x-card p-4 flex items-center gap-3.5">
+  <div class="w-9 h-9 rounded-[10px] grid place-items-center text-[14px] font-bold flex-none"
+       style="background:<%= softs[tone] %>;color:<%= colors[tone] %>"><%= icon %></div>
+  <div class="min-w-0">
+    <div class="x-num text-[24px] font-bold leading-none mb-1"><%= value %></div>
+    <div class="x-muted truncate"><%= label %></div>
+  </div>
+</div>

@@ -1,0 +1,37 @@
+<div class="flex flex-wrap items-center gap-3">
+  <div class="x-seg">
+    <% { "month" => "Tháng này", "quarter" => "Quý này", "year" => "Năm nay" }.each do |key, label| %>
+      <%= link_to label, root_path(request.query_parameters.merge(period: key).except("from", "to")),
+                  class: (@period == key ? "is-active" : "") %>
+    <% end %>
+    <%= link_to "Tuỳ chọn", root_path(request.query_parameters.merge(period: "custom")),
+                class: (@period == "custom" ? "is-active" : "") %>
+  </div>
+
+  <div class="x-seg">
+    <%= link_to "Tất cả loại hình", root_path(request.query_parameters.except("type")), class: (@type.blank? ? "is-active" : "") %>
+    <% Project.project_types.keys.each do |type| %>
+      <%= link_to root_path(request.query_parameters.merge(type: type)), class: (@type == type ? "is-active" : "") do %>
+        <span class="inline-flex items-center gap-1.5">
+          <i class="w-2 h-2 rounded-full inline-block" style="background:<%= type == 'product_sales' ? 'var(--type-ps)' : 'var(--type-dx)' %>"></i>
+          <%= t("project_types.#{type}") %>
+        </span>
+      <% end %>
+    <% end %>
+  </div>
+
+  <% if @period == "custom" %>
+    <%= form_with url: root_path, method: :get, class: "flex items-center gap-2" do %>
+      <%= hidden_field_tag :period, "custom" %>
+      <%= hidden_field_tag :type, @type if @type %>
+      <input type="date" name="from" value="<%= params[:from] || @range.first %>" class="x-input h-9 w-auto text-[13px]">
+      <span class="x-muted">–</span>
+      <input type="date" name="to" value="<%= params[:to] || @range.last %>" class="x-input h-9 w-auto text-[13px]">
+      <button class="x-btn x-btn-ghost x-btn-sm">Áp dụng</button>
+    <% end %>
+  <% end %>
+
+  <div class="ml-auto x-muted">
+    <%= l(@range.first) %> – <%= l(@range.last) %> · giờ Việt Nam
+  </div>
+</div>

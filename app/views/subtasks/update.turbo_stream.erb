@@ -1,0 +1,3 @@
+<%= turbo_stream.replace "subtasks" do %>
+  <div id="subtasks"><%= render "subtasks/list", task: @task %></div>
+<% end %>

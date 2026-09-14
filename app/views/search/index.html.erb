@@ -1,0 +1,78 @@
+<% page_title "Tìm kiếm" %>
+
+<div class="max-w-[900px] space-y-4">
+  <%= form_with url: search_path, method: :get do %>
+    <input type="search" name="q" value="<%= @q %>" autofocus class="x-input x-btn-lg h-[46px] text-[15px]"
+           placeholder="Tìm dự án, công việc, giao dịch, nút định hướng…">
+  <% end %>
+
+  <% if @q.blank? %>
+    <div class="x-card"><%= render "shared/empty", icon: "🔍", title: "Nhập từ khoá để tìm",
+                                   body: "Tìm được trong tên dự án, tiêu đề công việc, diễn giải giao dịch và nút cây định hướng." %></div>
+  <% else %>
+    <% total = @projects.size + @tasks.size + @transactions.size + @nodes.size %>
+    <p class="x-sub"><%= total %> kết quả cho “<strong style="color:var(--ink)"><%= @q %></strong>”</p>
+
+    <% if @projects.any? %>
+      <div class="x-card">
+        <div class="x-card-head"><h2 class="x-h3">Dự án</h2><span class="x-muted"><%= @projects.size %></span></div>
+        <div class="p-2">
+          <% @projects.each do |p| %>
+            <%= link_to project_path(p), class: "flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-[var(--bg)]" do %>
+              <i class="w-1.5 h-1.5 rounded-full flex-none" style="background:<%= p.type_color %>"></i>
+              <span class="flex-1 truncate text-[13.5px] font-medium"><%= p.name %></span>
+              <span class="x-code"><%= p.code %></span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @tasks.any? %>
+      <div class="x-card">
+        <div class="x-card-head"><h2 class="x-h3">Công việc</h2><span class="x-muted"><%= @tasks.size %></span></div>
+        <div class="p-2">
+          <% @tasks.each { |task| %><%= render "shared/task_row", task: task, show_project: true %><% } %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @transactions.any? %>
+      <div class="x-card">
+        <div class="x-card-head"><h2 class="x-h3">Giao dịch</h2><span class="x-muted"><%= @transactions.size %></span></div>
+        <div class="p-2">
+          <% @transactions.each do |t| %>
+            <%= link_to edit_transaction_path(t), class: "flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-[var(--bg)]" do %>
+              <span class="x-chip <%= t.kind_income? ? 'x-chip-good' : 'x-chip-bad' %> flex-none"><%= t.kind_label %></span>
+              <span class="flex-1 truncate text-[13.5px]"><%= t.description.presence || t.counterparty %></span>
+              <span class="x-num text-[12px]" style="color:var(--ink-3)"><%= l(t.occurred_on) %></span>
+              <span class="x-money <%= t.kind_income? ? 'x-in' : 'x-out' %>"><%= format_vnd(t.amount) %></span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @nodes.any? %>
+      <div class="x-card">
+        <div class="x-card-head"><h2 class="x-h3">Nút định hướng</h2><span class="x-muted"><%= @nodes.size %></span></div>
+        <div class="p-2">
+          <% @nodes.each do |node| %>
+            <%= link_to strategy_tree_path(node.strategy_tree, node: node.id),
+                        class: "flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-[var(--bg)]" do %>
+              <span class="flex-none"><%= node.icon.presence || "◆" %></span>
+              <span class="flex-1 truncate text-[13.5px] font-medium"><%= node.title %></span>
+              <%= node_status_chip(node) %>
+              <span class="x-muted"><%= node.strategy_tree.name %></span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if total.zero? %>
+      <div class="x-card"><%= render "shared/empty", icon: "🔍", title: "Không tìm thấy kết quả nào",
+                                     body: "Thử từ khoá ngắn hơn hoặc kiểm tra lại chính tả." %></div>
+    <% end %>
+  <% end %>
+</div>

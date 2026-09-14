@@ -1,0 +1,8 @@
+Chào <%= @user.full_name %>,
+
+<%= @user.invited_by&.display_name || "Quản trị viên" %> đã mời bạn vào không gian làm việc <%= @workspace.name %>.
+
+Đặt mật khẩu và kích hoạt tài khoản tại:
+<%= @url %>
+
+Liên kết có hiệu lực trong 7 ngày.

@@ -1,0 +1,59 @@
+<!-- Dán hàng loạt (FR-TREE-12) -->
+<div class="x-overlay hidden" data-tree-target="pasteOverlay" data-action="click->tree#closePaste">
+  <div class="absolute inset-0 grid place-items-center p-4">
+    <div class="x-modal max-w-[720px]" onclick="event.stopPropagation()">
+      <div class="x-card-head">
+        <h2 class="x-h3">Dán danh sách thụt lề vào cây</h2>
+        <button class="w-7 h-7 rounded-md hover:bg-[var(--bg)]" data-action="tree#closePaste" aria-label="Đóng">×</button>
+      </div>
+      <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="x-label block mb-1.5">Nội dung</label>
+          <textarea rows="12" class="x-textarea text-[13px] font-mono" data-tree-target="pasteInput"
+                    data-action="input->tree#previewPaste"
+placeholder="Sản phẩm
+  Nghiên cứu thị trường
+  Kênh bán
+    Đối tác
+    Trực tiếp
+Chuyển đổi số
+  Kho dữ liệu"></textarea>
+          <p class="x-hint">Dùng tab hoặc 2–4 dấu cách để thụt lề. Gạch đầu dòng “-”, “*” và đánh số cũng được.</p>
+        </div>
+        <div>
+          <label class="x-label block mb-1.5">Xem trước</label>
+          <div class="rounded-[10px] border p-3 h-[268px] overflow-auto x-scroll-thin text-[13px]"
+               style="border-color:var(--line);background:var(--bg-2)" data-tree-target="pastePreview">
+            <p class="x-muted">Dán nội dung để xem cấu trúc sẽ được tạo.</p>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2.5 px-5 pb-5">
+        <button class="x-btn x-btn-primary" data-action="tree#applyPaste">Chèn vào cây</button>
+        <button class="x-btn x-btn-ghost" data-action="tree#closePaste">Huỷ</button>
+        <span class="ml-auto x-muted" data-tree-target="pasteCount"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Xoá nút có nhánh con (FR-TREE-17) -->
+<div class="x-overlay hidden" data-tree-target="deleteOverlay" data-action="click->tree#closeDelete">
+  <div class="absolute inset-0 grid place-items-center p-4">
+    <div class="x-modal max-w-[440px]" onclick="event.stopPropagation()">
+      <div class="p-5">
+        <h2 class="x-h3 mb-2">Xoá nút “<span data-tree-target="deleteTitle"></span>”</h2>
+        <p class="x-sub mb-4">Nút này có <strong data-tree-target="deleteCount"></strong> nút con bên trong. Bạn muốn làm gì?</p>
+        <div class="space-y-2">
+          <button class="x-btn x-btn-ghost x-btn-block justify-start" data-action="tree#deleteCascade">
+            Xoá cả nhánh (<span data-tree-target="deleteCount2"></span> mục)
+          </button>
+          <button class="x-btn x-btn-ghost x-btn-block justify-start" data-action="tree#deletePromote">
+            Chỉ xoá nút này, đẩy các nút con lên cấp trên
+          </button>
+        </div>
+        <button class="x-btn x-btn-ghost x-btn-block mt-3" data-action="tree#closeDelete">Huỷ</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,33 @@
+<h1 style="margin:0 0 6px;font-size:19px;font-weight:700;">Bản tin ngày <%= l(Date.current) %></h1>
+<p style="margin:0 0 22px;font-size:13.5px;color:#8A98AC;">Chào <%= @user.full_name %>, đây là tóm tắt việc của bạn.</p>
+
+<% [["Quá hạn", @overdue, "#C8322B"], ["Đến hạn hôm nay", @due_today, "#D98324"], ["Đến hạn tuần này", @due_week, "#2E6BC0"]].each do |title, tasks, color| %>
+  <% next if tasks.empty? %>
+  <h2 style="margin:0 0 10px;font-size:13px;font-weight:700;color:<%= color %>;"><%= title %> (<%= tasks.size %>)</h2>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px;">
+    <% tasks.first(10).each do |task| %>
+      <tr><td style="padding:9px 12px;border-left:3px solid <%= color %>;background:#F7F9FC;border-radius:0 8px 8px 0;">
+        <a href="https://<%= @host %>/cong-viec/<%= task.code %>" style="color:#0D1B2E;font-size:13.5px;font-weight:600;text-decoration:none;"><%= task.title %></a>
+        <div style="font-size:11.5px;color:#8A98AC;margin-top:2px;">
+          <%= task.code %> · <%= task.project.name %><%= " · hạn #{l(task.due_date)}" if task.due_date %>
+        </div>
+      </td></tr>
+      <tr><td style="height:6px;"></td></tr>
+    <% end %>
+  </table>
+<% end %>
+
+<% if @activities.any? %>
+  <h2 style="margin:0 0 10px;font-size:13px;font-weight:700;color:#46566C;">Hoạt động hôm qua</h2>
+  <ul style="margin:0 0 18px;padding-left:18px;font-size:13px;line-height:1.8;color:#46566C;">
+    <% @activities.first(10).each do |a| %>
+      <li><strong style="color:#0D1B2E;"><%= a.user&.display_name || "Hệ thống" %></strong> <%= a.summary %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<table role="presentation" cellpadding="0" cellspacing="0">
+  <tr><td style="background:#0B1C33;border-radius:10px;">
+    <a href="https://<%= @host %>/viec-cua-toi" style="display:inline-block;padding:11px 22px;color:#fff;font-weight:600;font-size:13.5px;text-decoration:none;">Mở Việc của tôi</a>
+  </td></tr>
+</table>

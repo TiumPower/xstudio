@@ -1,0 +1,23 @@
+<% page_title t("nav.activity") %>
+
+<div class="max-w-[960px] space-y-4">
+  <%= form_with url: activities_path, method: :get, class: "flex flex-wrap items-center gap-2" do %>
+    <%= select_tag :user_id, options_from_collection_for_select(@users, :id, :display_name, params[:user_id]),
+                   include_blank: "Mọi người", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+    <%= select_tag :project_id, options_from_collection_for_select(@projects, :id, ->(p) { "#{p.code} · #{p.name}" }, params[:project_id]),
+                   include_blank: "Mọi dự án", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+    <%= select_tag :action_type, options_for_select(Activity::ACTIONS.map { |a| [t("activity_actions.#{a}", default: a), a] }, params[:action_type]),
+                   include_blank: "Mọi thao tác", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+    <input type="date" name="from" value="<%= params[:from] %>" class="x-input h-9 w-auto text-[13px]">
+    <span class="x-muted">–</span>
+    <input type="date" name="to" value="<%= params[:to] %>" class="x-input h-9 w-auto text-[13px]">
+    <button class="x-btn x-btn-ghost x-btn-sm">Lọc</button>
+    <% if params.values_at(:user_id, :project_id, :action_type, :from, :to).any?(&:present?) %>
+      <%= link_to "Xoá lọc", activities_path, class: "x-btn x-btn-ghost x-btn-sm" %>
+    <% end %>
+  <% end %>
+
+  <div class="x-card overflow-hidden">
+    <%= render "shared/activity_list", activities: @activities %>
+  </div>
+</div>

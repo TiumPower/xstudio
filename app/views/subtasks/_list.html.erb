@@ -1,0 +1,21 @@
+<% if task.subtasks.empty? %>
+  <p class="x-muted">Chưa có việc con nào.</p>
+<% else %>
+  <div class="space-y-1">
+    <% task.subtasks.ordered.each do |subtask| %>
+      <div class="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-[var(--bg)] group">
+        <%= form_with url: task_subtask_path(task, subtask), method: :patch, class: "flex items-center flex-1 gap-2.5 min-w-0" do %>
+          <%= hidden_field_tag "subtask[done]", subtask.done ? "0" : "1" %>
+          <button class="w-[17px] h-[17px] rounded-[5px] border grid place-items-center flex-none text-[11px] text-white"
+                  style="<%= subtask.done ? 'background:var(--good);border-color:var(--good)' : 'border-color:var(--line)' %>"
+                  aria-label="<%= subtask.done ? 'Bỏ đánh dấu' : 'Đánh dấu xong' %>"><%= "✓" if subtask.done %></button>
+          <span class="flex-1 min-w-0 truncate text-[13.5px] <%= 'line-through' if subtask.done %>"
+                style="<%= 'color:var(--ink-3)' if subtask.done %>"><%= subtask.title %></span>
+        <% end %>
+        <%= button_to "×", task_subtask_path(task, subtask), method: :delete,
+                      class: "w-6 h-6 rounded-md grid place-items-center opacity-0 group-hover:opacity-100 text-[15px] hover:bg-[var(--bad-soft)]",
+                      style: "color:var(--ink-3)", form_class: "flex-none" %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

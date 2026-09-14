@@ -1,0 +1,15 @@
+<% content_for :title, "Quên mật khẩu" %>
+<h1 class="x-h2 mb-1">Quên mật khẩu</h1>
+<p class="x-sub mb-6">Nhập email, chúng tôi sẽ gửi liên kết đặt lại mật khẩu. Liên kết có hiệu lực 2 giờ.</p>
+
+<%= form_with model: resource, url: password_path(resource_name), local: true do |f| %>
+  <div class="x-field">
+    <%= f.label :email, "Email" %>
+    <%= f.email_field :email, autofocus: true, class: "x-input", placeholder: "ban@xstudio.vn" %>
+  </div>
+  <%= f.submit "Gửi liên kết đặt lại", class: "x-btn x-btn-primary x-btn-lg x-btn-block cursor-pointer" %>
+<% end %>
+
+<p class="text-center mt-5">
+  <%= link_to "← Quay lại đăng nhập", new_session_path(resource_name), class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
+</p>

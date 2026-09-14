@@ -1,0 +1,62 @@
+<% page_title "Công việc mới" %>
+<div class="max-w-[720px]">
+  <div class="x-card">
+    <div class="x-card-head"><h2 class="x-h3">Tạo công việc mới</h2></div>
+    <div class="p-5" data-controller="task-form">
+      <% if @projects.empty? %>
+        <%= render "shared/empty", title: "Chưa có dự án nào", body: "Tạo dự án trước khi thêm công việc.",
+                   action_label: "Tạo dự án", action_path: new_project_path %>
+      <% else %>
+        <% selected = @projects.find { |p| p.id.to_s == params[:project_id].to_s } || @projects.first %>
+        <%= form_with url: project_tasks_path(selected), method: :post, local: true, id: "new_task_form" do |f| %>
+          <div class="x-field">
+            <label>Dự án</label>
+            <select class="x-select" data-action="change->task-form#switchProject" data-task-form-target="project">
+              <% @projects.each do |p| %>
+                <option value="<%= p.code %>" data-members='<%= p.members.map { |m| { id: m.id, name: m.display_name } }.to_json %>'
+                        data-columns='<%= p.board_columns.ordered.map { |c| { id: c.id, name: c.name } }.to_json %>'
+                        <%= "selected" if p.id == selected.id %>><%= p.code %> · <%= p.name %></option>
+              <% end %>
+            </select>
+          </div>
+
+          <div class="x-field">
+            <label>Tiêu đề <span style="color:var(--bad)">*</span></label>
+            <input type="text" name="task[title]" class="x-input" required autofocus placeholder="Chuẩn hoá bảng danh mục sản phẩm">
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5">
+            <div class="x-field">
+              <label>Cột</label>
+              <select name="task[board_column_id]" class="x-select" data-task-form-target="column">
+                <% selected.board_columns.ordered.each { |c| %><option value="<%= c.id %>"><%= c.name %></option><% } %>
+              </select>
+            </div>
+            <div class="x-field">
+              <label>Người thực hiện</label>
+              <select name="task[assignee_id]" class="x-select" data-task-form-target="assignee">
+                <option value=""><%= t("common.unassigned") %></option>
+                <% selected.members.each { |m| %><option value="<%= m.id %>"><%= m.display_name %></option><% } %>
+              </select>
+            </div>
+            <div class="x-field">
+              <label>Độ ưu tiên</label>
+              <select name="task[priority]" class="x-select">
+                <% Task.priorities.keys.each { |k| %><option value="<%= k %>" <%= "selected" if k == "medium" %>><%= t("priorities.#{k}") %></option><% } %>
+              </select>
+            </div>
+            <div class="x-field">
+              <label>Hạn hoàn thành</label>
+              <input type="date" name="task[due_date]" class="x-input">
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2.5 pt-1">
+            <button class="x-btn x-btn-primary">Tạo công việc</button>
+            <%= link_to "Huỷ", :back, class: "x-btn x-btn-ghost" %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

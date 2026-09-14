@@ -1,0 +1,83 @@
+<aside class="w-[320px] flex-none bg-white border-l overflow-y-auto x-scroll-thin hidden lg:block"
+       style="border-color:var(--line)" data-tree-target="panel">
+  <div class="p-4 space-y-4" data-tree-target="panelBody">
+    <p class="x-muted text-center py-10">Chọn một nút để xem và sửa chi tiết.</p>
+  </div>
+</aside>
+
+<!-- Khuôn mẫu panel chi tiết, Stimulus nhân bản khi chọn nút -->
+<template data-tree-target="panelTemplate">
+  <div class="space-y-4">
+    <div class="flex items-start justify-between gap-2">
+      <h2 class="x-h3">Chi tiết nút</h2>
+      <button class="w-7 h-7 rounded-md hover:bg-[var(--bg)] text-[15px]" style="color:var(--ink-3)"
+              data-action="tree#closePanel" aria-label="Đóng">×</button>
+    </div>
+
+    <div>
+      <label class="x-label block mb-1.5">Tiêu đề</label>
+      <input type="text" maxlength="120" class="x-input h-9 text-[13px]" data-field="title" data-action="change->tree#saveField">
+    </div>
+
+    <div>
+      <label class="x-label block mb-1.5">Trạng thái</label>
+      <select class="x-select h-9 text-[13px]" data-field="status" data-action="change->tree#saveField">
+        <%= options_for_select(StrategyNode.statuses.keys.map { |s| [t("node_statuses.#{s}"), s] }) %>
+      </select>
+    </div>
+
+    <div>
+      <label class="x-label block mb-1.5">Người phụ trách</label>
+      <select class="x-select h-9 text-[13px]" data-field="owner_id" data-action="change->tree#saveField">
+        <option value="">— chưa giao —</option>
+        <%= options_from_collection_for_select(@members, :id, :display_name) %>
+      </select>
+    </div>
+
+    <div class="flex items-end gap-2.5">
+      <div class="flex-1">
+        <label class="x-label block mb-1.5">Biểu tượng</label>
+        <input type="text" maxlength="4" class="x-input h-9 text-[15px] text-center" data-field="icon"
+               data-action="change->tree#saveField" placeholder="📦">
+      </div>
+      <div>
+        <label class="x-label block mb-1.5">Màu nhánh</label>
+        <input type="color" class="h-9 w-[54px] rounded-[9px] border cursor-pointer" style="border-color:var(--line)"
+               data-field="color" data-action="change->tree#saveField">
+      </div>
+    </div>
+
+    <div>
+      <label class="x-label block mb-1.5">Ghi chú</label>
+      <textarea rows="5" class="x-textarea text-[13px]" data-field="note" data-action="change->tree#saveField"
+                placeholder="Vì sao đội theo đuổi nhánh này? Đang vướng gì?"></textarea>
+    </div>
+
+    <div class="text-[11.5px]" style="color:var(--ink-3)" data-slot="meta"></div>
+
+    <div class="x-divider"></div>
+
+    <div class="flex flex-wrap gap-2">
+      <button class="x-btn x-btn-ghost x-btn-sm" data-action="tree#addChild">+ Nút con</button>
+      <button class="x-btn x-btn-ghost x-btn-sm" data-action="tree#duplicate">Nhân bản</button>
+      <button class="x-btn x-btn-ghost x-btn-sm" data-action="tree#openPaste">Dán hàng loạt</button>
+      <button class="x-btn x-btn-sm" style="color:var(--bad);background:var(--bad-soft)" data-action="tree#remove">Xoá</button>
+    </div>
+
+    <div class="x-divider"></div>
+
+    <div data-slot="ai">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-[13px] font-semibold">✨ Gợi ý nhánh con</h3>
+        <span class="x-muted">còn <span data-slot="aiRemaining"></span> lượt</span>
+      </div>
+      <input type="text" class="x-input h-9 text-[13px] mb-2" data-slot="aiInstruction"
+             placeholder="Chỉ dẫn thêm (tuỳ chọn)…">
+      <div class="flex gap-2 mb-3">
+        <button class="x-btn x-btn-primary x-btn-sm flex-1" data-action="tree#suggest">Gợi ý nhánh con</button>
+        <button class="x-btn x-btn-ghost x-btn-sm" data-action="tree#suggestSubtree" title="Dựng bản nháp cây 2 cấp">Cả cây con</button>
+      </div>
+      <div data-slot="aiResults"></div>
+    </div>
+  </div>
+</template>

@@ -1,0 +1,80 @@
+<% page_title t("nav.strategy") %>
+<div data-controller="tree"
+     data-tree-data-value="<%= tree_payload(@tree_data).to_json %>"
+     data-tree-view-value="<%= @view %>"
+     data-tree-max-level-value="<%= @max_level %>"
+     data-tree-max-depth-value="<%= StrategyNode::MAX_DEPTH %>"
+     data-tree-urls-value="<%= {
+       nodes:   strategy_tree_strategy_nodes_path(@tree),
+       node:    strategy_tree_strategy_node_path(@tree, "__ID__"),
+       move:    move_strategy_tree_strategy_node_path(@tree, "__ID__"),
+       dup:     duplicate_strategy_tree_strategy_node_path(@tree, "__ID__"),
+       suggest: suggest_strategy_tree_strategy_node_path(@tree, "__ID__"),
+       apply:   apply_suggestions_strategy_tree_strategy_node_path(@tree, "__ID__"),
+       paste:   bulk_paste_strategy_tree_strategy_nodes_path(@tree)
+     }.to_json %>"
+     data-tree-ai-enabled-value="<%= @ai_enabled %>"
+     data-tree-ai-remaining-value="<%= @ai_remaining %>"
+     data-tree-members-value="<%= @members.map { |m| { id: m.id, name: m.display_name } }.to_json %>"
+     data-tree-focus-value="<%= params[:node] %>"
+     class="-mx-5 lg:-mx-7 -mt-5 lg:-mt-6 flex flex-col" style="height:calc(100vh - 56px)">
+
+  <%= render "toolbar" %>
+
+  <div class="flex-1 min-h-0 flex">
+    <div class="flex-1 min-w-0 relative" data-tree-target="stage">
+      <div class="absolute inset-0 overflow-hidden" data-tree-target="canvasWrap"
+           style="background:var(--bg-2);background-image:radial-gradient(circle, #DDE3EC 1px, transparent 1px);background-size:22px 22px">
+        <svg class="w-full h-full" data-tree-target="canvas"></svg>
+      </div>
+
+      <div class="absolute inset-0 overflow-auto x-scroll-thin p-6 hidden" data-tree-target="outline"></div>
+
+      <!-- Trợ giúp phím tắt -->
+      <div class="absolute right-4 top-4 x-card px-3 py-2 text-[11.5px] z-20 hidden xl:block"
+           style="color:var(--ink-3)" data-tree-target="hint">
+        <kbd class="font-semibold">Tab</kbd> nút con ·
+        <kbd class="font-semibold">Enter</kbd> nút cùng cấp ·
+        <kbd class="font-semibold">⇧Tab</kbd> lên cấp ·
+        <kbd class="font-semibold">Space</kbd> thu/mở ·
+        <kbd class="font-semibold">⌘Z</kbd> hoàn tác
+      </div>
+
+      <!-- Điều khiển thu phóng -->
+      <div class="absolute left-4 bottom-4 flex items-center gap-1.5 z-20" data-tree-target="zoomBar">
+        <div class="x-card flex items-center px-1 py-1 gap-0.5">
+          <button class="w-7 h-7 rounded-md hover:bg-[var(--bg)] font-bold" data-action="tree#zoomOut" aria-label="Thu nhỏ">−</button>
+          <span class="x-num text-[12px] font-semibold w-[44px] text-center" data-tree-target="zoomLabel">100%</span>
+          <button class="w-7 h-7 rounded-md hover:bg-[var(--bg)] font-bold" data-action="tree#zoomIn" aria-label="Phóng to">+</button>
+        </div>
+        <button class="x-btn x-btn-ghost x-btn-sm" data-action="tree#fit">Vừa màn hình</button>
+        <button class="x-btn x-btn-ghost x-btn-sm" data-action="tree#home">Về gốc</button>
+      </div>
+
+      <!-- Bản đồ thu nhỏ -->
+      <div class="absolute right-4 bottom-4 x-card overflow-hidden z-20 hidden" data-tree-target="minimap"
+           style="width:168px;height:112px">
+        <svg class="w-full h-full" data-tree-target="minimapSvg"></svg>
+      </div>
+
+      <!-- Trạng thái rỗng -->
+      <div class="absolute inset-0 grid place-items-center pointer-events-none hidden" data-tree-target="empty">
+        <div class="text-center pointer-events-auto max-w-[360px]">
+          <div class="text-[34px] mb-3">🌱</div>
+          <h3 class="x-h3 mb-1.5">Bắt đầu bằng những mảng lớn team đang theo đuổi</h3>
+          <p class="x-sub mb-5">Mỗi mảng là một nhánh. Bên trong mỗi nhánh là những phần nhỏ hơn.</p>
+          <div class="flex items-center justify-center gap-2.5">
+            <button class="x-btn x-btn-primary" data-action="tree#addFirst">Thêm mảng đầu tiên</button>
+            <% if @ai_enabled %>
+              <button class="x-btn x-btn-ghost" data-action="tree#suggestForRoot">✨ Để AI gợi ý</button>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%= render "detail_panel" %>
+  </div>
+
+  <%= render "dialogs" %>
+</div>

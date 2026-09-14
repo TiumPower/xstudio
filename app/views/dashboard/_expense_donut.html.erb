@@ -1,0 +1,37 @@
+<%
+  palette = ["#2E6BC0", "#6D3BD4", "#0E7490", "#0E7A46", "#D98324", "#C8322B", "#5A6B82", "#B4479E"]
+  shown   = rows.first(6)
+  others  = rows.drop(6)
+  slices  = shown.map.with_index { |r, i| r.merge(color: palette[i % palette.size]) }
+  slices << { name: "Nhóm còn lại", amount: others.sum { |r| r[:amount] }, percent: others.sum { |r| r[:percent] }, color: "#C3D2E6" } if others.any?
+  circ = 2 * Math::PI * 54
+  offset = 0
+%>
+<% if total.zero? %>
+  <div class="x-empty py-10"><p>Chưa có khoản chi nào trong kỳ.</p></div>
+<% else %>
+  <div class="flex items-center gap-5">
+    <svg width="140" height="140" viewBox="0 0 140 140" class="flex-none -rotate-90">
+      <% slices.each do |s| %>
+        <% len = circ * s[:amount] / total.to_f %>
+        <circle cx="70" cy="70" r="54" fill="none" stroke="<%= s[:color] %>" stroke-width="20"
+                stroke-dasharray="<%= len.round(2) %> <%= (circ - len).round(2) %>"
+                stroke-dashoffset="<%= (-offset).round(2) %>"></circle>
+        <% offset += len %>
+      <% end %>
+    </svg>
+    <div class="flex-1 min-w-0 space-y-2">
+      <% slices.each do |s| %>
+        <div class="flex items-center gap-2 text-[12.5px]">
+          <i class="w-2.5 h-2.5 rounded-full flex-none" style="background:<%= s[:color] %>"></i>
+          <span class="flex-1 truncate" style="color:var(--ink-2)"><%= s[:name] %></span>
+          <span class="x-num font-semibold"><%= s[:percent] %>%</span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  <div class="flex items-center justify-between mt-4 pt-3.5 border-t" style="border-color:var(--line-2)">
+    <span class="x-sub">Tổng chi trong kỳ</span>
+    <span class="x-money"><%= format_vnd(total) %></span>
+  </div>
+<% end %>

@@ -1,0 +1,49 @@
+<% page_title @member.display_name %>
+
+<div class="max-w-[900px] space-y-4">
+  <%= link_to "← #{t('nav.members')}", members_path, class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
+
+  <div class="x-card p-5 flex items-center gap-4">
+    <%= avatar_for @member, size: :xl %>
+    <div class="min-w-0 flex-1">
+      <h1 class="x-h2"><%= @member.display_name %></h1>
+      <p class="x-sub"><%= [@member.job_title, @member.email].compact_blank.join(" · ") %></p>
+    </div>
+    <div class="flex flex-col items-end gap-1.5">
+      <span class="x-chip <%= 'x-chip-brand' if @member.role_admin? %>"><%= t("user_roles.#{@member.role}") %></span>
+      <span class="x-chip <%= { 'active' => 'x-chip-good', 'invited' => 'x-chip-warn', 'disabled' => 'x-chip-bad' }[@member.status] %>">
+        <%= t("user_statuses.#{@member.status}") %>
+      </span>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="x-card">
+      <div class="x-card-head"><h2 class="x-h3">Dự án tham gia</h2><span class="x-muted"><%= @projects.size %></span></div>
+      <div class="p-2">
+        <% if @projects.empty? %>
+          <p class="x-muted text-center py-6">Chưa tham gia dự án nào.</p>
+        <% else %>
+          <% @projects.each do |project| %>
+            <%= link_to project_path(project), class: "flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-[var(--bg)]" do %>
+              <i class="w-1.5 h-1.5 rounded-full flex-none" style="background:<%= project.type_color %>"></i>
+              <span class="flex-1 truncate text-[13.5px] font-medium"><%= project.name %></span>
+              <span class="x-code"><%= project.code %></span>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="x-card">
+      <div class="x-card-head"><h2 class="x-h3">Công việc đang mở</h2><span class="x-muted"><%= @open_tasks.size %></span></div>
+      <div class="p-2">
+        <% if @open_tasks.empty? %>
+          <p class="x-muted text-center py-6">Không còn công việc nào đang mở.</p>
+        <% else %>
+          <% @open_tasks.each { |task| %><%= render "shared/task_row", task: task, show_project: true %><% } %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

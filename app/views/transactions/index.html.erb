@@ -1,0 +1,125 @@
+<% page_title "Sổ thu chi" %>
+
+<div class="space-y-4">
+  <p class="x-sub">
+    Tổng hợp giao dịch của <strong style="color:var(--ink)">mọi dự án</strong> và các giao dịch
+    <strong style="color:var(--ink)">chung workspace</strong> (không gắn dự án).
+  </p>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="x-card p-5">
+      <div class="flex items-center gap-2 mb-1.5">
+        <span class="w-5 h-5 rounded-md grid place-items-center text-[12px] font-bold" style="background:var(--good-soft);color:var(--good)">+</span>
+        <span class="text-[12.5px] font-medium" style="color:var(--ink-2)">Tổng thu (đang lọc)</span>
+      </div>
+      <div class="x-money text-[24px] x-in"><%= format_vnd(@totals[:income], signed: true) %></div>
+    </div>
+    <div class="x-card p-5">
+      <div class="flex items-center gap-2 mb-1.5">
+        <span class="w-5 h-5 rounded-md grid place-items-center text-[12px] font-bold" style="background:var(--bad-soft);color:var(--bad)">−</span>
+        <span class="text-[12.5px] font-medium" style="color:var(--ink-2)">Tổng chi (đang lọc)</span>
+      </div>
+      <div class="x-money text-[24px] x-out">− <%= format_vnd(@totals[:expense]) %></div>
+    </div>
+    <div class="x-card-dark p-5">
+      <div class="text-[12.5px] font-medium mb-1.5" style="color:#9BB2CE">Chênh lệch</div>
+      <div class="x-money text-[24px] text-white"><%= format_vnd(@totals[:balance], signed: true) %></div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="x-card p-4 flex items-center gap-4">
+      <span class="x-chip x-chip-brand flex-none">Thuộc dự án</span>
+      <div class="flex-1 text-[12.5px]" style="color:var(--ink-2)">
+        <span class="x-in font-semibold">+ <%= format_vnd(@split[:project_income]) %></span>
+        <span class="mx-1">·</span>
+        <span class="x-out font-semibold">− <%= format_vnd(@split[:project_expense]) %></span>
+      </div>
+      <span class="x-money text-[14px]"><%= format_vnd(@split[:project_income] - @split[:project_expense], signed: true) %></span>
+    </div>
+    <div class="x-card p-4 flex items-center gap-4">
+      <span class="x-chip flex-none">Chung workspace</span>
+      <div class="flex-1 text-[12.5px]" style="color:var(--ink-2)">
+        <span class="x-in font-semibold">+ <%= format_vnd(@split[:general_income]) %></span>
+        <span class="mx-1">·</span>
+        <span class="x-out font-semibold">− <%= format_vnd(@split[:general_expense]) %></span>
+      </div>
+      <span class="x-money text-[14px]"><%= format_vnd(@split[:general_income] - @split[:general_expense], signed: true) %></span>
+    </div>
+  </div>
+
+  <%= render "filters" %>
+
+  <div class="x-card overflow-hidden">
+    <% if @transactions.empty? %>
+      <%= render "shared/empty", icon: "₫", title: "Không có giao dịch nào khớp bộ lọc",
+                 body: "Thử nới rộng khoảng ngày hoặc bỏ bớt điều kiện lọc.",
+                 action_label: "+ Giao dịch mới", action_path: new_transaction_path %>
+    <% else %>
+      <div class="overflow-x-auto x-scroll-thin">
+        <table class="x-table min-w-[1020px]">
+          <thead>
+            <tr>
+              <th class="w-[104px]">Ngày</th><th class="w-[62px]">Loại</th><th>Diễn giải</th>
+              <th>Danh mục</th><th>Thuộc về</th><th>Phương thức</th>
+              <th class="text-right">Số tiền</th><th class="w-[74px]"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @transactions.each do |t| %>
+              <tr style="box-shadow:inset 3px 0 0 <%= t.kind_income? ? 'var(--good)' : 'var(--bad)' %>">
+                <td class="x-num whitespace-nowrap"><%= l(t.occurred_on) %></td>
+                <td>
+                  <span class="x-chip <%= t.kind_income? ? 'x-chip-good' : 'x-chip-bad' %>"><%= t.kind_label %></span>
+                </td>
+                <td>
+                  <div class="font-medium text-[13px]"><%= blank_dash t.description %></div>
+                  <div class="x-muted"><%= t.counterparty %></div>
+                </td>
+                <td style="color:var(--ink-2)"><%= t.category&.name || "—" %></td>
+                <td>
+                  <% if t.project %>
+                    <%= link_to project_path(t.project), class: "x-chip",
+                                style: "background:#{t.project.type_color}1A;color:#{t.project.type_color}" do %>
+                      <%= t.project.code %> · <%= truncate(t.project.name, length: 28) %>
+                    <% end %>
+                  <% else %>
+                    <span class="x-chip">Chung workspace</span>
+                  <% end %>
+                </td>
+                <td style="color:var(--ink-2)"><%= t("payment_methods.#{t.payment_method}") %></td>
+                <td class="x-td-num">
+                  <span class="x-money <%= t.kind_income? ? 'x-in' : 'x-out' %>">
+                    <%= t.kind_income? ? "+ " : "− " %><%= number_with_delimiter(t.amount, delimiter: ".") %> ₫
+                  </span>
+                </td>
+                <td class="text-right whitespace-nowrap">
+                  <% if current_user.role_admin? || t.created_by_id == current_user.id %>
+                    <%= link_to "Sửa", edit_transaction_path(t, return_to: request.fullpath),
+                                class: "text-[12.5px] font-semibold", style: "color:var(--brand)" %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="6">Tổng cộng <%= @transactions.size %> giao dịch đang hiển thị</td>
+              <td class="x-td-num">
+                <div class="x-money x-in">+ <%= number_with_delimiter(@totals[:income], delimiter: ".") %> ₫</div>
+                <div class="x-money x-out">− <%= number_with_delimiter(@totals[:expense], delimiter: ".") %> ₫</div>
+                <div class="x-money pt-1 mt-1 border-t" style="border-color:var(--line)"><%= format_vnd(@totals[:balance], signed: true) %></div>
+              </td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <% if @scope.count > @transactions.size %>
+        <div class="px-4 py-3 x-muted text-center border-t" style="border-color:var(--line-2)">
+          Hiển thị <%= @transactions.size %> / <%= @scope.count %> giao dịch. Thu hẹp bộ lọc hoặc xuất Excel để xem đầy đủ.
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,38 @@
+wb = xlsx_package.workbook
+
+title  = wb.styles.add_style(b: true, bg_color: "0B1C33", fg_color: "FFFFFF", alignment: { horizontal: :center, vertical: :center }, border: { style: :thin, color: "D6DCE6" })
+money  = wb.styles.add_style(format_code: '#,##0" ₫"', alignment: { horizontal: :right })
+income = wb.styles.add_style(format_code: '#,##0" ₫"', fg_color: "0E7A46", alignment: { horizontal: :right })
+expense = wb.styles.add_style(format_code: '#,##0" ₫"', fg_color: "C8322B", alignment: { horizontal: :right })
+date_s = wb.styles.add_style(format_code: "dd/mm/yyyy", alignment: { horizontal: :center })
+total  = wb.styles.add_style(b: true, format_code: '#,##0" ₫"', alignment: { horizontal: :right }, border: { style: :thin, color: "0B1C33", edges: [:top] })
+bold   = wb.styles.add_style(b: true, border: { style: :thin, color: "0B1C33", edges: [:top] })
+
+wb.add_worksheet(name: "Sổ thu chi") do |sheet|
+  sheet.add_row ["Ngày", "Loại", "Diễn giải", "Danh mục", "Thuộc về", "Đối tác", "Phương thức", "Người tạo", "Số tiền (₫)"], style: title, height: 24
+
+  @transactions.each do |t|
+    sheet.add_row [
+      t.occurred_on,
+      t.kind_label,
+      t.description,
+      t.category&.name,
+      t.project ? "#{t.project.code} · #{t.project.name}" : "Chung workspace",
+      t.counterparty,
+      I18n.t("payment_methods.#{t.payment_method}"),
+      t.created_by&.display_name,
+      t.amount
+    ], style: [date_s, nil, nil, nil, nil, nil, nil, nil, t.kind_income? ? income : expense]
+  end
+
+  income_sum  = @transactions.select(&:kind_income?).sum(&:amount)
+  expense_sum = @transactions.select(&:kind_expense?).sum(&:amount)
+
+  sheet.add_row []
+  sheet.add_row ["Tổng thu", nil, nil, nil, nil, nil, nil, nil, income_sum],  style: [bold, nil, nil, nil, nil, nil, nil, nil, total]
+  sheet.add_row ["Tổng chi", nil, nil, nil, nil, nil, nil, nil, expense_sum], style: [bold, nil, nil, nil, nil, nil, nil, nil, total]
+  sheet.add_row ["Chênh lệch", nil, nil, nil, nil, nil, nil, nil, income_sum - expense_sum], style: [bold, nil, nil, nil, nil, nil, nil, nil, total]
+
+  sheet.column_widths 12, 7, 38, 20, 32, 20, 14, 16, 18
+  sheet.auto_filter = "A1:I1"
+end

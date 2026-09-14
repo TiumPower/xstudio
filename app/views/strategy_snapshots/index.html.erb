@@ -1,0 +1,51 @@
+<% page_title "Ảnh chụp phiên bản" %>
+
+<div class="max-w-[820px] space-y-4">
+  <div class="flex items-center justify-between gap-3">
+    <div>
+      <%= link_to "← #{@tree.name}", strategy_tree_path(@tree), class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
+      <h1 class="x-h2 mt-1">Ảnh chụp phiên bản</h1>
+      <p class="x-sub">Tự động chụp 1 bản mỗi ngày nếu cây có thay đổi. Giữ 30 bản tự động gần nhất; bản đặt tên thủ công giữ vĩnh viễn.</p>
+    </div>
+    <%= form_with url: strategy_tree_strategy_snapshots_path(@tree), method: :post, class: "flex gap-2 flex-none" do %>
+      <input type="text" name="name" placeholder="Tên phiên bản…" class="x-input h-9 w-[180px] text-[13px]">
+      <button class="x-btn x-btn-primary x-btn-sm">Chụp ngay</button>
+    <% end %>
+  </div>
+
+  <div class="x-card overflow-hidden">
+    <% if @snapshots.empty? %>
+      <%= render "shared/empty", icon: "🗂", title: "Chưa có ảnh chụp nào",
+                 body: "Chụp một bản để có thể quay lại trạng thái hiện tại bất cứ lúc nào." %>
+    <% else %>
+      <table class="x-table">
+        <thead><tr><th>Phiên bản</th><th>Số nút</th><th>Người tạo</th><th>Thời điểm</th><th></th></tr></thead>
+        <tbody>
+          <% @snapshots.each do |snapshot| %>
+            <tr>
+              <td>
+                <div class="font-semibold text-[13.5px] flex items-center gap-2">
+                  <%= snapshot.name %>
+                  <% if snapshot.auto %><span class="x-chip">Tự động</span><% end %>
+                </div>
+              </td>
+              <td class="x-num" style="color:var(--ink-2)"><%= snapshot.node_count %></td>
+              <td style="color:var(--ink-2)"><%= snapshot.created_by&.display_name || "Hệ thống" %></td>
+              <td class="x-num" style="color:var(--ink-2)"><%= l(snapshot.created_at, format: :default) %></td>
+              <td class="text-right whitespace-nowrap">
+                <div class="flex items-center justify-end gap-2.5">
+                  <%= button_to "Khôi phục", restore_strategy_tree_strategy_snapshot_path(@tree, snapshot), method: :post,
+                                form: { data: { turbo_confirm: "Khôi phục cây về “#{snapshot.name}”? Trạng thái hiện tại sẽ được chụp lại trước." } },
+                                class: "text-[12.5px] font-semibold hover:underline", style: "color:var(--brand)" %>
+                  <%= button_to "Xoá", strategy_tree_strategy_snapshot_path(@tree, snapshot), method: :delete,
+                                form: { data: { turbo_confirm: "Xoá ảnh chụp này?" } },
+                                class: "text-[12.5px] font-semibold hover:underline", style: "color:var(--bad)" %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  </div>
+</div>

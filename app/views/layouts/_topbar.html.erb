@@ -1,0 +1,45 @@
+<header class="x-topbar flex items-center gap-3 px-5 lg:px-7">
+  <h1 class="x-h3 flex-none"><%= content_for(:page_title).presence || t("nav.dashboard") %></h1>
+
+  <div class="flex-1 flex justify-center px-2">
+    <%= form_with url: search_path, method: :get, class: "w-full max-w-[420px] relative", data: { turbo_frame: "_top" } do %>
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="15" height="15" viewBox="0 0 16 16" fill="none">
+        <circle cx="7" cy="7" r="5" stroke="#8A98AC" stroke-width="1.5"/><path d="M11 11l3 3" stroke="#8A98AC" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="search" name="q" value="<%= params[:q] %>" class="x-input pl-9 h-9 text-[13px]"
+             style="background:var(--bg-2)" placeholder="Tìm dự án, công việc, giao dịch…">
+    <% end %>
+  </div>
+
+  <div class="flex items-center gap-2 flex-none">
+    <div class="relative" data-controller="dropdown">
+      <button type="button" class="x-btn x-btn-primary x-btn-sm" data-action="dropdown#toggle">
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 2.5v9M2.5 7h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span class="hidden sm:inline">Tạo mới</span>
+      </button>
+      <div class="absolute right-0 mt-2 w-[196px] x-card p-1.5 z-50" hidden data-dropdown-target="menu">
+        <%= link_to "Dự án mới",     new_project_path,     class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
+        <%= link_to "Công việc mới", new_task_path,        class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
+        <%= link_to "Giao dịch mới", new_transaction_path, class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
+      </div>
+    </div>
+
+    <div class="relative" data-controller="dropdown">
+      <button type="button" class="x-btn x-btn-ghost x-btn-icon relative" data-action="dropdown#toggle" aria-label="<%= t('nav.notifications') %>">
+        <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+          <path d="M9 2a4.5 4.5 0 00-4.5 4.5V10L3 12.5h12L13.5 10V6.5A4.5 4.5 0 009 2z" stroke="#46566C" stroke-width="1.4" stroke-linejoin="round"/>
+          <path d="M7.2 15a1.9 1.9 0 003.6 0" stroke="#46566C" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <% if unread_notifications_count.positive? %>
+          <span class="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold text-white grid place-items-center"
+                style="background:var(--bad)"><%= unread_notifications_count > 9 ? "9+" : unread_notifications_count %></span>
+        <% end %>
+      </button>
+      <div class="absolute right-0 mt-2 w-[340px] x-card z-50 overflow-hidden" hidden data-dropdown-target="menu">
+        <%= turbo_frame_tag "notifications_dropdown", src: notifications_path(compact: 1), loading: :lazy do %>
+          <div class="p-6 text-center x-muted">Đang tải…</div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</header>
