@@ -2,42 +2,59 @@
 <%= render "projects/header" %>
 
 <div class="mt-4 space-y-4">
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <div class="x-card p-5">
-      <div class="x-muted mb-1.5">Tổng thu của dự án</div>
-      <div class="x-money text-[22px] x-in"><%= format_vnd(@income) %></div>
+  <%# Ba số tổng đã nằm ở dải chỉ số đầu trang — ở đây đi thẳng vào chi tiết. %>
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+    <div class="x-card xl:col-span-2">
+      <div class="x-card-head">
+        <h2 class="x-h3 x-section-title">Thu — Chi theo tháng</h2>
+        <span class="x-muted">12 tháng gần nhất</span>
+      </div>
+      <div class="p-5"><%= render "dashboard/monthly_chart", series: @monthly %></div>
     </div>
-    <div class="x-card p-5">
-      <div class="x-muted mb-1.5">Tổng chi của dự án</div>
-      <div class="x-money text-[22px] x-out"><%= format_vnd(@expense) %></div>
-    </div>
-    <div class="x-card-dark p-5">
-      <div class="text-[12.5px] mb-1.5" style="color:#9BB2CE">Lợi nhuận</div>
-      <div class="x-money text-[22px] text-white"><%= format_vnd(@income - @expense, signed: true) %></div>
-    </div>
-  </div>
 
-  <div class="x-card">
-    <div class="x-card-head"><h2 class="x-h3">Thu — Chi theo tháng</h2></div>
-    <div class="p-5"><%= render "dashboard/monthly_chart", series: @monthly %></div>
+    <div class="x-card">
+      <div class="x-card-head">
+        <h2 class="x-h3 x-section-title x-section-title-bad">Chi theo danh mục</h2>
+      </div>
+      <div class="p-5">
+        <% if @by_category.empty? %>
+          <p class="x-muted text-center py-6">Dự án chưa có khoản chi nào.</p>
+        <% else %>
+          <div class="space-y-2.5">
+            <% @by_category.first(8).each do |row| %>
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-1 text-[12.5px]">
+                  <span class="truncate" style="color:var(--ink-2)"><%= row[:name] %></span>
+                  <span class="x-money text-[12.5px]"><%= format_vnd(row[:amount]) %></span>
+                </div>
+                <div class="x-progress"><span style="width:<%= row[:percent] %>%;background:var(--bad)"></span></div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
   </div>
 
   <div class="x-card overflow-hidden">
     <div class="x-card-head">
-      <h2 class="x-h3">Giao dịch của dự án</h2>
-      <%= link_to "+ Giao dịch mới", new_transaction_path(project_id: @project.id),
-                  class: "x-btn x-btn-primary x-btn-sm", data: { turbo_frame: "modal" } %>
+      <h2 class="x-h3 x-section-title x-section-title-good">Giao dịch của dự án</h2>
+      <div class="flex items-center gap-2">
+        <span class="x-muted"><%= @transactions.size %> giao dịch</span>
+        <%= link_to "+ Giao dịch mới", new_transaction_path(project_id: @project.id),
+                    class: "x-btn x-btn-primary x-btn-sm", data: { turbo_frame: "modal" } %>
+      </div>
     </div>
 
     <% if @transactions.empty? %>
       <%= render "shared/empty", icon: "₫", title: "Chưa có giao dịch nào cho dự án này",
-                 body: "Ghi khoản thu hoặc chi đầu tiên.",
+                 body: "Ghi khoản thu hoặc chi đầu tiên để theo dõi lãi lỗ của dự án.",
                  action_label: "+ Giao dịch mới",
                  action_path: new_transaction_path(project_id: @project.id), turbo_frame: "modal" %>
     <% else %>
       <div class="overflow-x-auto x-scroll-thin">
         <table class="x-table min-w-[780px]">
-          <thead><tr><th>Ngày</th><th>Loại</th><th>Diễn giải</th><th>Danh mục</th><th>Đối tác</th><th class="text-right">Số tiền</th></tr></thead>
+          <thead><tr><th>Ngày</th><th>Loại</th><th>Diễn giải</th><th>Danh mục</th><th>Đối tác</th><th class="text-right">Số tiền</th><th class="w-[64px]"></th></tr></thead>
           <tbody>
             <% @transactions.each do |t| %>
               <tr style="box-shadow:inset 3px 0 0 <%= t.kind_income? ? 'var(--good)' : 'var(--bad)' %>">
@@ -50,6 +67,12 @@
                   <span class="x-money <%= t.kind_income? ? 'x-in' : 'x-out' %>">
                     <%= t.kind_income? ? "+ " : "− " %><%= number_with_delimiter(t.amount, delimiter: ".") %> ₫
                   </span>
+                </td>
+                <td class="text-right">
+                  <% if current_user.role_admin? || t.created_by_id == current_user.id %>
+                    <%= link_to "Sửa", edit_transaction_path(t), class: "text-[12.5px] font-semibold",
+                                style: "color:var(--brand)", data: { turbo_frame: "modal" } %>
+                  <% end %>
                 </td>
               </tr>
             <% end %>

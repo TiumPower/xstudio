@@ -13,9 +13,11 @@
     <% end %>
   <% end %>
 
-  <h1 class="x-h3 flex-none truncate max-w-[280px]"><%= content_for(:page_title).presence || t("nav.dashboard") %></h1>
+  <h1 class="x-h3 flex-1 md:flex-none truncate md:max-w-[280px]"><%= content_for(:page_title).presence || t("nav.dashboard") %></h1>
 
-  <div class="flex-1 flex justify-center px-2">
+  <%# Ô tìm kiếm bị bóp còn một ký tự trên điện thoại — ẩn đi, đã có mục
+      Tìm kiếm riêng khi cần. %>
+  <div class="flex-1 hidden md:flex justify-center px-2">
     <%= form_with url: search_path, method: :get, class: "w-full max-w-[420px] relative", data: { turbo_frame: "_top" } do %>
       <svg class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="15" height="15" viewBox="0 0 16 16" fill="none">
         <circle cx="7" cy="7" r="5" stroke="#8A98AC" stroke-width="1.5"/><path d="M11 11l3 3" stroke="#8A98AC" stroke-width="1.5" stroke-linecap="round"/>
