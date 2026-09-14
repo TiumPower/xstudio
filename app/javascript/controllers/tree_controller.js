@@ -61,32 +61,45 @@ export default class extends Controller {
     return this.collapsed.has(node.id) ? [] : node.children
   }
 
-  // Tidy tree: mỗi lá chiếm một hàng, nút cha nằm giữa các con.
+  // Bước giãn cách giữa các nút anh em, đo theo trục mà chúng xếp cạnh nhau:
+  // sơ đồ ngang xếp dọc (cao nút), cây dọc xếp ngang (rộng nút).
+  siblingStep() {
+    return this.viewValue === "vertical" ? NODE_W + 24 : NODE_H + GAP_Y
+  }
+
+  // Tidy tree: mỗi lá chiếm một ô trên trục anh em, nút cha nằm giữa các con.
   layout() {
     const nodes = []
     const edges = []
+    const step = this.siblingStep()
     let cursor = 0
 
     const walk = (node, depth) => {
       const kids = this.visibleChildren(node)
-      let y
+      let offset
       if (kids.length === 0) {
-        y = cursor * (NODE_H + GAP_Y)
+        offset = cursor * step
         cursor += 1
       } else {
         const positions = kids.map((kid) => walk(kid, depth + 1))
-        y = (positions[0] + positions[positions.length - 1]) / 2
+        offset = (positions[0] + positions[positions.length - 1]) / 2
       }
-      const x = depth * (NODE_W + GAP_X)
-      nodes.push({ node, x, y, depth })
+      nodes.push({ node, offset, depth })
       kids.forEach((kid) => edges.push({ from: node.id, to: kid.id }))
-      return y
+      return offset
     }
 
     if (this.root) walk(this.root, 0)
     this.positions = new Map(nodes.map((n) => [n.node.id, n]))
     this.edges = edges
     return nodes
+  }
+
+  // Đổi (offset theo trục anh em, depth) thành toạ độ màn hình cho từng chế độ xem.
+  coords(item) {
+    return this.viewValue === "vertical"
+      ? { x: item.offset, y: item.depth * (NODE_H + 46) }
+      : { x: item.depth * (NODE_W + GAP_X), y: item.offset }
   }
 
   // ---- Vẽ ---------------------------------------------------------------
@@ -110,7 +123,7 @@ export default class extends Controller {
     if (placed.length === 0) { this.canvasTarget.innerHTML = ""; return }
 
     const vertical = this.viewValue === "vertical"
-    const coords = (item) => vertical ? { x: item.y * 1.25, y: item.depth * (NODE_H + 46) } : { x: item.x, y: item.y }
+    const coords = (item) => this.coords(item)
 
     const xs = placed.map((p) => coords(p).x)
     const ys = placed.map((p) => coords(p).y)
@@ -599,7 +612,7 @@ export default class extends Controller {
     const item = this.positions?.get(id)
     if (!item) return
     const rect = this.canvasWrapTarget.getBoundingClientRect()
-    const point = this.viewValue === "vertical" ? { x: item.y * 1.25, y: item.depth * (NODE_H + 46) } : { x: item.x, y: item.y }
+    const point = this.coords(item)
     this.pan = { x: rect.width / 2 - (point.x + NODE_W / 2) * this.scale, y: rect.height / 2 - (point.y + NODE_H / 2) * this.scale }
     this.applyTransform()
   }
@@ -616,7 +629,7 @@ export default class extends Controller {
     const svg = this.minimapSvgTarget
     svg.setAttribute("viewBox", `${this.bounds.minX} ${this.bounds.minY} ${width} ${height}`)
     svg.innerHTML = [...this.positions.values()].map((item) => {
-      const point = this.viewValue === "vertical" ? { x: item.y * 1.25, y: item.depth * (NODE_H + 46) } : { x: item.x, y: item.y }
+      const point = this.coords(item)
       return `<rect x="${point.x}" y="${point.y}" width="${NODE_W}" height="${NODE_H}" rx="8" fill="${item.node.color}" fill-opacity="0.55"/>`
     }).join("")
   }
