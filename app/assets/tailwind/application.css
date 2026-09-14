@@ -93,8 +93,21 @@ body {
   .x-card-pad { padding: 18px 20px; }
   .x-card-head {
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    padding: 16px 20px; border-bottom: 1px solid var(--line-2);
+    padding: 14px 20px; border-bottom: 1px solid var(--line-2);
+    background: linear-gradient(var(--bg-2), var(--bg-2));
+    border-radius: var(--radius) var(--radius) 0 0;
   }
+  /* Tiêu đề khối có gạch màu bên trái để mắt bắt ngay ranh giới từng phần. */
+  .x-card-head > :first-child { position: relative; }
+  .x-section-title { display: flex; align-items: center; gap: 9px; }
+  .x-section-title::before {
+    content: ""; width: 3px; height: 15px; border-radius: 2px;
+    background: var(--brand); flex: none;
+  }
+  .x-section-title-good::before { background: var(--good); }
+  .x-section-title-bad::before  { background: var(--bad); }
+  .x-section-title-warn::before { background: var(--warn); }
+  .x-section-title-plain::before { background: var(--line); }
   .x-card-dark {
     background: linear-gradient(155deg, #14304F 0%, #0B1C33 100%);
     border: 1px solid #17395F; color: #fff; border-radius: var(--radius);
@@ -298,7 +311,28 @@ body {
 .trix-content a { color: var(--brand); text-decoration: underline; }
 .trix-content pre { background: var(--bg); padding: 10px 12px; border-radius: 8px; font-family: ui-monospace, monospace; font-size: 12.5px; overflow-x: auto; }
 .trix-content blockquote { border-left: 3px solid var(--line); padding-left: 12px; color: var(--ink-2); }
-trix-toolbar .trix-button-group { border-color: var(--line); }
+/* Trix mặc định trông rất lạc lõng — kéo về đúng ngôn ngữ của app. */
+trix-toolbar { margin-bottom: 8px; }
+trix-toolbar .trix-button-group {
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  margin-bottom: 6px; margin-right: 6px; overflow: hidden; background: var(--surface);
+}
+trix-toolbar .trix-button {
+  border: 0; border-right: 1px solid var(--line-2); background: transparent;
+  height: 30px; padding: 0 10px; color: var(--ink-2);
+}
+trix-toolbar .trix-button:last-child { border-right: 0; }
+trix-toolbar .trix-button:hover { background: var(--bg); color: var(--ink); }
+trix-toolbar .trix-button.trix-active { background: var(--brand-soft); color: var(--brand-ink); }
+trix-toolbar .trix-button--icon::before { opacity: .7; }
+trix-toolbar .trix-button-group-spacer { flex-grow: 0; }
+trix-editor {
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  padding: 10px 12px; min-height: 140px; background: var(--surface);
+  font-size: 14px; line-height: 1.7;
+}
+trix-editor:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(46,107,192,.13); }
+trix-editor:empty:not(:focus)::before { color: var(--ink-3); }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1023px) {

@@ -1,49 +1,121 @@
 <% page_title t("nav.projects") %>
+<% base = request.query_parameters %>
+<% has_filter = params.values_at(:type, :status, :owner_id, :client, :q).any?(&:present?) %>
+
+<%= render "shared/page_header",
+           title: (@scope == "archived" ? "Dự án đã lưu trữ" : "Dự án"),
+           subtitle: (@scope == "archived" ?
+             "Những dự án đã đóng lại. Dữ liệu và thu chi vẫn giữ nguyên." :
+             "Mọi dự án của đội, theo hai mảng: Sản phẩm & Kinh doanh và Chuyển đổi số."),
+           actions: capture {
+             concat link_to((@scope == "archived" ? "Dự án đang chạy" : "Đã lưu trữ"),
+                            projects_path(view: @view, scope: @scope == "archived" ? "active" : "archived"),
+                            class: "x-btn x-btn-ghost x-btn-sm")
+             concat link_to("+ Dự án mới", new_project_path, class: "x-btn x-btn-primary x-btn-sm")
+           } %>
 
 <div class="space-y-4">
-  <div class="flex flex-wrap items-center gap-2.5">
-    <div class="x-seg">
-      <%= link_to projects_path(request.query_parameters.merge(view: "cards")), class: (@view == "cards" ? "is-active" : "") do %>
-        <span class="inline-flex items-center gap-1.5">▤ Thẻ</span>
+  <div class="x-card p-3">
+    <div class="flex flex-wrap items-center gap-2">
+      <div class="x-seg flex-none">
+        <%= link_to projects_path(base.merge(view: "cards")), class: (@view == "cards" ? "is-active" : "") do %>
+          <span class="inline-flex items-center gap-1.5">▤ Thẻ</span>
+        <% end %>
+        <%= link_to projects_path(base.merge(view: "table")), class: (@view == "table" ? "is-active" : "") do %>
+          <span class="inline-flex items-center gap-1.5">≡ Bảng</span>
+        <% end %>
+      </div>
+
+      <%= form_with url: projects_path, method: :get, class: "flex-1 min-w-[180px] max-w-[300px] relative" do %>
+        <% base.except("q").each { |k, v| concat hidden_field_tag(k, v, id: nil) } %>
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="14" height="14" viewBox="0 0 16 16" fill="none">
+          <circle cx="7" cy="7" r="5" stroke="#8A98AC" stroke-width="1.5"/><path d="M11 11l3 3" stroke="#8A98AC" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <%= text_field_tag :q, params[:q], placeholder: "Tìm tên hoặc mã…", class: "x-input h-9 text-[13px]", style: "padding-left:32px" %>
       <% end %>
-      <%= link_to projects_path(request.query_parameters.merge(view: "table")), class: (@view == "table" ? "is-active" : "") do %>
-        <span class="inline-flex items-center gap-1.5">≡ Bảng</span>
-      <% end %>
+
+      <div class="relative flex-none" data-controller="dropdown">
+        <button type="button" class="x-btn x-btn-ghost x-btn-sm" data-action="dropdown#toggle">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+            <path d="M2 4h12M4.5 8h7M6.5 12h3"/>
+          </svg>
+          Bộ lọc
+          <% count = [params[:type], params[:status], params[:owner_id], params[:client]].count(&:present?) %>
+          <% if count.positive? %>
+            <span class="x-num text-[11px] font-bold px-1.5 py-0.5 rounded-full" style="background:var(--brand);color:#fff"><%= count %></span>
+          <% end %>
+        </button>
+        <div class="absolute right-0 mt-2 w-[300px] x-card p-4 z-50" hidden data-dropdown-target="menu">
+          <%= form_with url: projects_path, method: :get, class: "space-y-3.5" do %>
+            <%= hidden_field_tag :view,  @view,       id: nil %>
+            <%= hidden_field_tag :scope, @scope,      id: nil %>
+            <%= hidden_field_tag :q,     params[:q],  id: nil %>
+            <div>
+              <label class="x-label block mb-1.5">Loại hình</label>
+              <%= select_tag :type, options_for_select(Project.project_types.keys.map { |k| [t("project_types_long.#{k}"), k] }, params[:type]),
+                             include_blank: "Cả hai mảng", class: "x-select h-9 text-[13px]", id: nil %>
+            </div>
+            <div>
+              <label class="x-label block mb-1.5">Trạng thái</label>
+              <%= select_tag :status, options_for_select(Project.statuses.keys.map { |k| [t("project_statuses.#{k}"), k] }, params[:status]),
+                             include_blank: "Mọi trạng thái", class: "x-select h-9 text-[13px]", id: nil %>
+            </div>
+            <div>
+              <label class="x-label block mb-1.5">Người phụ trách</label>
+              <%= select_tag :owner_id, options_from_collection_for_select(@owners, :id, :display_name, params[:owner_id]),
+                             include_blank: "Mọi người", class: "x-select h-9 text-[13px]", id: nil %>
+            </div>
+            <% if @clients.any? %>
+              <div>
+                <label class="x-label block mb-1.5">Khách hàng</label>
+                <%= select_tag :client, options_for_select(@clients, params[:client]),
+                               include_blank: "Mọi khách hàng", class: "x-select h-9 text-[13px]", id: nil %>
+              </div>
+            <% end %>
+            <div class="flex items-center gap-2 pt-1">
+              <button class="x-btn x-btn-primary x-btn-sm flex-1">Áp dụng</button>
+              <%= link_to "Xoá hết", projects_path(view: @view, scope: @scope), class: "x-btn x-btn-ghost x-btn-sm" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="flex-none flex items-center gap-2 ml-auto">
+        <%= select_tag :sort, options_for_select([["Cập nhật gần nhất", "updated"], ["Hạn gần nhất", "due"], ["Tên A→Z", "name"]], params[:sort]),
+                       class: "x-select h-9 w-auto text-[13px]",
+                       onchange: "location.href='#{projects_path(base.except('sort'))}' + (location.search ? '&' : '?') + 'sort=' + this.value" %>
+        <span class="x-muted whitespace-nowrap"><%= @projects.size %> dự án</span>
+      </div>
     </div>
 
-    <%= form_with url: projects_path, method: :get, class: "flex flex-wrap items-center gap-2" do %>
-      <%= hidden_field_tag :view, @view %>
-      <%= hidden_field_tag :scope, @scope %>
-      <%= select_tag :type, options_for_select(Project.project_types.keys.map { |k| [t("project_types.#{k}"), k] }, params[:type]),
-                     include_blank: "Loại hình", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
-      <%= select_tag :status, options_for_select(Project.statuses.keys.map { |k| [t("project_statuses.#{k}"), k] }, params[:status]),
-                     include_blank: "Trạng thái", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
-      <%= select_tag :owner_id, options_from_collection_for_select(@owners, :id, :display_name, params[:owner_id]),
-                     include_blank: "Người phụ trách", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
-      <%= select_tag :sort, options_for_select([["Cập nhật gần nhất", "updated"], ["Hạn gần nhất", "due"], ["Tên A→Z", "name"]], params[:sort]),
-                     class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
-      <%= text_field_tag :q, params[:q], placeholder: "Tìm tên hoặc mã…", class: "x-input h-9 w-[180px] text-[13px]" %>
-      <% if params[:type].present? || params[:status].present? || params[:owner_id].present? || params[:q].present? %>
-        <%= link_to "Xoá lọc", projects_path(view: @view, scope: @scope), class: "x-btn x-btn-ghost x-btn-sm" %>
-      <% end %>
+    <% if has_filter %>
+      <div class="flex flex-wrap items-center gap-1.5 mt-2.5 pt-2.5 border-t" style="border-color:var(--line-2)">
+        <span class="x-muted flex-none">Đang lọc:</span>
+        <% {
+             type:     ["Loại hình", params[:type].present? ? t("project_types.#{params[:type]}") : nil],
+             status:   ["Trạng thái", params[:status].present? ? t("project_statuses.#{params[:status]}") : nil],
+             owner_id: ["Phụ trách", @owners.find { |u| u.id.to_s == params[:owner_id] }&.display_name],
+             client:   ["Khách hàng", params[:client]],
+             q:        ["Tìm", params[:q]]
+           }.each do |key, (label, value)| %>
+          <% next if value.blank? %>
+          <span class="x-chip">
+            <span style="color:var(--ink-3)"><%= label %>:</span> <%= value %>
+            <%= link_to "×", projects_path(base.except(key.to_s)), class: "ml-0.5 font-bold hover:opacity-60", style: "color:var(--ink-3)" %>
+          </span>
+        <% end %>
+        <%= link_to "Xoá hết", projects_path(view: @view, scope: @scope), class: "x-chip x-chip-bad ml-1" %>
+      </div>
     <% end %>
-
-    <div class="ml-auto flex items-center gap-2.5">
-      <%= link_to (@scope == "archived" ? "Dự án đang chạy" : "Đã lưu trữ"),
-                  projects_path(view: @view, scope: @scope == "archived" ? "active" : "archived"),
-                  class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
-      <%= link_to "+ Dự án mới", new_project_path, class: "x-btn x-btn-primary x-btn-sm" %>
-    </div>
-  </div>
-
-  <div class="x-muted text-right">
-    <%= @projects.size %> dự án<%= " · #{t('common.all').downcase} bộ lọc" if false %>
   </div>
 
   <% if @projects.empty? %>
     <div class="x-card">
-      <%= render "shared/empty", icon: "▤", title: "Chưa có dự án nào",
-                 body: "Tạo dự án đầu tiên để bắt đầu.", action_label: "Tạo dự án", action_path: new_project_path %>
+      <%= render "shared/empty", icon: "▤",
+                 title: (has_filter ? "Không có dự án nào khớp bộ lọc" : "Chưa có dự án nào"),
+                 body: (has_filter ? "Thử bỏ bớt điều kiện lọc." : "Tạo dự án đầu tiên để bắt đầu."),
+                 action_label: (has_filter ? "Xoá bộ lọc" : "Tạo dự án"),
+                 action_path: (has_filter ? projects_path(view: @view) : new_project_path) %>
     </div>
   <% elsif @view == "table" %>
     <div class="x-card overflow-hidden"><%= render "table", projects: @projects %></div>

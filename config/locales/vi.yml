@@ -109,6 +109,22 @@ vi:
     open: "Đang mở"
     done: "Hoàn thành"
     cancelled: "Huỷ"
+  activity_actions:
+    created: "Tạo mới"
+    updated: "Cập nhật"
+    deleted: "Xoá"
+    moved: "Chuyển cột"
+    commented: "Bình luận"
+    assigned: "Giao việc"
+    archived: "Lưu trữ"
+    restored: "Khôi phục"
+    invited: "Mời thành viên"
+    status_changed: "Đổi trạng thái"
+    node_created: "Thêm nút định hướng"
+    node_updated: "Sửa nút định hướng"
+    node_deleted: "Xoá nút định hướng"
+    node_moved: "Di chuyển nút định hướng"
+
   node_statuses:
     idea: "Ý tưởng"
     pursuing: "Đang theo đuổi"

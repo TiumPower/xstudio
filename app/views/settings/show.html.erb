@@ -1,5 +1,11 @@
 <% page_title t("nav.settings") %>
 
+<div class="max-w-[860px]">
+  <%= render "shared/page_header",
+             title: "Cài đặt workspace",
+             subtitle: "Tên và nhận diện của không gian làm việc, cùng danh mục thu chi dùng chung." %>
+</div>
+
 <div class="max-w-[860px] space-y-4">
   <% unless current_user.role_admin? %>
     <div class="x-toast x-toast-warn">Chỉ quản trị viên mới sửa được cài đặt workspace. Bạn đang xem ở chế độ chỉ đọc.</div>

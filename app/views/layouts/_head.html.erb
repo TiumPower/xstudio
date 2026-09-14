@@ -10,5 +10,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
 
 <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+<%# actiontext.css kéo theo trix.css — thiếu nó thanh công cụ soạn thảo
+    hiện thành một dòng chữ trần. %>
+<%= stylesheet_link_tag "actiontext", "data-turbo-track": "reload" %>
 <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
 <%= javascript_importmap_tags %>

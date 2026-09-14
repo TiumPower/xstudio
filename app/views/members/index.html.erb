@@ -1,26 +1,26 @@
 <% page_title t("nav.members") %>
 
-<div class="max-w-[1080px] space-y-4">
-  <div class="flex items-center justify-between gap-3">
-    <p class="x-sub">
-      <%= @members.size %> thành viên<%= " · #{@pending} đang chờ kích hoạt" if @pending.positive? %>
-    </p>
-    <% if current_user.role_admin? %>
-      <div class="relative" data-controller="dropdown">
-        <button class="x-btn x-btn-primary x-btn-sm" data-action="dropdown#toggle">+ Mời thành viên</button>
-        <div class="absolute right-0 mt-2 w-[360px] x-card p-4 z-50" hidden data-dropdown-target="menu">
-          <%= form_with url: invite_members_path, method: :post do %>
-            <label class="x-label block mb-1.5">Email (mỗi dòng một địa chỉ)</label>
-            <textarea name="emails" rows="4" class="x-textarea text-[13px] mb-2.5"
-                      placeholder="an@xstudio.vn&#10;binh@xstudio.vn"></textarea>
-            <p class="x-hint mb-3">Người được mời nhận email đặt mật khẩu. Liên kết có hiệu lực 7 ngày.</p>
-            <button class="x-btn x-btn-primary x-btn-sm x-btn-block">Gửi lời mời</button>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
-  </div>
+<div class="max-w-[1080px]">
+  <%= render "shared/page_header",
+             title: "Thành viên",
+             subtitle: "#{@members.size} người trong workspace#{@pending.positive? ? " · #{@pending} đang chờ kích hoạt" : ''}. Mọi thành viên đều thấy toàn bộ dự án và thu chi.",
+             actions: (current_user.role_admin? ? capture do %>
+               <div class="relative" data-controller="dropdown">
+                 <button class="x-btn x-btn-primary x-btn-sm" data-action="dropdown#toggle">+ Mời thành viên</button>
+                 <div class="absolute right-0 mt-2 w-[360px] x-card p-4 z-50 text-left" hidden data-dropdown-target="menu">
+                   <%= form_with url: invite_members_path, method: :post do %>
+                     <label class="x-label block mb-1.5">Email (mỗi dòng một địa chỉ)</label>
+                     <textarea name="emails" rows="4" class="x-textarea text-[13px] mb-2.5"
+                               placeholder="an@xstudio.vn&#10;binh@xstudio.vn"></textarea>
+                     <p class="x-hint mb-3">Người được mời nhận email đặt mật khẩu. Liên kết có hiệu lực 7 ngày.</p>
+                     <button class="x-btn x-btn-primary x-btn-sm x-btn-block">Gửi lời mời</button>
+                   <% end %>
+                 </div>
+               </div>
+             <% end : nil) %>
+</div>
 
+<div class="max-w-[1080px] space-y-4">
   <div class="x-card overflow-hidden">
     <div class="overflow-x-auto x-scroll-thin">
       <table class="x-table min-w-[860px]">

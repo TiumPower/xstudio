@@ -1,23 +1,46 @@
 <% page_title t("nav.activity") %>
+<% base = request.query_parameters %>
+<% has_filter = params.values_at(:user_id, :project_id, :action_type, :from, :to).any?(&:present?) %>
+
+<div class="max-w-[960px]">
+  <%= render "shared/page_header",
+             title: "Nhật ký hoạt động",
+             subtitle: "Dòng thời gian mọi thao tác trong workspace — ai làm gì, lúc nào." %>
+</div>
 
 <div class="max-w-[960px] space-y-4">
-  <%= form_with url: activities_path, method: :get, class: "flex flex-wrap items-center gap-2" do %>
-    <%= select_tag :user_id, options_from_collection_for_select(@users, :id, :display_name, params[:user_id]),
-                   include_blank: "Mọi người", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
-    <%= select_tag :project_id, options_from_collection_for_select(@projects, :id, ->(p) { "#{p.code} · #{p.name}" }, params[:project_id]),
-                   include_blank: "Mọi dự án", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
-    <%= select_tag :action_type, options_for_select(Activity::ACTIONS.map { |a| [t("activity_actions.#{a}", default: a), a] }, params[:action_type]),
-                   include_blank: "Mọi thao tác", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
-    <input type="date" name="from" value="<%= params[:from] %>" class="x-input h-9 w-auto text-[13px]">
-    <span class="x-muted">–</span>
-    <input type="date" name="to" value="<%= params[:to] %>" class="x-input h-9 w-auto text-[13px]">
-    <button class="x-btn x-btn-ghost x-btn-sm">Lọc</button>
-    <% if params.values_at(:user_id, :project_id, :action_type, :from, :to).any?(&:present?) %>
-      <%= link_to "Xoá lọc", activities_path, class: "x-btn x-btn-ghost x-btn-sm" %>
+  <div class="x-card p-3">
+    <%= form_with url: activities_path, method: :get, class: "flex flex-wrap items-center gap-2" do %>
+      <%= select_tag :user_id, options_from_collection_for_select(@users, :id, :display_name, params[:user_id]),
+                     include_blank: "Mọi người", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+      <%= select_tag :project_id, options_from_collection_for_select(@projects, :id, ->(p) { "#{p.code} · #{p.name}" }, params[:project_id]),
+                     include_blank: "Mọi dự án", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+      <%= select_tag :action_type, options_for_select(Activity::ACTIONS.map { |a| [t("activity_actions.#{a}", default: a.humanize), a] }, params[:action_type]),
+                     include_blank: "Mọi thao tác", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+
+      <div class="flex items-center gap-1.5">
+        <%= date_field_tag :from, params[:from], class: "x-input h-9 w-auto text-[13px]", title: "Từ ngày" %>
+        <span class="x-muted">–</span>
+        <%= date_field_tag :to, params[:to], class: "x-input h-9 w-auto text-[13px]", title: "Đến ngày" %>
+        <button class="x-btn x-btn-ghost x-btn-sm">Lọc</button>
+      </div>
+
+      <div class="ml-auto flex items-center gap-2">
+        <% if has_filter %>
+          <%= link_to "Xoá lọc", activities_path, class: "x-btn x-btn-ghost x-btn-sm" %>
+        <% end %>
+        <span class="x-muted whitespace-nowrap"><%= @activities.size %> thao tác</span>
+      </div>
     <% end %>
-  <% end %>
+  </div>
 
   <div class="x-card overflow-hidden">
+    <div class="x-card-head">
+      <h2 class="x-h3 x-section-title">
+        <%= has_filter ? "Kết quả lọc" : "Gần đây nhất" %>
+      </h2>
+      <span class="x-muted">Giữ tối thiểu 12 tháng</span>
+    </div>
     <%= render "shared/activity_list", activities: @activities %>
   </div>
 </div>

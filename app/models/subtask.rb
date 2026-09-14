@@ -15,7 +15,9 @@ class Subtask < ApplicationRecord
   private
 
   def refresh_task_counters
-    return unless task
+    # Khi xoá cả công việc, Rails xoá việc con trước rồi mới xoá công việc —
+    # lúc đó không được ghi ngược lên bản ghi đang bị huỷ.
+    return if task.nil? || task.destroyed? || destroyed_by_association
     task.update_column(:done_subtasks_count, task.subtasks.where(done: true).count)
   end
 end

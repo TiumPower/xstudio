@@ -1,0 +1,14 @@
+<%# Phần đầu trang dùng chung: tên màn hình, một câu nói rõ nó là gì, và hành
+    động chính nằm cố định bên phải. Nhờ vậy mọi trang mở ra đều đọc được ngay
+    "đây là gì" và "làm gì tiếp". %>
+<div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+  <div class="min-w-0">
+    <h1 class="x-h1 leading-tight"><%= title %></h1>
+    <% if local_assigns[:subtitle].present? %>
+      <p class="x-sub mt-1 max-w-[70ch]"><%= subtitle %></p>
+    <% end %>
+  </div>
+  <% if local_assigns[:actions].present? %>
+    <div class="flex items-center gap-2 flex-none"><%= actions %></div>
+  <% end %>
+</div>

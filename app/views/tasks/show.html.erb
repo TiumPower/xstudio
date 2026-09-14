@@ -1,125 +1,161 @@
-<% page_title "Chi tiết công việc" %>
+<% page_title "Công việc #{@task.code}" %>
+<% content_for :back_path, project_board_path(@project) %>
 
-<nav class="flex items-center gap-2 text-[13px] mb-4" style="color:var(--ink-3)">
-  <%= link_to "← #{@project.name}", project_board_path(@project), class: "font-semibold hover:underline" %>
+<nav class="flex items-center gap-2 text-[13px] mb-3" style="color:var(--ink-3)">
+  <%= link_to @project.name, project_path(@project), class: "font-semibold hover:underline", style: "color:var(--brand)" %>
   <span>/</span>
   <span class="x-code"><%= @task.code %></span>
 </nav>
 
-<div class="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-4 items-start">
+<div class="grid grid-cols-1 lg:grid-cols-[1fr_272px] gap-4 items-start">
   <div class="space-y-4">
-    <div class="x-card p-5">
-      <%= form_with model: @task, url: task_path(@task), method: :patch, local: true do |f| %>
-        <%= f.text_field :title, class: "x-input text-[19px] font-semibold h-auto py-2.5 mb-4" %>
-        <div class="x-field">
-          <label>Mô tả</label>
-          <%= f.rich_text_area :description, class: "trix-content" %>
-        </div>
-        <%= f.submit "Lưu", class: "x-btn x-btn-primary x-btn-sm cursor-pointer" %>
-      <% end %>
-    </div>
-
+    <%# --- Tiêu đề & mô tả ------------------------------------------- %>
     <div class="x-card">
       <div class="x-card-head">
-        <h2 class="x-h3">Việc con</h2>
-        <span class="x-muted x-num"><%= @task.subtask_summary %></span>
+        <h2 class="x-h3 x-section-title">Nội dung công việc</h2>
+        <div class="flex items-center gap-2">
+          <%= priority_chip(@task) %>
+          <span class="x-chip" style="background:<%= @task.board_column&.color || '#6B7A8F' %>1A;color:<%= @task.board_column&.color || '#6B7A8F' %>">
+            <%= @task.board_column&.name || "—" %>
+          </span>
+        </div>
       </div>
-      <div class="p-4">
-        <div id="subtasks"><%= render "subtasks/list", task: @task %></div>
-        <%= form_with url: task_subtasks_path(@task), method: :post, class: "flex gap-2 mt-3" do %>
-          <input type="text" name="subtask[title]" placeholder="+ Thêm việc con…" class="x-input h-9 text-[13px]" required>
-          <button class="x-btn x-btn-ghost x-btn-sm">Thêm</button>
+      <div class="p-5">
+        <%= form_with model: @task, url: task_path(@task), method: :patch, local: true do |f| %>
+          <div class="x-field">
+            <%= f.label :title, "Tiêu đề" %>
+            <%= f.text_field :title, class: "x-input text-[17px] font-semibold h-auto py-2.5" %>
+          </div>
+          <div class="x-field">
+            <%= f.label :description, "Mô tả" %>
+            <%= f.rich_text_area :description, placeholder: "Mô tả rõ phạm vi, tiêu chí hoàn thành…" %>
+          </div>
+          <%= f.submit "Lưu nội dung", class: "x-btn x-btn-primary x-btn-sm cursor-pointer" %>
         <% end %>
       </div>
     </div>
 
-    <% if @task.files.attached? %>
-      <div class="x-card">
-        <div class="x-card-head"><h2 class="x-h3">Tệp đính kèm</h2></div>
-        <div class="p-4 flex flex-wrap gap-2">
-          <% @task.files.each do |file| %>
-            <%= link_to rails_blob_path(file, disposition: "attachment"),
-                        class: "x-chip x-chip-brand", target: "_blank", rel: "noopener" do %>
-              📎 <%= file.filename.to_s.truncate(34) %> · <%= number_to_human_size(file.byte_size) %>
-            <% end %>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
-
+    <%# --- Việc con --------------------------------------------------- %>
     <div class="x-card">
       <div class="x-card-head">
-        <h2 class="x-h3">Bình luận</h2>
+        <h2 class="x-h3 x-section-title x-section-title-good">Việc con</h2>
+        <span class="x-chip x-num"><%= @task.subtask_summary %></span>
+      </div>
+      <div class="p-4">
+        <div id="subtasks"><%= render "subtasks/list", task: @task %></div>
+        <%= form_with url: task_subtasks_path(@task), method: :post, class: "flex gap-2 mt-3" do %>
+          <input type="text" name="subtask[title]" placeholder="Thêm một bước…" class="x-input h-9 text-[13px]" required>
+          <button class="x-btn x-btn-ghost x-btn-sm flex-none">Thêm</button>
+        <% end %>
+      </div>
+    </div>
+
+    <%# --- Tệp đính kèm ----------------------------------------------- %>
+    <div class="x-card">
+      <div class="x-card-head">
+        <h2 class="x-h3 x-section-title x-section-title-plain">Tệp đính kèm</h2>
+        <span class="x-muted"><%= @task.files.attached? ? @task.files.count : 0 %></span>
+      </div>
+      <div class="p-4">
+        <% if @task.files.attached? %>
+          <div class="flex flex-wrap gap-2 mb-3">
+            <% @task.files.each do |file| %>
+              <%= link_to rails_blob_path(file, disposition: "attachment"),
+                          class: "x-chip x-chip-brand", target: "_blank", rel: "noopener" do %>
+                📎 <%= file.filename.to_s.truncate(34) %> · <%= number_to_human_size(file.byte_size) %>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="x-muted mb-3">Chưa có tệp nào.</p>
+        <% end %>
+        <%= form_with model: @task, url: task_path(@task), method: :patch, local: true, multipart: true, class: "flex items-center gap-2" do |f| %>
+          <%= f.file_field :files, multiple: true, class: "text-[12.5px]" %>
+          <%= f.submit "Tải lên", class: "x-btn x-btn-ghost x-btn-sm cursor-pointer flex-none" %>
+        <% end %>
+      </div>
+    </div>
+
+    <%# --- Bình luận -------------------------------------------------- %>
+    <div class="x-card">
+      <div class="x-card-head">
+        <h2 class="x-h3 x-section-title x-section-title-warn">Bình luận</h2>
         <span class="x-muted"><%= @task.comments.kept.count %></span>
       </div>
       <div class="p-5"><%= render "comments/section", commentable: @task %></div>
     </div>
   </div>
 
-  <aside class="x-card p-4 space-y-3.5 lg:sticky lg:top-[72px]">
-    <%= form_with model: @task, url: task_path(@task), method: :patch, local: true, class: "space-y-3.5" do |f| %>
-      <div>
-        <label class="x-label block mb-1.5">Trạng thái</label>
-        <%= f.collection_select :board_column_id, @project.board_columns.ordered, :id, :name, {}, class: "x-select h-9 text-[13px]" %>
-      </div>
-      <div>
-        <label class="x-label block mb-1.5">Người thực hiện</label>
-        <%= f.collection_select :assignee_id, @project.members, :id, :display_name,
-                                { include_blank: t("common.unassigned") }, class: "x-select h-9 text-[13px]" %>
-      </div>
-      <div>
-        <label class="x-label block mb-1.5">Độ ưu tiên</label>
-        <%= f.select :priority, Task.priorities.keys.map { |k| [t("priorities.#{k}"), k] }, {}, class: "x-select h-9 text-[13px]" %>
-      </div>
-      <div>
-        <label class="x-label block mb-1.5">Ngày bắt đầu</label>
-        <%= f.date_field :start_date, class: "x-input h-9 text-[13px]" %>
-      </div>
-      <div>
-        <label class="x-label block mb-1.5">Hạn hoàn thành</label>
-        <%= f.date_field :due_date, class: "x-input h-9 text-[13px]" %>
-      </div>
-      <div>
-        <label class="x-label block mb-1.5">Ước lượng (giờ)</label>
-        <%= f.number_field :estimated_hours, step: 0.5, min: 0, class: "x-input h-9 text-[13px] x-num" %>
-      </div>
-      <% if @project.labels.any? %>
-        <div>
-          <label class="x-label block mb-1.5">Nhãn</label>
-          <div class="space-y-1">
-            <% @project.labels.order(:name).each do |label| %>
-              <label class="flex items-center gap-2 px-1.5 py-1 rounded-md cursor-pointer hover:bg-[var(--bg)] text-[12.5px]">
-                <%= check_box_tag "task[label_ids][]", label.id, @task.label_ids.include?(label.id), class: "x-check", id: "lbl_#{label.id}" %>
-                <span class="x-chip text-[10.5px] py-0.5" style="background:<%= label.color %>1A;color:<%= label.color %>"><%= label.name %></span>
-              </label>
-            <% end %>
+  <%# --- Thuộc tính ---------------------------------------------------- %>
+  <aside class="space-y-3 lg:sticky lg:top-[72px]">
+    <div class="x-card">
+      <div class="x-card-head"><h2 class="x-h3 x-section-title">Thuộc tính</h2></div>
+      <div class="p-4">
+        <%= form_with model: @task, url: task_path(@task), method: :patch, local: true, class: "space-y-3.5" do |f| %>
+          <div>
+            <label class="x-label block mb-1.5">Trạng thái (cột)</label>
+            <%= f.collection_select :board_column_id, @project.board_columns.ordered, :id, :name, {}, class: "x-select h-9 text-[13px]" %>
           </div>
+          <div>
+            <label class="x-label block mb-1.5">Người thực hiện</label>
+            <%= f.collection_select :assignee_id, @project.members, :id, :display_name,
+                                    { include_blank: t("common.unassigned") }, class: "x-select h-9 text-[13px]" %>
+          </div>
+          <div>
+            <label class="x-label block mb-1.5">Độ ưu tiên</label>
+            <%= f.select :priority, Task.priorities.keys.map { |k| [t("priorities.#{k}"), k] }, {}, class: "x-select h-9 text-[13px]" %>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="x-label block mb-1.5">Bắt đầu</label>
+              <%= f.date_field :start_date, class: "x-input h-9 text-[13px]" %>
+            </div>
+            <div>
+              <label class="x-label block mb-1.5">Hạn</label>
+              <%= f.date_field :due_date, class: "x-input h-9 text-[13px]" %>
+            </div>
+          </div>
+          <div>
+            <label class="x-label block mb-1.5">Ước lượng (giờ)</label>
+            <%= f.number_field :estimated_hours, step: 0.5, min: 0, class: "x-input h-9 text-[13px] x-num" %>
+          </div>
+          <% if @project.labels.any? %>
+            <div>
+              <label class="x-label block mb-1.5">Nhãn</label>
+              <div class="space-y-0.5">
+                <% @project.labels.order(:name).each do |label| %>
+                  <label class="flex items-center gap-2 px-1.5 py-1 rounded-md cursor-pointer hover:bg-[var(--bg)]">
+                    <%= check_box_tag "task[label_ids][]", label.id, @task.label_ids.include?(label.id), class: "x-check", id: "lbl_#{label.id}" %>
+                    <span class="x-chip text-[10.5px] py-0.5" style="background:<%= label.color %>1A;color:<%= label.color %>"><%= label.name %></span>
+                  </label>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+          <%= f.submit "Lưu thay đổi", class: "x-btn x-btn-primary x-btn-sm x-btn-block cursor-pointer" %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="x-card p-4">
+      <dl class="space-y-2 text-[12.5px]">
+        <div class="flex justify-between gap-3">
+          <dt style="color:var(--ink-3)">Người tạo</dt>
+          <dd class="font-medium truncate"><%= @task.reporter&.display_name || "—" %></dd>
         </div>
+        <div class="flex justify-between gap-3">
+          <dt style="color:var(--ink-3)">Ngày tạo</dt><dd class="x-num"><%= l(@task.created_at.to_date) %></dd>
+        </div>
+        <div class="flex justify-between gap-3">
+          <dt style="color:var(--ink-3)">Cập nhật</dt><dd><%= time_ago(@task.updated_at) %></dd>
+        </div>
+      </dl>
+      <% if current_user.role_admin? || @task.reporter_id == current_user.id %>
+        <div class="x-divider my-3"></div>
+        <%= button_to "Xoá công việc", task_path(@task), method: :delete,
+                      form: { data: { turbo_confirm: "Xoá công việc #{@task.code}?" } },
+                      class: "x-btn x-btn-sm x-btn-block", style: "color:var(--bad);background:var(--bad-soft)" %>
       <% end %>
-      <%= f.submit "Lưu thay đổi", class: "x-btn x-btn-primary x-btn-sm x-btn-block cursor-pointer" %>
-    <% end %>
-
-    <div class="x-divider"></div>
-
-    <%= form_with model: @task, url: task_path(@task), method: :patch, local: true, multipart: true do |f| %>
-      <label class="x-label block mb-1.5">Thêm tệp đính kèm</label>
-      <%= f.file_field :files, multiple: true, class: "text-[12px] w-full mb-2" %>
-      <%= f.submit "Tải lên", class: "x-btn x-btn-ghost x-btn-sm x-btn-block cursor-pointer" %>
-    <% end %>
-
-    <div class="x-divider"></div>
-
-    <dl class="space-y-2 text-[12.5px]">
-      <div class="flex justify-between"><dt style="color:var(--ink-3)">Người tạo</dt><dd class="font-medium"><%= @task.reporter&.display_name || "—" %></dd></div>
-      <div class="flex justify-between"><dt style="color:var(--ink-3)">Ngày tạo</dt><dd class="x-num"><%= l(@task.created_at.to_date) %></dd></div>
-      <div class="flex justify-between"><dt style="color:var(--ink-3)">Cập nhật</dt><dd><%= time_ago(@task.updated_at) %></dd></div>
-      <div class="flex justify-between"><dt style="color:var(--ink-3)">Dự án</dt><dd><%= link_to @project.code, project_path(@project), class: "font-semibold", style: "color:var(--brand)" %></dd></div>
-    </dl>
-
-    <% if current_user.role_admin? || @task.reporter_id == current_user.id %>
-      <%= button_to "Xoá công việc", task_path(@task), method: :delete,
-                    form: { data: { turbo_confirm: "Xoá công việc #{@task.code}?" } },
-                    class: "x-btn x-btn-sm x-btn-block", style: "color:var(--bad);background:var(--bad-soft)" %>
-    <% end %>
+    </div>
   </aside>
 </div>
