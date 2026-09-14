@@ -7,7 +7,8 @@
 
       <div class="flex-1 min-w-0 flex flex-col">
         <%= render "layouts/topbar" %>
-        <main class="flex-1 min-w-0 px-5 py-5 lg:px-7 lg:py-6">
+        <!-- pb-24 ở mobile để nội dung không nằm dưới thanh điều hướng dưới cùng -->
+        <main class="flex-1 min-w-0 px-5 pt-5 pb-24 lg:px-7 lg:pt-6 lg:pb-6">
           <%= render "layouts/flash" %>
           <%= yield %>
         </main>

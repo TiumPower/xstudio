@@ -106,6 +106,9 @@ export default class extends Controller {
   render() {
     this.emptyTarget.classList.toggle("hidden", Boolean(this.root && this.root.children.length))
 
+    // Bảng phím tắt chỉ có nghĩa trên canvas; ở chế độ danh sách nó che mất nội dung.
+    if (this.hasHintTarget) this.hintTarget.classList.toggle("hidden", this.viewValue === "outline")
+
     if (this.viewValue === "outline") {
       this.canvasWrapTarget.classList.add("hidden")
       this.zoomBarTarget.classList.add("hidden")
