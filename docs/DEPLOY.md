@@ -47,6 +47,11 @@ sudo certbot --nginx -d xstudio.czin.net
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
+> **Bắt buộc cho realtime cây định hướng:** vhost phải có khối `location ^~ /cable`
+> với `Upgrade`/`Connection` (đã có sẵn trong `config/nginx/xstudio.czin.net.conf`).
+> Thiếu nó thì WebSocket không nâng cấp được và thay đổi của người này không
+> hiện sang người khác — trang vẫn chạy bình thường nên rất dễ bỏ sót.
+
 ## 4. Sidekiq (systemd, một lần)
 
 `/etc/systemd/system/sidekiq-xstudio.service` — xem `config/systemd/sidekiq-xstudio.service`.
@@ -75,3 +80,12 @@ Sau đó đổi mật khẩu tài khoản quản trị và mời thành viên th
 | 08:00 | `DailyDigestJob` | bản tin tổng hợp hàng ngày |
 | 23:00 | `TreeSnapshotJob` | ảnh chụp cây định hướng nếu có thay đổi |
 | 03:15 | cron hệ thống | sao lưu CSDL, giữ 30 ngày |
+
+## Những chỗ dễ vấp
+
+| Triệu chứng | Nguyên nhân | Cách xử lý |
+|---|---|---|
+| Deploy xong nhưng `systemctl --user start` báo *bad unit file setting* | `cap production puma:install` sinh unit đặt biến môi trường ngay trong `ExecStart` — systemd từ chối | Chép `config/systemd/xstudio_puma_production.service` đè lên `~/.config/systemd/user/`, rồi `systemctl --user daemon-reload` |
+| Thay đổi cây không hiện sang người khác | nginx thiếu `location /cable`, hoặc gem `redis` lên 6.x (actioncable 7.2 yêu cầu `< 6`) | Kiểm tra vhost; giữ `gem "redis", "~> 5.4"` trong Gemfile |
+| Email không tới | Chưa có `SMTP_*` trong `shared/.env` — production đang `delivery_method = :logger` | Điền SMTP rồi `systemctl --user reload xstudio_puma_production` |
+| Nút ✨ hiện “AI chưa cấu hình” | Thiếu `ANTHROPIC_API_KEY` | Điền vào `shared/.env`, reload puma |
