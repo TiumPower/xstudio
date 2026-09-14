@@ -8,7 +8,9 @@ gem "importmap-rails"
 gem "turbo-rails"
 gem "stimulus-rails"
 gem "tailwindcss-rails"
-gem "redis", ">= 4.0.1"
+# ActionCable (Rails 7.2) khai báo redis (>= 4, < 6); redis 6 làm adapter
+# pubsub không nạp được và mọi broadcast im lặng thất bại.
+gem "redis", "~> 5.4"
 gem "rack-attack"
 gem "connection_pool", "~> 2.4"
 
