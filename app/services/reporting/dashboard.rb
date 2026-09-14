@@ -40,13 +40,13 @@ module Reporting
 
       income  = fetch(current, :income)
       expense = fetch(current, :expense)
-      general = scoped_transactions.general.expense.sum(:amount)
 
+      # Tổng chi ở đây là chi của MỌI dự án cộng chi chung workspace — trang
+      # Tổng quan nhìn cả đội nên không tách riêng.
       {
         income:  { value: income,  previous: fetch(previous, :income) },
         expense: { value: expense, previous: fetch(previous, :expense) },
-        profit:  { value: income - expense, previous: fetch(previous, :income) - fetch(previous, :expense) },
-        general: { value: general, previous: scoped_transactions(previous_range).general.expense.sum(:amount) }
+        profit:  { value: income - expense, previous: fetch(previous, :income) - fetch(previous, :expense) }
       }
     end
 

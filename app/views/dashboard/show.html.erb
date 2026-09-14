@@ -4,12 +4,12 @@
 <div class="space-y-4">
   <%= render "dashboard/filters" %>
 
-  <!-- Hàng 1 — chỉ số tài chính (FR-DASH-01) -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+  <!-- Hàng 1 — chỉ số tài chính. Tổng quan là bức tranh chung nên Tổng chi đã
+       gồm cả chi của mọi dự án lẫn chi chung workspace. -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
     <%= render "dashboard/kpi", label: "Tổng thu",  data: f[:income],  dark: true %>
     <%= render "dashboard/kpi", label: "Tổng chi",  data: f[:expense], tone: :bad %>
     <%= render "dashboard/kpi", label: "Lợi nhuận", data: f[:profit],  tone: :good %>
-    <%= render "dashboard/kpi", label: "Chi chung workspace", data: f[:general], hint: "Không gắn dự án" %>
   </div>
 
   <!-- Hàng 2 — biểu đồ -->
