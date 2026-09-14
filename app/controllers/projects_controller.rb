@@ -23,7 +23,8 @@ class ProjectsController < ApplicationController
                 else @projects.recent
                 end.to_a
 
-    @stats = Finance::ProjectTotals.new(@projects.map(&:id)).call
+    # Chỉ chế độ Thẻ hiện số tiền; chế độ Bảng không cần truy vấn tổng hợp này.
+    @stats = @view == "cards" ? Finance::ProjectTotals.new(@projects.map(&:id)).call : {}
     @owners  = User.alphabetical.where(id: Project.kept.select(:owner_id))
     @clients = Project.kept.where.not(client_name: [nil, ""]).distinct.pluck(:client_name).sort
   end

@@ -1,35 +1,44 @@
+<%# Bảng danh sách cố ý KHÔNG có cột Thu/Chi/Lợi nhuận: chín cột chen nhau làm
+    tên dự án bị bóp thành từng chữ và cột tiền vẫn bị cắt. Số liệu tài chính
+    xem ở trang chi tiết dự án — nơi có cả tab Thu chi đầy đủ. %>
 <div class="overflow-x-auto x-scroll-thin">
-  <table class="x-table min-w-[900px]">
+  <table class="x-table min-w-[720px]">
     <thead>
       <tr>
         <th>Dự án</th><th>Loại hình</th><th>Trạng thái</th><th>Phụ trách</th>
-        <th class="w-[120px]">Tiến độ</th><th>Hạn</th>
-        <th class="text-right">Thu</th><th class="text-right">Chi</th><th class="text-right">Lợi nhuận</th>
+        <th class="w-[150px]">Tiến độ</th><th class="w-[112px]">Hạn</th>
+        <th class="text-right w-[92px]">Công việc</th>
       </tr>
     </thead>
     <tbody>
       <% projects.each do |project| %>
-        <% t = stats[project.id] || { income: 0, expense: 0, profit: 0 } %>
         <tr class="x-row-link" onclick="location.href='<%= project_path(project) %>'">
           <td>
-            <div class="font-semibold text-[13.5px]"><%= project.name %></div>
-            <div class="x-code"><%= project.code %><%= " · #{project.client_name}" if project.client_name.present? %></div>
+            <div class="flex items-start gap-2.5">
+              <i class="w-1.5 h-1.5 rounded-full mt-[7px] flex-none" style="background:<%= project.type_color %>"></i>
+              <div class="min-w-0">
+                <div class="font-semibold text-[13.5px]"><%= project.name %></div>
+                <div class="x-code"><%= project.code %><%= " · #{project.client_name}" if project.client_name.present? %></div>
+              </div>
+            </div>
           </td>
           <td><%= project_type_chip(project) %></td>
           <td><%= project_status_chip(project) %></td>
           <td class="whitespace-nowrap"><%= project.owner&.display_name || "—" %></td>
           <td>
             <div class="flex items-center gap-2">
-              <div class="x-progress flex-1 min-w-[50px]"><span style="width:<%= project.progress %>%"></span></div>
-              <span class="x-num text-[12px] font-semibold"><%= project.progress %>%</span>
+              <div class="x-progress flex-1 min-w-[60px]"><span style="width:<%= project.progress %>%;background:<%= project.type_color %>"></span></div>
+              <span class="x-num text-[12px] font-semibold w-[32px] text-right"><%= project.progress %>%</span>
             </div>
           </td>
           <td class="whitespace-nowrap">
-            <span class="x-num <%= 'x-out font-semibold' if project.overdue? %>"><%= project.due_date ? l(project.due_date) : "—" %></span>
+            <% if project.overdue? %>
+              <span class="x-chip x-chip-bad x-num"><%= l(project.due_date) %></span>
+            <% else %>
+              <span class="x-num" style="color:var(--ink-2)"><%= project.due_date ? l(project.due_date) : "—" %></span>
+            <% end %>
           </td>
-          <td class="x-td-num"><span class="x-money x-in"><%= format_vnd(t[:income]) %></span></td>
-          <td class="x-td-num"><span class="x-money x-out"><%= format_vnd(t[:expense]) %></span></td>
-          <td class="x-td-num"><span class="x-money <%= t[:profit].negative? ? 'x-out' : 'x-in' %>"><%= format_vnd(t[:profit], signed: true) %></span></td>
+          <td class="x-td-num" style="color:var(--ink-2)"><%= project.tasks.kept.size %></td>
         </tr>
       <% end %>
     </tbody>

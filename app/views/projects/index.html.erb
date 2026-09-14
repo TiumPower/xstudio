@@ -46,7 +46,7 @@
                  body: "Tạo dự án đầu tiên để bắt đầu.", action_label: "Tạo dự án", action_path: new_project_path %>
     </div>
   <% elsif @view == "table" %>
-    <div class="x-card overflow-hidden"><%= render "table", projects: @projects, stats: @stats %></div>
+    <div class="x-card overflow-hidden"><%= render "table", projects: @projects %></div>
   <% else %>
     <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
       <% @projects.each do |project| %>
