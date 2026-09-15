@@ -74,10 +74,17 @@ namespace :storage do
     abort "Có tệp không đọc được." if broken.any?
   end
 
+  # Kho đích là kho MẶC ĐỊNH của môi trường, không phải `:spaces` trần. Ở
+  # production mặc định là `:spaces_mirrored`: ghi qua nó thì tệp dời sang có
+  # cả bản trên Spaces lẫn bản trên đĩa, giống hệt tệp mới tải lên. Ghi thẳng
+  # vào `:spaces` rồi đánh dấu "spaces_mirrored" là nói dối cột service_name —
+  # bản ghi bảo có bản sao trên đĩa mà thật ra không có.
+  def target_name = Rails.application.config.active_storage.service.to_s
+
   def spaces_service
     unless ENV["SPACES_KEY"].present? && ENV["SPACES_BUCKET"].present?
       abort "Thiếu SPACES_KEY / SPACES_BUCKET trong .env — xem config/storage.yml."
     end
-    ActiveStorage::Blob.services.fetch(:spaces)
+    ActiveStorage::Blob.services.fetch(target_name.to_sym)
   end
 end
