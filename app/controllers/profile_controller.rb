@@ -35,6 +35,14 @@ class ProfileController < ApplicationController
     redirect_to profile_path, notice: "Đã lưu cấu hình thông báo."
   end
 
+  # Huỷ mọi phiên đang mở của chính mình, kể cả thiết bị này.
+  def sign_out_everywhere
+    current_user.invalidate_all_sessions!
+    sign_out(current_user)
+    redirect_to new_user_session_path,
+                notice: "Đã đăng xuất khỏi mọi thiết bị. Hãy đăng nhập lại."
+  end
+
   private
 
   def profile_params = params.require(:user).permit(:full_name, :job_title, :phone, :avatar)

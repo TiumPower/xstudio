@@ -115,11 +115,33 @@
     </div>
   </div>
 
-  <div class="x-card p-5 flex items-center justify-between">
-    <div>
-      <div class="text-[13.5px] font-semibold">Đăng xuất khỏi thiết bị này</div>
-      <div class="x-muted">Phiên đăng nhập kéo dài 30 ngày khi bật “Duy trì đăng nhập”.</div>
+  <div class="x-card">
+    <div class="x-card-head"><h2 class="x-h3 x-section-title x-section-title-warn">Phiên đăng nhập</h2></div>
+    <div class="p-5 space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="min-w-0">
+          <div class="text-[13.5px] font-semibold">Đăng xuất khỏi thiết bị này</div>
+          <div class="x-muted">Các thiết bị khác vẫn đăng nhập bình thường.</div>
+        </div>
+        <%= button_to t("nav.logout"), destroy_user_session_path, method: :delete,
+                      class: "x-btn x-btn-ghost flex-none" %>
+      </div>
+
+      <div class="x-divider"></div>
+
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="min-w-0">
+          <div class="text-[13.5px] font-semibold">Đăng xuất khỏi mọi thiết bị</div>
+          <div class="x-muted max-w-[60ch]">
+            Huỷ toàn bộ phiên đang mở ở mọi máy và trình duyệt, kể cả máy này.
+            Dùng khi bạn nghi ngờ tài khoản bị người khác dùng, hoặc quên đăng
+            xuất ở một máy nào đó. Không cần đổi mật khẩu.
+          </div>
+        </div>
+        <%= button_to "Đăng xuất mọi nơi", sign_out_everywhere_profile_path, method: :delete,
+                      form: { data: { turbo_confirm: "Đăng xuất khỏi mọi thiết bị? Bạn sẽ phải đăng nhập lại ngay trên máy này." } },
+                      class: "x-btn x-btn-danger flex-none" %>
+      </div>
     </div>
-    <%= button_to t("nav.logout"), destroy_user_session_path, method: :delete, class: "x-btn x-btn-ghost" %>
   </div>
 </div>

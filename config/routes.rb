@@ -69,6 +69,7 @@ Rails.application.routes.draw do
   resource :profile, path: "ho-so", only: [:show, :update], controller: "profile" do
     patch :password, on: :collection
     patch :notifications, on: :collection
+    delete :sign_out_everywhere, path: "dang-xuat-moi-thiet-bi", on: :collection
   end
 
   resource :settings, path: "cai-dat", only: [:show, :update], controller: "settings" do

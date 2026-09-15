@@ -75,6 +75,20 @@ class User < ApplicationRecord
     save
   end
 
+  # --- Đăng xuất khỏi mọi thiết bị ----------------------------------------
+  #
+  # Devise dựng khoá phiên từ `authenticatable_salt`. Trộn thêm session_token
+  # vào đó, nên chỉ cần đổi token là MỌI phiên đang mở (kể cả cookie ghi nhớ
+  # 10 năm) lập tức hết hiệu lực — mà không phải đổi mật khẩu.
+  def authenticatable_salt
+    "#{super}#{session_token}"
+  end
+
+  def invalidate_all_sessions!
+    forget_me!
+    update_column(:session_token, SecureRandom.hex(16))
+  end
+
   # --- Devise hooks -------------------------------------------------------
   # Thành viên bị vô hiệu hoá hoặc chưa kích hoạt thì không đăng nhập được.
   def active_for_authentication?
