@@ -6,16 +6,17 @@
   step    = 10**Math.log10(raw_max / unit[0].to_f / ticks).floor
   step    = [1, 2, 2.5, 5, 10].map { |m| m * step }.find { |v| v * ticks >= raw_max / unit[0].to_f } || step
   max     = (step * ticks * unit[0]).to_i
-  # Nhiều cột thì chỉ ghi nhãn cách quãng cho khỏi chồng chữ.
-  every   = [(points.size / 12.0).ceil, 1].max
+  # Nhãn theo ngày chỉ 1–2 ký tự nên ghi được dày hơn nhãn theo tuần/tháng.
+  max_labels = trend.unit == :day ? 16 : 12
+  every      = [(points.size / max_labels.to_f).ceil, 1].max
 %>
 
 <div class="flex items-start gap-3">
   <div class="flex-none w-[52px] text-right">
-    <div class="x-muted text-[10.5px] mb-2">Đơn vị: <%= unit[1] %></div>
+    <div class="text-[10.5px] mb-2 font-medium" style="color:var(--ink-2)">Đơn vị: <%= unit[1] %></div>
     <div class="relative h-[180px]">
       <% (0..ticks).reverse_each do |i| %>
-        <div class="absolute right-0 text-[10.5px] x-num" style="color:var(--ink-3);top:<%= (ticks - i) * (180.0 / ticks) - 6 %>px">
+        <div class="absolute right-0 text-[11px] x-num font-medium" style="color:var(--ink-2);top:<%= (ticks - i) * (180.0 / ticks) - 6 %>px">
           <%= (step * i) == (step * i).to_i ? (step * i).to_i : (step * i).round(1).to_s.sub(".", ",") %>
         </div>
       <% end %>
@@ -32,7 +33,8 @@
         <% points.each do |row| %>
           <div class="flex-1 flex items-end justify-center gap-[2px] h-full group relative">
             <div class="w-[42%] rounded-t-[3px]" style="background:var(--brand);height:<%= (row[:income] * 100.0 / max).round(1) %>%"></div>
-            <div class="w-[42%] rounded-t-[3px]" style="background:#C3D2E6;height:<%= (row[:expense] * 100.0 / max).round(1) %>%"></div>
+            <%# Chi dùng đỏ nhạt cho khớp với quy ước màu ở mọi nơi khác. %>
+            <div class="w-[42%] rounded-t-[3px]" style="background:#E8A39E;height:<%= (row[:expense] * 100.0 / max).round(1) %>%"></div>
             <div class="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 hidden group-hover:block z-10 whitespace-nowrap
                         px-2.5 py-1.5 rounded-lg text-[11px] text-white shadow-lg" style="background:var(--nav)">
               <div class="font-semibold mb-0.5"><%= row[:label] %></div>
@@ -45,7 +47,7 @@
     </div>
     <div class="flex gap-[3px] mt-2">
       <% points.each_with_index do |row, i| %>
-        <div class="flex-1 text-center text-[10.5px] x-num truncate" style="color:var(--ink-3)">
+        <div class="flex-1 text-center text-[11px] x-num font-medium truncate" style="color:var(--ink-2)">
           <%= (i % every).zero? || i == points.size - 1 ? row[:label] : "" %>
         </div>
       <% end %>
@@ -57,15 +59,15 @@
 <% total_expense = points.sum { |r| r[:expense] } %>
 <div class="flex flex-wrap gap-6 mt-4 pt-4 border-t text-[12.5px]" style="border-color:var(--line-2)">
   <div>
-    <div style="color:var(--ink-3)">Thu trong kỳ</div>
+    <div class="font-medium" style="color:var(--ink-2)">Thu trong kỳ</div>
     <div class="x-money x-in mt-0.5"><%= format_vnd(total_income) %></div>
   </div>
   <div>
-    <div style="color:var(--ink-3)">Chi trong kỳ</div>
+    <div class="font-medium" style="color:var(--ink-2)">Chi trong kỳ</div>
     <div class="x-money x-out mt-0.5"><%= format_vnd(total_expense) %></div>
   </div>
   <div>
-    <div style="color:var(--ink-3)">Chênh lệch</div>
+    <div class="font-medium" style="color:var(--ink-2)">Chênh lệch</div>
     <div class="x-money mt-0.5" style="color:<%= (total_income - total_expense).negative? ? 'var(--bad)' : 'var(--good)' %>">
       <%= format_vnd(total_income - total_expense, signed: true) %>
     </div>

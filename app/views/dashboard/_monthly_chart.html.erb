@@ -12,7 +12,7 @@
     <div class="x-muted text-[10.5px] mb-2">Đơn vị: <%= unit[1] %></div>
     <div class="relative h-[180px]">
       <% (0..ticks).reverse_each do |i| %>
-        <div class="absolute right-0 text-[10.5px] x-num" style="color:var(--ink-3);top:<%= (ticks - i) * (180.0 / ticks) - 6 %>px">
+        <div class="absolute right-0 text-[10.5px] x-num" style="color:var(--ink-2);top:<%= (ticks - i) * (180.0 / ticks) - 6 %>px">
           <%= (step * i) == (step * i).to_i ? (step * i).to_i : (step * i).round(1).to_s.sub(".", ",") %>
         </div>
       <% end %>
@@ -29,7 +29,7 @@
         <% series.each do |row| %>
           <div class="flex-1 flex items-end justify-center gap-[2px] h-full group relative">
             <div class="w-[42%] rounded-t-[3px] transition-all" style="background:var(--brand);height:<%= (row[:income] * 100.0 / max).round(1) %>%"></div>
-            <div class="w-[42%] rounded-t-[3px] transition-all" style="background:#C3D2E6;height:<%= (row[:expense] * 100.0 / max).round(1) %>%"></div>
+            <div class="w-[42%] rounded-t-[3px] transition-all" style="background:#E8A39E;height:<%= (row[:expense] * 100.0 / max).round(1) %>%"></div>
             <div class="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 hidden group-hover:block z-10 whitespace-nowrap
                         px-2.5 py-1.5 rounded-lg text-[11px] text-white shadow-lg" style="background:var(--nav)">
               <div class="font-semibold mb-0.5"><%= row[:label] %></div>
@@ -42,7 +42,7 @@
     </div>
     <div class="flex gap-[3px] mt-2">
       <% series.each_with_index do |row, i| %>
-        <div class="flex-1 text-center text-[10.5px] x-num" style="color:var(--ink-3)">
+        <div class="flex-1 text-center text-[11px] x-num font-medium" style="color:var(--ink-2)">
           <%= i.zero? || row[:month].month == 1 ? row[:month].strftime("%m/%y") : row[:month].strftime("%m") %>
         </div>
       <% end %>

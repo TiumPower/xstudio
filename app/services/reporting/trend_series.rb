@@ -74,9 +74,11 @@ module Reporting
       end
     end
 
+    # Nhãn trục X. Chia theo ngày thì chỉ cần số ngày — kỳ đã ghi rõ ở tiêu đề
+    # nên không phải lặp lại tháng ở từng cột.
     def label_for(date, unit)
       case unit
-      when :day   then date.strftime("%d/%m")
+      when :day   then date.day.to_s
       when :week  then date.strftime("%d/%m")
       else date.strftime("%m/%y")
       end
