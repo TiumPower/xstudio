@@ -28,7 +28,9 @@
   --brand-2:       #3E7AC9;
   --brand-soft:    #EAF1FA;
   --brand-ink:     #1B4E93;
-  --good:          #0B8A5C;   /* Thu / hoàn thành */
+  /* Xanh lá CHỈ còn mang nghĩa "tốt / hoàn thành": việc xong, thành viên đang
+     hoạt động, lợi nhuận dương. Không dùng cho Thu nữa. */
+  --good:          #0B8A5C;
   --good-soft:     #E3F5EC;
   --warn:          #D98324;
   --warn-soft:     #FDF3E4;
@@ -40,7 +42,12 @@
      Chữ và số dùng --good/--bad (đậm, dễ đọc); cột và mảng màu dùng cặp dưới
      đây. Hai màu cố ý để CÙNG độ tươi: trước đây Chi bị nhạt hơn hẳn nên nhìn
      lướt dễ lẫn với Thu. Chi ngả cam thay vì đỏ thuần để tách xa xanh lá hơn. */
-  --chart-income:  #0EA06B;   /* Thu — xanh lá tươi */
+  /* Thu dùng XANH DƯƠNG, không dùng xanh lá: xanh lá với đỏ là cặp khó phân
+     biệt nhất với người mù màu đỏ–lục (~8% nam giới), mà Thu/Chi thì luôn nằm
+     cạnh nhau để so sánh. Xanh dương với đỏ cam thì ai cũng tách được. */
+  --income:        #1D6FD0;
+  --income-soft:   #E8F0FB;
+  --chart-income:  #2E7FD6;   /* Thu — xanh dương */
   --chart-expense: #E8452E;   /* Chi — đỏ cam */
 
   /* Loại hình dự án */
@@ -91,7 +98,7 @@ body {
   .x-code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; color: var(--ink-3); letter-spacing: .04em; }
   /* Số tiền không bao giờ được xuống dòng, kể cả ký hiệu ₫. */
   .x-money { font-variant-numeric: tabular-nums; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; }
-  .x-in  { color: var(--good); }
+  .x-in  { color: var(--income); }
   .x-out { color: var(--bad); }
   .x-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .x-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
@@ -161,6 +168,7 @@ body {
   }
   .x-chip-brand { background: var(--brand-soft); color: var(--brand-ink); }
   .x-chip-good  { background: var(--good-soft); color: var(--good); }
+  .x-chip-income { background: var(--income-soft); color: var(--income); }
   .x-chip-warn  { background: var(--warn-soft); color: #B4700F; }
   .x-chip-bad   { background: var(--bad-soft);  color: var(--bad); }
   .x-chip-ps    { background: var(--type-ps-soft); color: var(--type-ps); }
@@ -219,7 +227,7 @@ body {
   .x-kind:has(:checked) .x-kind-mark svg { opacity: 1; color: #fff; }
 
   .x-kind-income:has(:checked) {
-    background: var(--good-soft); border-color: var(--chart-income); color: var(--good);
+    background: var(--income-soft); border-color: var(--chart-income); color: var(--income);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--chart-income) 14%, transparent);
   }
   .x-kind-expense:has(:checked) {

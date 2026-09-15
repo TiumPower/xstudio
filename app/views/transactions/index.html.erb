@@ -9,7 +9,7 @@
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
     <div class="x-card p-5">
       <div class="flex items-center gap-2 mb-1.5">
-        <span class="w-5 h-5 rounded-md grid place-items-center text-[12px] font-bold" style="background:var(--good-soft);color:var(--good)">+</span>
+        <span class="w-5 h-5 rounded-md grid place-items-center text-[12px] font-bold" style="background:var(--income-soft);color:var(--income)">+</span>
         <span class="text-[12.5px] font-medium" style="color:var(--ink-2)">Tổng thu (đang lọc)</span>
       </div>
       <div class="x-money text-[24px] x-in"><%= format_vnd(@totals[:income], signed: true) %></div>
@@ -62,10 +62,10 @@
           </thead>
           <tbody>
             <% @transactions.each do |t| %>
-              <tr style="box-shadow:inset 3px 0 0 <%= t.kind_income? ? 'var(--good)' : 'var(--bad)' %>">
+              <tr style="box-shadow:inset 3px 0 0 <%= t.kind_income? ? 'var(--chart-income)' : 'var(--chart-expense)' %>">
                 <td class="x-num whitespace-nowrap"><%= l(t.occurred_on) %></td>
                 <td>
-                  <span class="x-chip <%= t.kind_income? ? 'x-chip-good' : 'x-chip-bad' %>"><%= t.kind_label %></span>
+                  <span class="x-chip <%= t.kind_income? ? 'x-chip-income' : 'x-chip-bad' %>"><%= t.kind_label %></span>
                 </td>
                 <td>
                   <div class="font-medium text-[13px]"><%= blank_dash t.description %></div>

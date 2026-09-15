@@ -8,7 +8,7 @@
        gồm cả chi của mọi dự án lẫn chi chung workspace. -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
     <%# Lợi nhuận là con số người ta nhìn đầu tiên → đặt lên thẻ nổi bật. %>
-    <%= render "dashboard/kpi", label: "Tổng thu",  data: f[:income],  tone: :good %>
+    <%= render "dashboard/kpi", label: "Tổng thu",  data: f[:income],  tone: :income %>
     <%= render "dashboard/kpi", label: "Tổng chi",  data: f[:expense], tone: :bad %>
     <%= render "dashboard/kpi", label: "Lợi nhuận", data: f[:profit],  dark: true %>
   </div>
