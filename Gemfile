@@ -10,7 +10,7 @@ gem "stimulus-rails"
 gem "tailwindcss-rails"
 # ActionCable (Rails 7.2) khai báo redis (>= 4, < 6); redis 6 làm adapter
 # pubsub không nạp được và mọi broadcast im lặng thất bại.
-gem "redis", "~> 5.4"
+gem "redis", "~> 6.0"
 gem "rack-attack"
 gem "connection_pool", "~> 2.4"
 
