@@ -102,7 +102,7 @@ class Project < ApplicationRecord
     { key: "todo",   name: "Cần làm",   color: "#6B7A8F", is_done_column: false },
     { key: "doing",  name: "Đang làm",  color: "#2E6BC0", is_done_column: false },
     { key: "review", name: "Chờ duyệt", color: "#D98324", is_done_column: false },
-    { key: "done",   name: "Hoàn thành", color: "#0E7A46", is_done_column: true }
+    { key: "done",   name: "Hoàn thành", color: "#0B8A5C", is_done_column: true }
   ].freeze
 
   def create_default_board_columns

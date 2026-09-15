@@ -29,8 +29,8 @@ class StrategyNode < ApplicationRecord
     "idea"     => "#6B7A8F",
     "pursuing" => "#2E6BC0",
     "paused"   => "#D98324",
-    "achieved" => "#0E7A46",
-    "dropped"  => "#C8322B"
+    "achieved" => "#0B8A5C",
+    "dropped"  => "#D13A21"
   }.freeze
 
   LEVEL_COLORS = %w[#2E6BC0 #6D3BD4 #0E7490 #0E7A46 #D98324 #B4479E #5A6B82].freeze

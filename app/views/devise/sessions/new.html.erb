@@ -15,7 +15,7 @@
 
   <div class="flex items-center justify-between mb-5">
     <label class="flex items-center gap-2 text-[13px] cursor-pointer" style="color:var(--ink-2)">
-      <%= f.check_box :remember_me, class: "x-check" %>
+      <%= f.check_box :remember_me, { checked: true, class: "x-check" } %>
       Duy trì đăng nhập
     </label>
     <%= link_to "Quên mật khẩu?", new_password_path(resource_name), class: "text-[13px] font-semibold", style: "color:var(--brand)" %>

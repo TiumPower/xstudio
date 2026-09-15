@@ -167,12 +167,14 @@ Devise.setup do |config|
 
   # ==> Configuration for :rememberable
   # The time the user will be remembered without asking for credentials again.
-  config.remember_for = 30.days       # FR-AUTH-07
+  # Không giới hạn phiên đăng nhập theo yêu cầu vận hành (SRS ghi 30 ngày).
+  config.remember_for = 10.years
 
   # Invalidates all the remember me tokens when the user signs out.
   config.expire_all_remember_me_on_sign_out = true
 
   # If true, extends the user's remember period when remembered via cookie.
+  # Mỗi lần truy cập lại đẩy hạn ra xa, nên người dùng thường xuyên không bao giờ bị đá ra.
   config.extend_remember_period = true
 
   # Options to be passed to the created cookie. For instance, you can set

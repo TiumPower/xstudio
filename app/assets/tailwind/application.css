@@ -28,20 +28,20 @@
   --brand-2:       #3E7AC9;
   --brand-soft:    #EAF1FA;
   --brand-ink:     #1B4E93;
-  --good:          #0E7A46;   /* Thu / hoàn thành */
-  --good-soft:     #E4F4EA;
+  --good:          #0B8A5C;   /* Thu / hoàn thành */
+  --good-soft:     #E3F5EC;
   --warn:          #D98324;
   --warn-soft:     #FDF3E4;
-  --bad:           #C8322B;   /* Chi / quá hạn */
-  --bad-soft:      #FCECEB;
+  --bad:           #D13A21;   /* Chi / quá hạn */
+  --bad-soft:      #FDEDE8;
   --info:          #0EA5E9;
 
   /* Màu Thu / Chi trên BIỂU ĐỒ.
      Chữ và số dùng --good/--bad (đậm, dễ đọc); cột và mảng màu dùng cặp dưới
-     đây (nhạt hơn một bậc, cân trọng lượng thị giác). Cùng tông với --good/--bad
-     nên nhìn đâu cũng thấy Thu là xanh lá, Chi là đỏ. */
-  --chart-income:  #1F9D62;
-  --chart-expense: #E2766D;
+     đây. Hai màu cố ý để CÙNG độ tươi: trước đây Chi bị nhạt hơn hẳn nên nhìn
+     lướt dễ lẫn với Thu. Chi ngả cam thay vì đỏ thuần để tách xa xanh lá hơn. */
+  --chart-income:  #0EA06B;   /* Thu — xanh lá tươi */
+  --chart-expense: #E8452E;   /* Chi — đỏ cam */
 
   /* Loại hình dự án */
   --type-ps:       #6D3BD4;   /* Products */
