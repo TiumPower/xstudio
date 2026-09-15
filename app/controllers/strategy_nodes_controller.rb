@@ -162,11 +162,18 @@ class StrategyNodesController < ApplicationController
   end
 
   def render_tree(notice: nil)
-    flash[:notice] = notice if notice.present?
     respond_to do |format|
+      # Canvas vẽ lại tại chỗ nên không dùng flash — flash sẽ nằm chờ rồi hiện
+      # lạc lõng ở lần tải trang sau đó.
       format.json { render json: { ok: true, notice: notice } }
-      format.html { redirect_to strategy_tree_path(@tree) }
-      format.turbo_stream { redirect_to strategy_tree_path(@tree) }
+      format.html do
+        flash[:notice] = notice if notice.present?
+        redirect_to strategy_tree_path(@tree)
+      end
+      format.turbo_stream do
+        flash[:notice] = notice if notice.present?
+        redirect_to strategy_tree_path(@tree)
+      end
     end
   end
 

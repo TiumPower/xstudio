@@ -341,6 +341,7 @@ body {
   .x-tree-node:hover .x-node-actions,
   .x-tree-node:focus-within .x-node-actions { opacity: 1; pointer-events: auto; }
   .x-node-actions g:hover circle { fill: var(--brand-soft); stroke: var(--brand); }
+  .x-node-actions g.x-node-action-danger:hover circle { fill: var(--bad-soft); stroke: var(--bad); }
 
   /* Chế độ danh sách phân cấp */
   .x-outline-row {

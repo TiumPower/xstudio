@@ -167,7 +167,7 @@ export default class extends Controller {
     const xs = placed.map((p) => coords(p).x)
     const ys = placed.map((p) => coords(p).y)
     this.bounds = {
-      minX: Math.min(...xs) - 40, maxX: Math.max(...xs) + NODE_W + 100,
+      minX: Math.min(...xs) - 40, maxX: Math.max(...xs) + NODE_W + 120,
       minY: Math.min(...ys) - 40, maxY: Math.max(...ys) + NODE_H + 40
     }
 
@@ -270,7 +270,7 @@ export default class extends Controller {
 
     if (node.children.length && this.collapsed.has(node.id)) {
       const badge = document.createElementNS(svgNS, "g")
-      badge.setAttribute("transform", `translate(${NODE_W + 62}, ${NODE_H / 2 - 10})`)
+      badge.setAttribute("transform", `translate(${NODE_W + 88}, ${NODE_H / 2 - 10})`)
       badge.style.cursor = "pointer"
       const circle = document.createElementNS(svgNS, "circle")
       circle.setAttribute("cx", "10"); circle.setAttribute("cy", "10"); circle.setAttribute("r", "10")
@@ -308,6 +308,12 @@ export default class extends Controller {
         run: () => { this.select(node.id); this.runSuggest("children") }
       })
     }
+    if (node.parentId !== null) {
+      buttons.push({
+        label: "🗑", title: "Xoá nhánh này", size: 10, danger: true,
+        run: () => { this.selectedId = node.id; this.remove() }
+      })
+    }
 
     buttons.forEach((button, index) => {
       const g = document.createElementNS(svgNS, "g")
@@ -317,11 +323,13 @@ export default class extends Controller {
       const circle = document.createElementNS(svgNS, "circle")
       circle.setAttribute("cx", "11"); circle.setAttribute("cy", "11"); circle.setAttribute("r", "10.5")
       circle.setAttribute("fill", "#FFFFFF")
-      circle.setAttribute("stroke", "#D6DEE9")
+      circle.setAttribute("stroke", button.danger ? "#F0C6C2" : "#D6DEE9")
       g.appendChild(circle)
+      if (button.danger) g.setAttribute("class", "x-node-action-danger")
 
       g.appendChild(this.text(button.label, 11, button.label === "+" ? 16 : 14.5,
-                              { size: button.size, weight: 600, fill: "#46566C", anchor: "middle" }))
+                              { size: button.size, weight: 600,
+                                fill: button.danger ? "#C8322B" : "#46566C", anchor: "middle" }))
 
       const title = document.createElementNS(svgNS, "title")
       title.textContent = button.title
@@ -339,7 +347,7 @@ export default class extends Controller {
   hoverBridge() {
     const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect")
     rect.setAttribute("x", "0"); rect.setAttribute("y", "-6")
-    rect.setAttribute("width", NODE_W + 62); rect.setAttribute("height", NODE_H + 12)
+    rect.setAttribute("width", NODE_W + 90); rect.setAttribute("height", NODE_H + 12)
     rect.setAttribute("fill", "transparent")
     return rect
   }
@@ -480,8 +488,8 @@ export default class extends Controller {
     const value = event.target.value
     const before = { title: node.title, status: node.status, owner_id: node.ownerId, icon: node.icon, color: node.ownColor, note: node.note }
 
-    const response = await this.request(this.urlsValue.node.replace("__ID__", node.id), "PATCH", { strategy_node: { [name]: value } })
-    if (!response) return
+    const result = await this.request(this.urlsValue.node.replace("__ID__", node.id), "PATCH", { strategy_node: { [name]: value } })
+    if (!result) return
 
     this.pushUndo({
       redo: () => this.request(this.urlsValue.node.replace("__ID__", node.id), "PATCH", { strategy_node: { [name]: value } }),
@@ -501,8 +509,8 @@ export default class extends Controller {
     })
     if (title === null) return
     this.collapsed.delete(node.id)
-    await this.request(this.urlsValue.nodes, "POST", { parent_id: node.id, strategy_node: { title: title || "Nút mới" } })
-    this.reload()
+    const result = await this.request(this.urlsValue.nodes, "POST", { parent_id: node.id, strategy_node: { title: title || "Nút mới" } })
+    this.refresh({ notice: result && `Đã thêm “${title || "Nút mới"}”.` })
   }
 
   addFirst() { this.selectedId = this.root?.id; this.addChild() }
@@ -515,8 +523,8 @@ export default class extends Controller {
       hint: parent ? `Nằm trong “${parent.title}”` : null, placeholder: "Tên nhánh…", okLabel: "Thêm", maxLength: 120
     })
     if (title === null) return
-    await this.request(this.urlsValue.nodes, "POST", { parent_id: node.parentId, strategy_node: { title: title || "Nút mới" } })
-    this.reload()
+    const result = await this.request(this.urlsValue.nodes, "POST", { parent_id: node.parentId, strategy_node: { title: title || "Nút mới" } })
+    this.refresh({ notice: result && `Đã thêm “${title || "Nút mới"}”.` })
   }
 
   async outdent() {
@@ -531,8 +539,8 @@ export default class extends Controller {
   async duplicate() {
     const node = this.findNode(this.selectedId)
     if (!node || node.parentId === null) return this.toast("Không nhân bản được nút gốc.", "warn")
-    await this.request(this.urlsValue.dup.replace("__ID__", node.id), "POST", {})
-    this.reload()
+    const result = await this.request(this.urlsValue.dup.replace("__ID__", node.id), "POST", {})
+    this.refresh({ notice: result && "Đã nhân bản nhánh." })
   }
 
   async inlineEdit(node) {
@@ -576,9 +584,9 @@ export default class extends Controller {
   async performDelete(mode) {
     const node = this.findNode(this.selectedId)
     if (!node) return
-    await this.request(`${this.urlsValue.node.replace("__ID__", node.id)}?mode=${mode}`, "DELETE", {})
+    const result = await this.request(`${this.urlsValue.node.replace("__ID__", node.id)}?mode=${mode}`, "DELETE", {})
     this.selectedId = node.parentId
-    this.reload()
+    this.refresh({ notice: result && `Đã xoá “${node.title}”.` })
   }
 
   // ---- Thu gọn / mở rộng -------------------------------------------------
@@ -905,9 +913,9 @@ export default class extends Controller {
       if (chosen.length === 0) return this.toast("Chưa chọn gợi ý nào.", "warn")
 
       this.collapsed.delete(node.id)
-      await this.request(this.urlsValue.apply.replace("__ID__", node.id), "POST",
-                         { items: chosen, log_id: payload.log_id })
-      this.reload()
+      const result = await this.request(this.urlsValue.apply.replace("__ID__", node.id), "POST",
+                                        { items: chosen, log_id: payload.log_id })
+      this.refresh({ notice: result?.notice })
     })
   }
 
@@ -950,9 +958,9 @@ export default class extends Controller {
     const text = this.pasteInputTarget.value
     if (!text.trim()) return
     this.collapsed.delete(this.selectedId)
-    await this.request(this.urlsValue.paste, "POST", { parent_id: this.selectedId, text })
+    const result = await this.request(this.urlsValue.paste, "POST", { parent_id: this.selectedId, text })
     this.pasteOverlayTarget.classList.add("hidden")
-    this.reload()
+    this.refresh({ notice: result?.notice })
   }
 
   // ---- Xuất PNG ----------------------------------------------------------
@@ -1052,7 +1060,7 @@ export default class extends Controller {
     if (!command) return this.toast("Không còn thao tác nào để hoàn tác.", "warn")
     await command.undo()
     this.redoStack.push(command)
-    this.reload()
+    this.refresh({ notice: "Đã hoàn tác." })
   }
 
   async redo() {
@@ -1060,7 +1068,7 @@ export default class extends Controller {
     if (!command) return
     await command.redo()
     this.undoStack.push(command)
-    this.reload()
+    this.refresh({ notice: "Đã làm lại." })
   }
 
   // ---- Tiện ích ----------------------------------------------------------
@@ -1104,11 +1112,59 @@ export default class extends Controller {
     }
   }
 
-  reload() {
+  // Cập nhật tại chỗ: chỉ xin lại payload cây rồi vẽ lại canvas. Giữ nguyên
+  // thu phóng, vị trí kéo, nút đang chọn và trạng thái thu gọn — nạp lại cả
+  // trang sau mỗi thao tác nhỏ làm mất hết những thứ đó.
+  async refresh({ notice = null } = {}) {
+    try {
+      const response = await fetch(`${window.location.pathname}.json`,
+                                   { headers: { Accept: "application/json" } })
+      if (!response.ok) throw new Error("tải lại cây thất bại")
+      const payload = await response.json()
+
+      this.root = payload.tree && payload.tree.id ? payload.tree : null
+      this.pruneCollapsed()
+
+      if (typeof payload.aiRemaining === "number") {
+        this.aiRemainingValue = payload.aiRemaining
+        if (this.hasAiCounterTarget) this.aiCounterTarget.textContent = payload.aiRemaining
+      }
+
+      if (this.selectedId && !this.findNode(this.selectedId)) this.selectedId = null
+      this.render()
+      if (this.selectedId) this.renderPanel()
+      else this.panelBodyTarget.innerHTML = '<p class="x-muted text-center py-10">Chọn một nút để xem và sửa chi tiết.</p>'
+
+      this.updateTreeCount(payload.nodeCount)
+      if (notice) this.toast(notice, "good")
+    } catch (error) {
+      // Không vẽ lại được thì quay về cách chắc ăn: nạp lại trang.
+      this.hardReload()
+    }
+  }
+
+  // Giữ tương thích với các chỗ gọi cũ.
+  reload(options = {}) { return this.refresh(options) }
+
+  hardReload() {
     const url = new URL(window.location)
     if (this.selectedId) url.searchParams.set("node", this.selectedId)
     url.searchParams.set("level", this.maxLevelValue)
     window.Turbo.visit(url.toString(), { action: "replace" })
+  }
+
+  // Bỏ khỏi tập thu gọn những id không còn tồn tại.
+  pruneCollapsed() {
+    const alive = new Set()
+    const walk = (node) => { if (!node) return; alive.add(node.id); node.children.forEach(walk) }
+    walk(this.root)
+    this.collapsed.forEach((id) => { if (!alive.has(id)) this.collapsed.delete(id) })
+  }
+
+  updateTreeCount(count) {
+    if (typeof count !== "number") return
+    const badge = document.querySelector(`a[href$="${window.location.pathname}"] .x-num`)
+    if (badge) badge.textContent = count - 1
   }
 
   toast(message, tone = "bad") {

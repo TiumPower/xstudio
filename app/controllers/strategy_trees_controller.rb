@@ -7,6 +7,16 @@ class StrategyTreesController < ApplicationController
   end
 
   def show
+    # Canvas cập nhật tại chỗ sau mỗi thao tác: chỉ xin lại payload cây,
+    # giữ nguyên thu phóng, vị trí kéo và nút đang chọn.
+    if request.format.json?
+      return render json: {
+        tree: helpers.tree_payload(@tree.nodes_tree),
+        nodeCount: @tree.node_count,
+        aiRemaining: AiSuggestionLog.remaining_today(current_user)
+      }
+    end
+
     @trees   = StrategyTree.ordered.to_a
     @view    = params[:view].presence_in(%w[mindmap vertical outline]) || cookies[:strategy_view].presence || "mindmap"
     cookies[:strategy_view] = { value: @view, expires: 1.year.from_now }

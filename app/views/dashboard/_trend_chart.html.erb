@@ -9,6 +9,7 @@
   # Nhãn theo ngày chỉ 1–2 ký tự nên ghi được dày hơn nhãn theo tuần/tháng.
   max_labels = trend.unit == :day ? 16 : 12
   every      = [(points.size / max_labels.to_f).ceil, 1].max
+  x_unit     = { day: "ngày trong tháng", week: "tuần (ngày đầu tuần)", month: "tháng" }[trend.unit]
 %>
 
 <div class="flex items-start gap-3">
@@ -52,6 +53,10 @@
         </div>
       <% end %>
     </div>
+    <%# Đơn vị của trục ngang, đặt ở góc phải cho cân với đơn vị trục dọc
+        nằm ở góc trái phía trên. Để riêng một hàng nên không làm lệch nhãn
+        khỏi cột. %>
+    <div class="text-right text-[10.5px] mt-1" style="color:var(--ink-3)"><%= x_unit %></div>
   </div>
 </div>
 
