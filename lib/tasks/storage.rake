@@ -21,7 +21,12 @@ namespace :storage do
   desc "Chép mọi tệp đang nằm trên đĩa lên Spaces (DRY=1 để chạy thử)"
   task to_spaces: :environment do
     dry    = ENV["DRY"].present?
+    # Ghi thẳng lên Spaces (kho chính) — tệp vốn đã nằm trên đĩa, cho đi qua
+    # Mirror nữa chỉ tổ chép lại đúng những byte đó xuống chính chỗ cũ.
     target = spaces_service
+    # …nhưng blob phải trỏ về kho MẶC ĐỊNH của app (production: spaces_mirrored),
+    # để mọi thao tác sau này (ghi đè, xoá) còn đi qua mirror như tệp mới.
+    target_name = Rails.configuration.active_storage.service.to_s
     disk   = ActiveStorage::Blob.services.fetch(:local)
 
     pending = ActiveStorage::Blob.where.not(service_name: target_name)
