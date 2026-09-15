@@ -5,8 +5,7 @@
     <div class="min-h-screen flex items-center justify-center px-4 py-10">
       <div class="w-full max-w-[420px]">
         <div class="flex items-center gap-3 justify-center mb-7">
-          <div class="w-11 h-11 rounded-xl grid place-items-center text-white font-bold text-lg"
-               style="background:linear-gradient(150deg,#3E7AC9,#2E6BC0)">X</div>
+          <%= image_tag "logo.svg", alt: "Xstudio", class: "w-11 h-11 rounded-xl" %>
           <div class="text-white">
             <div class="font-bold text-[17px] leading-tight"><%= current_workspace.name %></div>
             <div class="text-[12px]" style="color:#6B87AC"><%= current_workspace.tagline.presence || "Xstudio" %></div>

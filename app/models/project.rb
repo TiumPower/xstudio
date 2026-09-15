@@ -20,6 +20,10 @@ class Project < ApplicationRecord
   has_many :transactions,  dependent: :nullify
   has_many :activities,    dependent: :nullify
   has_many :comments, as: :commentable, dependent: :destroy
+  has_many :project_resources, -> { ordered }, dependent: :destroy
+
+  # Mô tả sản phẩm — dài, có định dạng. Chỉ dùng cho dự án loại Products.
+  has_rich_text :product_brief
 
   validates :name, presence: true
   validates :code, presence: true, uniqueness: { case_sensitive: false }
@@ -89,6 +93,12 @@ class Project < ApplicationRecord
   def type_label = I18n.t("project_types.#{project_type}")
 
   def to_param = code
+
+  # Dự án loại Products là sản phẩm của chính đội, không phải việc làm thuê —
+  # nên có thêm tab riêng và ô "Khách hàng" mang nghĩa khác.
+  def product? = product_sales?
+
+  def client_label = product? ? "Đối tượng khách hàng" : "Khách hàng"
 
   def member?(user) = user.present? && project_memberships.exists?(user_id: user.id)
 

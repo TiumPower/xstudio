@@ -16,7 +16,8 @@
       <%= f.label :project_type %>
       <%= f.select :project_type,
                    Project.project_types.keys.map { |k| [t("project_types_long.#{k}"), k] },
-                   {}, class: "x-select" %>
+                   {}, class: "x-select",
+                   onchange: "const l=this.closest('form').querySelector('[data-client-label]'); if(l) l.textContent = this.value==='product_sales' ? 'Đối tượng khách hàng' : 'Khách hàng';" %>
     </div>
 
     <div class="x-field">
@@ -31,8 +32,13 @@
     </div>
 
     <div class="x-field">
-      <%= f.label :client_name %>
-      <%= f.text_field :client_name, class: "x-input", placeholder: "Coopmart · hợp đồng 3 giai đoạn" %>
+      <%# Dự án Products là sản phẩm của đội, không có "khách hàng" — ô này
+          mang nghĩa nhóm người dùng mà sản phẩm nhắm tới. %>
+      <label data-client-label>
+        <%= project.product? ? "Đối tượng khách hàng" : "Khách hàng" %>
+      </label>
+      <%= f.text_field :client_name, class: "x-input",
+                       placeholder: project.product? ? "Chuỗi bán lẻ vừa, 10–50 cửa hàng" : "Coopmart · hợp đồng 3 giai đoạn" %>
     </div>
 
     <div class="x-field">

@@ -105,7 +105,7 @@ class ProjectsController < ApplicationController
   def project_params
     params.require(:project).permit(:name, :code, :description, :project_type, :status,
                                     :client_name, :start_date, :due_date, :owner_id,
-                                    :color, :progress_mode, :manual_progress)
+                                    :color, :progress_mode, :manual_progress, :product_brief)
   end
 
   def sync_members

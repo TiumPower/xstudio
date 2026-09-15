@@ -17,11 +17,12 @@
       <%= form_with model: @workspace, url: settings_path, method: :patch, local: true, multipart: true do |f| %>
         <fieldset <%= "disabled" unless current_user.role_admin? %>>
           <div class="flex items-center gap-4 mb-5">
-            <div class="w-14 h-14 rounded-[14px] grid place-items-center text-white font-bold text-[20px] flex-none overflow-hidden"
-                 style="background:linear-gradient(150deg,#3E7AC9,#2E6BC0)">
+            <div class="w-14 h-14 rounded-[14px] flex-none overflow-hidden">
               <% if @workspace.logo.attached? %>
                 <%= image_tag @workspace.logo.variant(resize_to_fill: [112, 112]), class: "w-full h-full object-cover" %>
-              <% else %>X<% end %>
+              <% else %>
+                <%= image_tag "logo.svg", alt: "Xstudio", class: "w-full h-full" %>
+              <% end %>
             </div>
             <div>
               <label class="x-label block mb-1.5">Logo</label>

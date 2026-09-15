@@ -27,6 +27,9 @@ Rails.application.routes.draw do
     get "thu-chi",     to: "project_transactions#index", as: :transactions
     get "thanh-vien",  to: "project_members#index",   as: :members
     get "hoat-dong",   to: "project_activities#index", as: :activities
+    get "san-pham",    to: "product#show",              as: :product
+
+    resources :project_resources, path: "tai-nguyen", only: [:create, :update, :destroy]
 
     resources :board_columns, path: "cot", only: [:create, :update, :destroy] do
       collection { patch :reorder }

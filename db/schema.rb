@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_09_15_100000) do
+ActiveRecord::Schema[7.2].define(version: 2026_09_15_110000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "unaccent"
@@ -167,6 +167,22 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_15_100000) do
     t.index ["project_id", "user_id"], name: "index_project_memberships_on_project_id_and_user_id", unique: true
     t.index ["project_id"], name: "index_project_memberships_on_project_id"
     t.index ["user_id"], name: "index_project_memberships_on_user_id"
+  end
+
+  create_table "project_resources", force: :cascade do |t|
+    t.bigint "project_id", null: false
+    t.integer "kind", default: 0, null: false
+    t.string "label", null: false
+    t.string "url"
+    t.string "username"
+    t.text "note"
+    t.integer "position", default: 0, null: false
+    t.bigint "created_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_by_id"], name: "index_project_resources_on_created_by_id"
+    t.index ["project_id", "kind", "position"], name: "index_project_resources_on_project_id_and_kind_and_position"
+    t.index ["project_id"], name: "index_project_resources_on_project_id"
   end
 
   create_table "projects", force: :cascade do |t|
@@ -390,6 +406,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_15_100000) do
   add_foreign_key "notifications", "users", column: "actor_id"
   add_foreign_key "project_memberships", "projects"
   add_foreign_key "project_memberships", "users"
+  add_foreign_key "project_resources", "projects"
+  add_foreign_key "project_resources", "users", column: "created_by_id"
   add_foreign_key "projects", "users", column: "created_by_id"
   add_foreign_key "projects", "users", column: "owner_id"
   add_foreign_key "strategy_nodes", "strategy_nodes", column: "parent_id"

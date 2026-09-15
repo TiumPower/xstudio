@@ -28,7 +28,7 @@
           <div class="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-x-5 gap-y-1.5 text-[13px]" style="color:var(--ink-2)">
             <% if @project.client_name.present? %>
               <span class="inline-flex items-center gap-1.5">
-                <span style="color:var(--ink-3)">Khách hàng</span>
+                <span style="color:var(--ink-3)"><%= @project.client_label %></span>
                 <strong style="color:var(--ink)"><%= @project.client_name %></strong>
               </span>
             <% end %>
@@ -119,12 +119,14 @@
   <%# --- Điều hướng trong dự án -------------------------------------- %>
   <div class="x-card px-2 overflow-x-auto x-no-scrollbar">
     <div class="x-tabs" style="border-bottom:0">
-      <% [["Tổng quan", project_path(@project), "overview"],
-          ["Công việc", project_tasks_path(@project), "tasks"],
+      <% tabs = [["Tổng quan", project_path(@project), "overview"]]
+         tabs << ["Sản phẩm", project_product_path(@project), "product"] if @project.product?
+         tabs += [["Công việc", project_tasks_path(@project), "tasks"],
           ["Kanban", project_board_path(@project), "kanban"],
           ["Thu chi", project_transactions_path(@project), "finance"],
           ["Thành viên", project_members_path(@project), "members"],
-          ["Hoạt động", project_activities_path(@project), "activity"]].each do |label, path, key| %>
+          ["Hoạt động", project_activities_path(@project), "activity"]] %>
+      <% tabs.each do |label, path, key| %>
         <%= link_to label, path, class: ("is-active" if @tab == key) %>
       <% end %>
     </div>
