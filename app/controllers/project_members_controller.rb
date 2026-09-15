@@ -10,5 +10,8 @@ class ProjectMembersController < ApplicationController
 
   private
 
-  def load_project = @project = Project.kept.find_by!(code: params[:project_code])
+  def load_project
+    @project = Project.kept.find_by!(code: params[:project_code])
+    authorize_project!(@project)
+  end
 end

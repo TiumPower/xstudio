@@ -16,10 +16,11 @@ module Reporting
       month: { trunc: "month", step: :months, caption: "theo tháng" }
     }.freeze
 
-    def initialize(range:, project: nil, project_type: nil)
+    def initialize(range:, project: nil, project_type: nil, project_ids: nil)
       @range = range
       @project = project
       @project_type = project_type
+      @project_ids = project_ids # nil = không giới hạn (quản trị)
     end
 
     def call
@@ -49,6 +50,7 @@ module Reporting
 
     def totals(trunc)
       scope = Transaction.kept.where(occurred_on: @range)
+      scope = scope.where(project_id: [nil, *@project_ids]) if @project_ids
       scope = scope.where(project_id: @project.id) if @project
       scope = scope.joins(:project).where(projects: { project_type: @project_type }) if @project_type
       scope.group(:kind, Arel.sql("date_trunc('#{trunc}', occurred_on)")).sum(:amount)

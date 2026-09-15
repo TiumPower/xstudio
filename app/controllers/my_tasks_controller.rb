@@ -2,6 +2,7 @@
 class MyTasksController < ApplicationController
   def index
     scope = Task.kept.open_tasks.where(assignee_id: current_user.id)
+                .where(project_id: visible_project_ids)
                 .includes(:project, :board_column).order(Arel.sql("due_date NULLS LAST"))
 
     today = Date.current

@@ -3,7 +3,7 @@ class TransactionsController < ApplicationController
 
   def index
     @filter  = Finance::LedgerFilter.new(params)
-    @scope   = @filter.apply(Transaction.kept.includes(:category, :project, :created_by))
+    @scope   = @filter.apply(visible_transactions.includes(:category, :project, :created_by))
     @totals  = { income: @scope.income.sum(:amount), expense: @scope.expense.sum(:amount) }
     @totals[:balance] = @totals[:income] - @totals[:expense]
     @split = {
@@ -15,12 +15,12 @@ class TransactionsController < ApplicationController
     @pagy         = Pagination.new(@scope.newest, page: params[:page])
     @transactions = @pagy.records
     @categories   = TransactionCategory.active.ordered
-    @projects     = Project.kept.order(:name)
+    @projects     = visible_projects.order(:name)
   end
 
   def export
     @filter = Finance::LedgerFilter.new(params)
-    @transactions = @filter.apply(Transaction.kept.includes(:category, :project, :created_by)).newest
+    @transactions = @filter.apply(visible_transactions.includes(:category, :project, :created_by)).newest
     respond_to do |format|
       format.xlsx do
         response.headers["Content-Disposition"] =
@@ -96,11 +96,20 @@ class TransactionsController < ApplicationController
     end
   end
 
-  def load_transaction = @transaction = Transaction.kept.find(params[:id])
+  # Giao dịch thấy được = của dự án mình tham gia, cộng giao dịch chung
+  # workspace (không gắn dự án). Quản trị thấy tất cả.
+  def visible_transactions
+    return Transaction.kept if current_user.role_admin?
+    Transaction.kept.where(project_id: [nil, *visible_project_ids])
+  end
+
+  def load_transaction
+    @transaction = visible_transactions.find(params[:id])
+  end
 
   def load_form_data
     @categories = TransactionCategory.active.ordered
-    @projects   = Project.active.order(:name)
+    @projects   = Project.active.visible_to(current_user).order(:name)
   end
 
   def transaction_params

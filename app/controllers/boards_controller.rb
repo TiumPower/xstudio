@@ -24,5 +24,6 @@ class BoardsController < ApplicationController
 
   def load_project
     @project = Project.kept.includes(:members).find_by!(code: params[:project_code])
+    authorize_project!(@project)
   end
 end

@@ -11,10 +11,20 @@ module Reporting
       @user  = user
     end
 
+    # Dự án người này được phép thấy. Mọi con số trên Tổng quan đều chỉ tính
+    # trong phạm vi đó — không thể để người ta thấy doanh thu của dự án mà
+    # chính họ không được vào xem.
+    def visible_ids
+      @visible_ids ||= Project.kept.visible_to(@user).pluck(:id)
+    end
+
+    def all_projects? = @user.nil? || @user.role_admin?
+
     def call
       Result.new(
         financial:         financial,
-        trend:             TrendSeries.new(range: @range, project_type: @type).call,
+        trend:             TrendSeries.new(range: @range, project_type: @type,
+                                           project_ids: (visible_ids unless all_projects?)).call,
         expense_breakdown: expense_breakdown,
         by_project_type:   by_project_type,
         top_projects:      profit_ranking.first(5),
@@ -23,14 +33,22 @@ module Reporting
         project_rows:      project_rows,
         workload:          workload,
         my_tasks:          my_tasks,
-        recent_activities: Activity.newest.includes(:user, :project).limit(10)
+        recent_activities: recent_activities
       )
     end
 
     private
 
+    def recent_activities
+      scope = Activity.newest.includes(:user, :project)
+      scope = scope.where(project_id: [nil, *visible_ids]) unless all_projects?
+      scope.limit(10)
+    end
+
     def scoped_transactions(range = @range)
       scope = Transaction.kept.in_period(range.first, range.last)
+      # Giao dịch chung workspace (không gắn dự án) thì ai cũng thấy.
+      scope = scope.where(project_id: [nil, *visible_ids]) unless all_projects?
       @type ? scope.joins(:project).where(projects: { project_type: @type }) : scope
     end
 
@@ -74,7 +92,8 @@ module Reporting
     # FR-DASH-04 — thu chi theo loại hình dự án.
     def by_project_type
       rows = Transaction.kept.in_period(@range.first, @range.last)
-                        .joins(:project).group("projects.project_type", :kind).sum(:amount)
+      rows = rows.where(project_id: visible_ids) unless all_projects?
+      rows = rows.joins(:project).group("projects.project_type", :kind).sum(:amount)
 
       Project.project_types.keys.map do |type|
         idx    = Project.project_types[type]
@@ -85,7 +104,7 @@ module Reporting
     end
 
     def projects_scope
-      scope = Project.kept.includes(:owner)
+      scope = Project.kept.visible_to(@user).includes(:owner)
       @type ? scope.where(project_type: @type) : scope
     end
 
@@ -121,14 +140,17 @@ module Reporting
 
     # FR-DASH-08 — phân bổ công việc theo người.
     def workload
-      counts = Task.kept.where.not(status: Task.statuses[:cancelled])
-                   .where.not(assignee_id: nil).group(:assignee_id, :status).count
+      scope  = Task.kept.where.not(status: Task.statuses[:cancelled]).where.not(assignee_id: nil)
+      scope  = scope.where(project_id: visible_ids) unless all_projects?
+      counts = scope.group(:assignee_id, :status).count
       users  = User.where(id: counts.keys.map(&:first).uniq).index_by(&:id)
 
       users.values.map do |user|
         open = counts[[user.id, "open"]] || counts[[user.id, 0]] || 0
         done = counts[[user.id, "done"]] || counts[[user.id, 1]] || 0
-        overdue = Task.kept.open_tasks.where(assignee_id: user.id).where("tasks.due_date < ?", Date.current).count
+        overdue = Task.kept.open_tasks.where(assignee_id: user.id)
+                       .then { |q| all_projects? ? q : q.where(project_id: visible_ids) }
+                       .where("tasks.due_date < ?", Date.current).count
         { user: user, open: open, done: done, overdue: overdue, total: open + done }
       end.sort_by { |r| -r[:open] }.first(10)
     end
@@ -136,6 +158,7 @@ module Reporting
     # FR-DASH-09 — widget Việc của tôi.
     def my_tasks
       scope = Task.kept.open_tasks.where(assignee_id: @user.id)
+      scope = scope.where(project_id: visible_ids) unless all_projects?
       {
         overdue:   scope.where("tasks.due_date < ?", Date.current).count,
         today:     scope.where(due_date: Date.current).count,

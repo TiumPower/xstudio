@@ -26,7 +26,7 @@ class TasksController < ApplicationController
 
   def new
     @task = Task.new(priority: :medium, project_id: params[:project_id])
-    @projects = Project.active.order(:name)
+    @projects = Project.active.visible_to(current_user).order(:name)
   end
 
   def create
@@ -106,6 +106,7 @@ class TasksController < ApplicationController
 
   def bulk_update
     tasks = Task.kept.where(code: Array(params[:codes]))
+                     .where(project_id: visible_project_ids)
     attrs = {}
     attrs[:assignee_id]     = params[:assignee_id].presence     if params.key?(:assignee_id)
     attrs[:board_column_id] = params[:board_column_id].presence if params[:board_column_id].present?
@@ -133,12 +134,15 @@ class TasksController < ApplicationController
   private
 
   def load_project
-    @project = Project.kept.includes(:members, :board_columns).find_by!(code: params[:project_code] || params.dig(:task, :project_code))
+    @project = Project.kept.includes(:members, :board_columns)
+                      .find_by!(code: params[:project_code] || params.dig(:task, :project_code))
+    authorize_project!(@project)
   end
 
   def load_task
     @task = Task.kept.includes(:project, :assignee, :labels, :subtasks, :comments).find_by!(code: params[:code])
     @project = @task.project
+    authorize_project!(@project)
   end
 
   def task_params

@@ -31,6 +31,20 @@ class Project < ApplicationRecord
   after_create      :create_default_board_columns
   after_create      :ensure_owner_membership
 
+  # ---- Ai thấy dự án nào -------------------------------------------------
+  #
+  # Quản trị thấy tất cả. Thành viên chỉ thấy dự án mình được thêm vào —
+  # kể cả dự án mình tạo ra hay phụ trách (cả hai trường hợp đó đều đã tự
+  # thành thành viên, xem BR-10).
+  scope :visible_to, ->(user) {
+    next all if user.nil? || user.role_admin?
+    where(id: ProjectMembership.where(user_id: user.id).select(:project_id))
+  }
+
+  def visible_to?(user)
+    user.present? && (user.role_admin? || member?(user))
+  end
+
   scope :active,      -> { kept.where(archived_at: nil) }
   scope :archived,    -> { kept.where.not(archived_at: nil) }
   scope :open_status, -> { where(status: [statuses[:planning], statuses[:in_progress], statuses[:on_hold]]) }

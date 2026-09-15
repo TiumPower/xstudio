@@ -12,6 +12,23 @@ class ApplicationController < ActionController::Base
     @current_workspace ||= Workspace.current
   end
 
+  # Những dự án người đang đăng nhập được phép thấy. Quản trị thấy tất cả.
+  def visible_projects
+    @visible_projects ||= Project.kept.visible_to(current_user)
+  end
+
+  def visible_project_ids
+    @visible_project_ids ||= visible_projects.pluck(:id)
+  end
+  helper_method :visible_projects
+
+  # Chặn truy cập thẳng bằng URL vào dự án không thuộc phạm vi của mình.
+  def authorize_project!(project)
+    return if project.visible_to?(current_user)
+    redirect_to projects_path,
+                alert: "Bạn chưa được thêm vào dự án này nên không xem được."
+  end
+
   # Dự án đang mở, nếu có — để nút "Tạo mới" trên thanh trên gắn sẵn dự án đó.
   def current_project
     @project if defined?(@project) && @project.is_a?(Project) && @project.persisted?

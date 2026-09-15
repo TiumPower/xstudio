@@ -5,6 +5,7 @@ class ProjectsController < ApplicationController
     @view    = params[:view].presence_in(%w[cards table]) || "cards"
     @scope   = params[:scope].presence_in(%w[active archived]) || "active"
     @projects = (@scope == "archived" ? Project.archived : Project.active)
+                .visible_to(current_user)
                 .includes(:owner, :members, :tasks)
 
     @projects = @projects.where(project_type: params[:type])   if params[:type].present?
@@ -25,8 +26,8 @@ class ProjectsController < ApplicationController
 
     # Chỉ chế độ Thẻ hiện số tiền; chế độ Bảng không cần truy vấn tổng hợp này.
     @stats = @view == "cards" ? Finance::ProjectTotals.new(@projects.map(&:id)).call : {}
-    @owners  = User.alphabetical.where(id: Project.kept.select(:owner_id))
-    @clients = Project.kept.where.not(client_name: [nil, ""]).distinct.pluck(:client_name).sort
+    @owners  = User.alphabetical.where(id: visible_projects.select(:owner_id))
+    @clients = visible_projects.where.not(client_name: [nil, ""]).distinct.pluck(:client_name).sort
   end
 
   def show
@@ -98,6 +99,7 @@ class ProjectsController < ApplicationController
 
   def load_project
     @project = Project.kept.includes(:owner, :members).find_by!(code: params[:code])
+    authorize_project!(@project)
   end
 
   def project_params

@@ -41,7 +41,10 @@ class BoardColumnsController < ApplicationController
 
   private
 
-  def load_project = @project = Project.kept.find_by!(code: params[:project_code])
+  def load_project
+    @project = Project.kept.find_by!(code: params[:project_code])
+    authorize_project!(@project)
+  end
 
   def column_params
     permitted = params.require(:board_column).permit(:name, :color, :wip_limit, :is_done_column, :position)
