@@ -10,6 +10,14 @@ class NotificationsController < ApplicationController
     @notifications = @pagy.records
   end
 
+  # Bấm vào một thông báo: đánh dấu đã đọc RỒI mới mở đối tượng.
+  # Trước đây link trỏ thẳng tới đối tượng nên nó vẫn mãi ở trạng thái chưa đọc.
+  def open
+    notification = current_user.notifications.find(params[:id])
+    notification.mark_read!
+    redirect_to(notification.url.presence || notifications_path, allow_other_host: false)
+  end
+
   def read
     current_user.notifications.find(params[:id]).mark_read!
     redirect_back fallback_location: notifications_path

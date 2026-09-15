@@ -1,27 +1,43 @@
-<% page_title "Cây định hướng mới" %>
-<div>
-  <div class="x-card">
-    <div class="x-card-head"><h2 class="x-h3">Tạo cây định hướng mới</h2></div>
-    <div class="p-5">
-      <%= form_with model: @tree, url: strategy_trees_path, local: true do |f| %>
-        <div class="x-field">
-          <label>Tên cây</label>
-          <%= f.text_field :name, class: "x-input", autofocus: true, placeholder: "Định hướng 2027" %>
-        </div>
-        <div class="x-field">
-          <label>Mô tả</label>
-          <%= f.text_area :description, class: "x-textarea", rows: 2 %>
-        </div>
-        <div class="x-field">
-          <label>Bắt đầu từ</label>
-          <select name="template" class="x-select">
-            <option value="blank">Cây trống</option>
-            <option value="year">Mẫu định hướng năm (4 mảng)</option>
-            <option value="product">Mẫu cây sản phẩm</option>
-          </select>
-        </div>
-        <button class="x-btn x-btn-primary">Tạo cây</button>
-      <% end %>
+<% form = capture do %>
+  <%= form_with model: @tree, url: strategy_trees_path, local: true do |f| %>
+    <div class="x-field">
+      <label>Tên cây <span style="color:var(--bad)">*</span></label>
+      <%= f.text_field :name, class: "x-input", autofocus: true, placeholder: "Định hướng 2027", required: true %>
     </div>
+    <div class="x-field">
+      <label>Mô tả</label>
+      <%= f.text_area :description, class: "x-textarea", rows: 2,
+                      placeholder: "Cây này dùng để làm gì, ai theo dõi…" %>
+    </div>
+    <div class="x-field">
+      <label>Bắt đầu từ</label>
+      <select name="template" class="x-select">
+        <option value="blank">Cây trống</option>
+        <option value="year">Mẫu định hướng năm (4 mảng)</option>
+        <option value="product">Mẫu cây sản phẩm</option>
+      </select>
+      <p class="x-hint">Chọn mẫu để có sẵn vài nhánh lớn, sửa lại sau cũng được.</p>
+    </div>
+    <div class="flex items-center gap-2.5 pt-1">
+      <button class="x-btn x-btn-primary">Tạo cây</button>
+      <%= link_to "Huỷ", strategy_trees_path, class: "x-btn x-btn-ghost", data: { turbo_frame: "_top" } %>
+    </div>
+  <% end %>
+<% end %>
+
+<% if turbo_frame_request? %>
+  <%= turbo_frame_tag "modal" do %>
+    <%= render layout: "shared/modal",
+               locals: { title: "Tạo cây định hướng mới", width: "max-w-[520px]",
+                         subtitle: "Mỗi cây là một bức tranh định hướng riêng, cả đội cùng xem và sửa." } do %>
+      <%= form %>
+    <% end %>
+  <% end %>
+<% else %>
+  <% page_title "Cây định hướng mới" %>
+  <div>
+    <%= render "shared/page_header", title: "Tạo cây định hướng mới",
+               subtitle: "Mỗi cây là một bức tranh định hướng riêng, cả đội cùng xem và sửa." %>
+    <div class="x-card"><div class="p-5"><%= form %></div></div>
   </div>
-</div>
+<% end %>

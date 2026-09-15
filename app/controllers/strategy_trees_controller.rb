@@ -26,7 +26,7 @@ class StrategyTreesController < ApplicationController
     if @tree.save
       seed_from_template(@tree) if params[:template].present?
       log_activity("created", trackable: @tree, summary: "đã tạo cây định hướng #{@tree.name}")
-      redirect_to strategy_tree_path(@tree), notice: "Đã tạo cây “#{@tree.name}”."
+      close_modal_and_go(strategy_tree_path(@tree), notice: "Đã tạo cây “#{@tree.name}”.")
     else
       redirect_to strategy_trees_path, alert: @tree.errors.full_messages.to_sentence
     end

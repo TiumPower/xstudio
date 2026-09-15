@@ -16,26 +16,42 @@
     <% if params.values_at(:assignee_id, :priority, :label_id, :due).any?(&:present?) %>
       <%= link_to "Xoá lọc", project_board_path(@project), class: "x-btn x-btn-ghost x-btn-sm" %>
     <% end %>
-    <span class="ml-auto x-muted">Kéo–thả thẻ để đổi cột · lưu ngay</span>
+    <div class="ml-auto flex items-center gap-2">
+      <span class="x-muted hidden lg:block">Kéo–thả thẻ để đổi cột · lưu ngay</span>
+
+      <%# Quản lý cột nằm sau nút bánh răng để bảng gọn gàng. %>
+      <div class="relative" data-controller="dropdown">
+        <button type="button" class="x-btn x-btn-ghost x-btn-icon" data-action="dropdown#toggle"
+                aria-label="Quản lý cột" title="Quản lý cột">
+          <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor"
+               stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="9" r="2.6"/>
+            <path d="M9 1.5v2M9 14.5v2M16.5 9h-2M3.5 9h-2M14.3 3.7l-1.4 1.4M5.1 12.9l-1.4 1.4M14.3 14.3l-1.4-1.4M5.1 5.1L3.7 3.7"/>
+          </svg>
+        </button>
+        <div class="absolute right-0 mt-2 w-[280px] x-card p-4 z-50" hidden data-dropdown-target="menu">
+          <h3 class="text-[13px] font-semibold mb-1">Quản lý cột</h3>
+          <p class="x-hint mb-3">Rê chuột vào đầu cột để thấy tay nắm kéo đổi thứ tự. Bấm ⋯ trên mỗi cột để đổi tên, màu hoặc giới hạn WIP.</p>
+          <%= form_with url: project_board_columns_path(@project), method: :post do %>
+            <label class="x-label block mb-1.5">Thêm cột mới</label>
+            <input type="text" name="board_column[name]" placeholder="Tên cột" class="x-input h-9 text-[13px] mb-2" required>
+            <div class="flex items-center gap-2">
+              <input type="color" name="board_column[color]" value="#6B7A8F"
+                     class="h-9 w-[44px] rounded-[9px] border cursor-pointer flex-none" style="border-color:var(--line)">
+              <button class="x-btn x-btn-primary x-btn-sm flex-1">Thêm cột</button>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
   <% end %>
 
-  <div class="x-board x-scroll-thin" data-controller="kanban"
+  <div class="x-board x-scroll-thin" data-controller="kanban" data-kanban-target="board"
        data-kanban-move-url-value="<%= move_task_path(code: "__CODE__") %>"
        data-kanban-reorder-url-value="<%= reorder_project_board_columns_path(@project) %>">
     <% @columns.each do |column| %>
       <%= render "column", column: column, tasks: (@tasks_by_column[column.id] || []) %>
     <% end %>
 
-    <div class="w-[260px] flex-none">
-      <%= form_with url: project_board_columns_path(@project), method: :post, class: "x-card p-3" do %>
-        <input type="text" name="board_column[name]" placeholder="+ Thêm cột mới"
-               class="x-input h-9 text-[13px] mb-2" required>
-        <div class="flex items-center gap-2">
-          <input type="color" name="board_column[color]" value="#6B7A8F"
-                 class="h-9 w-[44px] rounded-[9px] border cursor-pointer flex-none" style="border-color:var(--line)">
-          <button class="x-btn x-btn-ghost x-btn-sm flex-1">Thêm cột</button>
-        </div>
-      <% end %>
-    </div>
   </div>
 </div>

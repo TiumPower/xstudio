@@ -36,7 +36,8 @@
       <div class="absolute inset-0 overflow-auto x-scroll-thin p-6 hidden" data-tree-target="outline"></div>
 
       <!-- Trợ giúp phím tắt -->
-      <div class="absolute right-4 top-4 x-card px-3 py-2 text-[11.5px] z-20 hidden xl:block"
+      <%# Trước đây nằm ở góc trên nên đè lên thanh công cụ. Đưa xuống đáy. %>
+      <div class="absolute left-1/2 -translate-x-1/2 bottom-4 x-card px-3 py-1.5 text-[11.5px] z-10 hidden xl:block pointer-events-none"
            style="color:var(--ink-3)" data-tree-target="hint">
         <kbd class="font-semibold">Tab</kbd> nút con ·
         <kbd class="font-semibold">Enter</kbd> nút cùng cấp ·

@@ -1,0 +1,73 @@
+<%
+  points  = trend.points
+  raw_max = [points.map { |r| [r[:income], r[:expense]].max }.max.to_i, 1].max
+  unit    = raw_max >= 20_000_000_000 ? [1_000_000_000, "tỷ ₫"] : [1_000_000, "triệu ₫"]
+  ticks   = 4
+  step    = 10**Math.log10(raw_max / unit[0].to_f / ticks).floor
+  step    = [1, 2, 2.5, 5, 10].map { |m| m * step }.find { |v| v * ticks >= raw_max / unit[0].to_f } || step
+  max     = (step * ticks * unit[0]).to_i
+  # Nhiều cột thì chỉ ghi nhãn cách quãng cho khỏi chồng chữ.
+  every   = [(points.size / 12.0).ceil, 1].max
+%>
+
+<div class="flex items-start gap-3">
+  <div class="flex-none w-[52px] text-right">
+    <div class="x-muted text-[10.5px] mb-2">Đơn vị: <%= unit[1] %></div>
+    <div class="relative h-[180px]">
+      <% (0..ticks).reverse_each do |i| %>
+        <div class="absolute right-0 text-[10.5px] x-num" style="color:var(--ink-3);top:<%= (ticks - i) * (180.0 / ticks) - 6 %>px">
+          <%= (step * i) == (step * i).to_i ? (step * i).to_i : (step * i).round(1).to_s.sub(".", ",") %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="flex-1 min-w-0">
+    <div class="x-muted text-[10.5px] mb-2 opacity-0">.</div>
+    <div class="relative h-[180px]">
+      <% (0..ticks).each do |i| %>
+        <div class="absolute inset-x-0 border-t" style="border-color:var(--line-2);top:<%= i * (180.0 / ticks) %>px"></div>
+      <% end %>
+      <div class="absolute inset-0 flex items-end gap-[3px]">
+        <% points.each do |row| %>
+          <div class="flex-1 flex items-end justify-center gap-[2px] h-full group relative">
+            <div class="w-[42%] rounded-t-[3px]" style="background:var(--brand);height:<%= (row[:income] * 100.0 / max).round(1) %>%"></div>
+            <div class="w-[42%] rounded-t-[3px]" style="background:#C3D2E6;height:<%= (row[:expense] * 100.0 / max).round(1) %>%"></div>
+            <div class="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 hidden group-hover:block z-10 whitespace-nowrap
+                        px-2.5 py-1.5 rounded-lg text-[11px] text-white shadow-lg" style="background:var(--nav)">
+              <div class="font-semibold mb-0.5"><%= row[:label] %></div>
+              <div>Thu <%= format_vnd(row[:income]) %></div>
+              <div>Chi <%= format_vnd(row[:expense]) %></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    <div class="flex gap-[3px] mt-2">
+      <% points.each_with_index do |row, i| %>
+        <div class="flex-1 text-center text-[10.5px] x-num truncate" style="color:var(--ink-3)">
+          <%= (i % every).zero? || i == points.size - 1 ? row[:label] : "" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<% total_income  = points.sum { |r| r[:income] } %>
+<% total_expense = points.sum { |r| r[:expense] } %>
+<div class="flex flex-wrap gap-6 mt-4 pt-4 border-t text-[12.5px]" style="border-color:var(--line-2)">
+  <div>
+    <div style="color:var(--ink-3)">Thu trong kỳ</div>
+    <div class="x-money x-in mt-0.5"><%= format_vnd(total_income) %></div>
+  </div>
+  <div>
+    <div style="color:var(--ink-3)">Chi trong kỳ</div>
+    <div class="x-money x-out mt-0.5"><%= format_vnd(total_expense) %></div>
+  </div>
+  <div>
+    <div style="color:var(--ink-3)">Chênh lệch</div>
+    <div class="x-money mt-0.5" style="color:<%= (total_income - total_expense).negative? ? 'var(--bad)' : 'var(--good)' %>">
+      <%= format_vnd(total_income - total_expense, signed: true) %>
+    </div>
+  </div>
+</div>

@@ -15,7 +15,7 @@
                  body: "Khi có việc liên quan tới bạn, thông báo sẽ xuất hiện ở đây." %>
     <% else %>
       <% @notifications.each do |n| %>
-        <%= link_to (n.url.presence || "#"), class: "flex items-start gap-3 px-4 py-3.5 hover:bg-[var(--bg)] border-b last:border-0",
+        <%= link_to open_notification_path(n), class: "flex items-start gap-3 px-4 py-3.5 hover:bg-[var(--bg)] border-b last:border-0",
                     style: "border-color:var(--line-2);#{'background:var(--brand-soft)' unless n.read?}" do %>
           <%= avatar_for n.actor %>
           <div class="min-w-0 flex-1">

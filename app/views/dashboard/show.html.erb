@@ -7,9 +7,10 @@
   <!-- Hàng 1 — chỉ số tài chính. Tổng quan là bức tranh chung nên Tổng chi đã
        gồm cả chi của mọi dự án lẫn chi chung workspace. -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <%= render "dashboard/kpi", label: "Tổng thu",  data: f[:income],  dark: true %>
+    <%# Lợi nhuận là con số người ta nhìn đầu tiên → đặt lên thẻ nổi bật. %>
+    <%= render "dashboard/kpi", label: "Tổng thu",  data: f[:income],  tone: :good %>
     <%= render "dashboard/kpi", label: "Tổng chi",  data: f[:expense], tone: :bad %>
-    <%= render "dashboard/kpi", label: "Lợi nhuận", data: f[:profit],  tone: :good %>
+    <%= render "dashboard/kpi", label: "Lợi nhuận", data: f[:profit],  dark: true %>
   </div>
 
   <!-- Hàng 2 — biểu đồ -->
@@ -17,15 +18,15 @@
     <div class="x-card xl:col-span-2">
       <div class="x-card-head">
         <div class="flex items-baseline gap-2.5">
-          <h2 class="x-h3 x-section-title">Thu — Chi theo tháng</h2>
-          <span class="x-muted">12 tháng gần nhất</span>
+          <h2 class="x-h3 x-section-title">Thu — Chi <%= @report.trend.caption %></h2>
+          <span class="x-muted"><%= l(@range.first) %> – <%= l(@range.last) %></span>
         </div>
         <div class="flex items-center gap-3.5 text-[12px]">
           <span class="flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-sm inline-block" style="background:var(--brand)"></i>Thu</span>
           <span class="flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-sm inline-block" style="background:#C3D2E6"></i>Chi</span>
         </div>
       </div>
-      <div class="p-5"><%= render "dashboard/monthly_chart", series: @report.monthly %></div>
+      <div class="p-5"><%= render "dashboard/trend_chart", trend: @report.trend %></div>
     </div>
 
     <div class="x-card">

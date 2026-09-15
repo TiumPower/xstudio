@@ -137,11 +137,17 @@ module ApplicationHelper
 
   def percent(value) = "#{value.to_i}%"
 
-  def delta_badge(current, previous)
+  # `on_dark`: trên nền navy phải dùng sắc sáng, xanh/đỏ gốc sẽ chìm.
+  def delta_badge(current, previous, on_dark: false)
     return tag.span("—", class: "x-muted") if previous.to_i.zero?
+
     pct = ((current.to_f - previous) / previous.abs * 100).round(1)
     up  = pct >= 0
-    tag.span(class: "text-[12px] font-semibold", style: "color:#{up ? 'var(--good)' : 'var(--bad)'}") do
+    color = if on_dark then (up ? "#8FE3B4" : "#FFA8A0")
+            else (up ? "var(--good)" : "var(--bad)")
+            end
+
+    tag.span(class: "text-[12px] font-semibold", style: "color:#{color}") do
       "#{up ? '▲' : '▼'} #{pct.abs.to_s.sub('.', ',')}%"
     end
   end

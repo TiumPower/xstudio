@@ -76,7 +76,10 @@ Rails.application.routes.draw do
   end
 
   resources :notifications, path: "thong-bao", only: [:index] do
-    member     { patch :read }
+    member do
+      get   :open   # đánh dấu đã đọc rồi mở đối tượng
+      patch :read
+    end
     collection { patch :read_all }
   end
 

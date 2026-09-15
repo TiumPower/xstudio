@@ -114,12 +114,13 @@ body {
   .x-section-title-bad::before  { background: var(--bad); }
   .x-section-title-warn::before { background: var(--warn); }
   .x-section-title-plain::before { background: var(--line); }
+  /* Thẻ nổi bật: navy nhạt hơn nền sidebar để nổi mà không nặng nề. */
   .x-card-dark {
-    background: linear-gradient(155deg, #14304F 0%, #0B1C33 100%);
-    border: 1px solid #17395F; color: #fff; border-radius: var(--radius);
-    box-shadow: 0 10px 28px rgba(11,28,51,.22);
+    background: linear-gradient(155deg, #2B5486 0%, #1D3D66 100%);
+    border: 1px solid #386298; color: #fff; border-radius: var(--radius);
+    box-shadow: 0 8px 22px rgba(29,61,102,.20);
   }
-  .x-card-dark .x-sub, .x-card-dark .x-muted { color: #9BB2CE; }
+  .x-card-dark .x-sub, .x-card-dark .x-muted { color: #C2D3E8; }
 
   /* ---------- Nút ---------- */
   .x-btn {
@@ -275,6 +276,9 @@ body {
   .x-confirm {
     border: 0; padding: 0; background: transparent;
     max-width: 420px; width: calc(100vw - 32px); color: var(--ink);
+    /* Preflight của Tailwind đặt margin:0 cho mọi thẻ, làm <dialog> mất canh
+       giữa mặc định và dính góc trên trái. Canh lại bằng tay. */
+    margin: auto; inset: 0; position: fixed;
   }
   .x-confirm::backdrop { background: rgba(12,29,52,.45); }
   .x-confirm .x-confirm-body {
@@ -289,18 +293,39 @@ body {
   .x-modal {
     background: var(--surface); border-radius: 18px; box-shadow: var(--shadow-lg);
     width: 100%; max-height: calc(100vh - 64px); overflow: auto;
+    scrollbar-width: thin; scrollbar-color: transparent transparent;
   }
+  .x-modal:hover { scrollbar-color: #D3DBE6 transparent; }
+  .x-modal::-webkit-scrollbar { width: 6px; }
+  .x-modal::-webkit-scrollbar-track { background: transparent; }
+  .x-modal::-webkit-scrollbar-thumb { background: transparent; border-radius: 999px; }
+  .x-modal:hover::-webkit-scrollbar-thumb { background: #D3DBE6; }
   .x-panel {
     position: fixed; top: 0; right: 0; bottom: 0; width: 720px; max-width: 100vw;
     background: var(--surface); box-shadow: var(--shadow-lg); z-index: 61; overflow: auto;
     animation: x-slide-in .18s ease-out;
+    scrollbar-width: thin; scrollbar-color: transparent transparent;
   }
+  .x-panel:hover { scrollbar-color: #D3DBE6 transparent; }
+  .x-panel::-webkit-scrollbar { width: 6px; }
+  .x-panel::-webkit-scrollbar-track { background: transparent; }
+  .x-panel::-webkit-scrollbar-thumb { background: transparent; border-radius: 999px; }
+  .x-panel:hover::-webkit-scrollbar-thumb { background: #D3DBE6; }
   @keyframes x-slide-in { from { transform: translateX(24px); opacity: .6 } to { transform: none; opacity: 1 } }
 
   /* ---------- Kanban ---------- */
   .x-board { display: flex; gap: 14px; align-items: flex-start; overflow-x: auto; padding-bottom: 14px; }
   .x-col { width: 300px; flex: none; background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius); }
-  .x-col-head { display: flex; align-items: center; gap: 8px; padding: 11px 12px; }
+  .x-col-head { display: flex; align-items: center; gap: 7px; padding: 10px 10px 10px 4px; }
+  /* Tay nắm kéo cột: chỉ lộ ra khi rê chuột vào cột. */
+  .x-col-grip {
+    display: grid; place-items: center; width: 16px; flex: none;
+    color: var(--ink-3); opacity: 0; cursor: grab; transition: opacity .12s;
+  }
+  .x-col:hover .x-col-grip { opacity: .55; }
+  .x-col-grip:hover { opacity: 1 !important; }
+  .x-col-dragging { opacity: .75; }
+  .x-col-ghost { opacity: .35; }
   .x-col-body { padding: 0 10px 10px; min-height: 60px; display: flex; flex-direction: column; gap: 8px; }
   .x-tcard {
     background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm);
@@ -309,6 +334,38 @@ body {
   .x-tcard:hover { border-color: #D2DAE6; box-shadow: var(--shadow-md); }
   .x-tcard.x-dragging { opacity: .8; transform: rotate(2deg); box-shadow: var(--shadow-drag); cursor: grabbing; }
   .x-drop-hint { border: 1.5px dashed var(--brand); border-radius: var(--radius-sm); background: var(--brand-soft); height: 62px; }
+
+  /* ---------- Cây định hướng ---------- */
+  /* Nút lệnh nổi chỉ hiện khi rê chuột vào nút, để canvas không rối. */
+  .x-node-actions { opacity: 0; pointer-events: none; transition: opacity .12s; }
+  .x-tree-node:hover .x-node-actions,
+  .x-tree-node:focus-within .x-node-actions { opacity: 1; pointer-events: auto; }
+  .x-node-actions g:hover circle { fill: var(--brand-soft); stroke: var(--brand); }
+
+  /* Chế độ danh sách phân cấp */
+  .x-outline-row {
+    display: flex; align-items: center; gap: 9px;
+    padding: 7px 10px; border-radius: 9px; cursor: pointer;
+  }
+  .x-outline-row:hover { background: #fff; }
+  .x-outline-row.is-selected { background: #fff; box-shadow: var(--shadow); }
+  .x-outline-toggle {
+    display: grid; place-items: center; width: 20px; height: 20px; flex: none;
+    border-radius: 6px; color: var(--ink-2); cursor: pointer;
+  }
+  .x-outline-toggle:hover { background: rgba(13,27,46,.08); color: var(--ink); }
+  .x-outline-bullet {
+    width: 20px; height: 20px; flex: none; display: grid; place-items: center;
+  }
+  .x-outline-bullet::before {
+    content: ""; width: 5px; height: 5px; border-radius: 999px; background: var(--ink-3);
+  }
+  .x-outline-add {
+    display: grid; place-items: center; width: 24px; height: 24px; flex: none;
+    border-radius: 7px; color: var(--ink-3); opacity: 0; transition: .12s;
+  }
+  .x-outline-row:hover .x-outline-add { opacity: 1; }
+  .x-outline-add:hover { background: var(--brand-soft); color: var(--brand); }
 
   /* ---------- Trạng thái rỗng ---------- */
   .x-empty { text-align: center; padding: 52px 24px; }

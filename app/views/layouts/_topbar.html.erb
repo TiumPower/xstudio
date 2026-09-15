@@ -17,8 +17,10 @@
 
   <%# Ô tìm kiếm bị bóp còn một ký tự trên điện thoại — ẩn đi, đã có mục
       Tìm kiếm riêng khi cần. %>
-  <div class="flex-1 <%= current_page?(search_path) ? "hidden" : "hidden md:flex" %> justify-center px-2">
-    <%= form_with url: search_path, method: :get, class: "w-full max-w-[420px] relative", data: { turbo_frame: "_top" } do %>
+  <%# Luôn giữ khoảng co giãn ở giữa; chỉ ẩn RIÊNG ô tìm. Nếu ẩn cả khối thì
+      nút Tạo mới và chuông bị hút sang trái. %>
+  <div class="flex-1 flex justify-center px-2 <%= "invisible" if current_page?(search_path) %>">
+    <%= form_with url: search_path, method: :get, class: "w-full max-w-[420px] relative hidden md:block", data: { turbo_frame: "_top" } do %>
       <svg class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="15" height="15" viewBox="0 0 16 16" fill="none">
         <circle cx="7" cy="7" r="5" stroke="#8A98AC" stroke-width="1.5"/><path d="M11 11l3 3" stroke="#8A98AC" stroke-width="1.5" stroke-linecap="round"/>
       </svg>

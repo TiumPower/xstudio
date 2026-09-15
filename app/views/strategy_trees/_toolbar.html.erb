@@ -16,23 +16,9 @@
       <% end %>
     <% end %>
 
-    <div class="relative flex-none" data-controller="dropdown">
-      <button class="x-btn x-btn-ghost x-btn-sm" data-action="dropdown#toggle">+ Cây mới</button>
-      <div class="absolute left-0 mt-2 w-[320px] x-card p-4 z-50" hidden data-dropdown-target="menu">
-        <%= form_with url: strategy_trees_path, method: :post do %>
-          <label class="x-label block mb-1.5">Tên cây</label>
-          <input type="text" name="strategy_tree[name]" class="x-input h-9 text-[13px] mb-3" required
-                 placeholder="Định hướng 2027">
-          <label class="x-label block mb-1.5">Bắt đầu từ</label>
-          <select name="template" class="x-select h-9 text-[13px] mb-3">
-            <option value="blank">Cây trống</option>
-            <option value="year">Mẫu định hướng năm (4 mảng)</option>
-            <option value="product">Mẫu cây sản phẩm</option>
-          </select>
-          <button class="x-btn x-btn-primary x-btn-sm x-btn-block">Tạo cây</button>
-        <% end %>
-      </div>
-    </div>
+    <%# Mở popup thay vì dropdown: hàng này cuộn ngang nên dropdown sẽ bị cắt. %>
+    <%= link_to "+ Cây mới", new_strategy_tree_path, class: "x-btn x-btn-ghost x-btn-sm flex-none",
+                data: { turbo_frame: "modal" } %>
   </div>
 
   <!-- Thanh công cụ -->

@@ -167,7 +167,7 @@ export default class extends Controller {
     const xs = placed.map((p) => coords(p).x)
     const ys = placed.map((p) => coords(p).y)
     this.bounds = {
-      minX: Math.min(...xs) - 40, maxX: Math.max(...xs) + NODE_W + 40,
+      minX: Math.min(...xs) - 40, maxX: Math.max(...xs) + NODE_W + 90,
       minY: Math.min(...ys) - 40, maxY: Math.max(...ys) + NODE_H + 40
     }
 
@@ -269,7 +269,7 @@ export default class extends Controller {
 
     if (node.children.length && this.collapsed.has(node.id)) {
       const badge = document.createElementNS(svgNS, "g")
-      badge.setAttribute("transform", `translate(${NODE_W + 6}, ${NODE_H / 2 - 10})`)
+      badge.setAttribute("transform", `translate(${NODE_W + 46}, ${NODE_H / 2 - 10})`)
       badge.style.cursor = "pointer"
       const circle = document.createElementNS(svgNS, "circle")
       circle.setAttribute("cx", "10"); circle.setAttribute("cy", "10"); circle.setAttribute("r", "10")
@@ -280,7 +280,55 @@ export default class extends Controller {
       group.appendChild(badge)
     }
 
+    group.appendChild(this.hoverActions(node))
     return this.wire(group, node)
+  }
+
+  // SRS 7.4 — rê chuột vào một nút thì hiện 3 nút tròn bên phải:
+  // + thêm nút con · ✨ gợi ý AI · ⋯ menu. Đây là cách tạo nhánh nhanh nhất,
+  // không cần nhớ phím tắt.
+  hoverActions(node) {
+    const svgNS = "http://www.w3.org/2000/svg"
+    const wrap = document.createElementNS(svgNS, "g")
+    wrap.setAttribute("class", "x-node-actions")
+    wrap.setAttribute("transform", `translate(${NODE_W + 8}, ${NODE_H / 2 - 13})`)
+
+    const buttons = [
+      { label: "+", title: "Thêm nút con", run: () => { this.select(node.id); this.addChild() } }
+    ]
+    if (this.aiEnabledValue) {
+      buttons.push({ label: "✨", title: "Gợi ý nhánh con bằng AI", run: () => { this.select(node.id); this.runSuggest("children") } })
+    }
+    if (node.parentId !== null) {
+      buttons.push({ label: "⋯", title: "Sửa, nhân bản, xoá", run: () => this.select(node.id) })
+    }
+
+    buttons.forEach((button, index) => {
+      const g = document.createElementNS(svgNS, "g")
+      g.setAttribute("transform", `translate(0, ${index * 28})`)
+      g.style.cursor = "pointer"
+
+      const circle = document.createElementNS(svgNS, "circle")
+      circle.setAttribute("cx", "13"); circle.setAttribute("cy", "13"); circle.setAttribute("r", "12")
+      circle.setAttribute("fill", "#FFFFFF")
+      circle.setAttribute("stroke", "#DDE4EE")
+      g.appendChild(circle)
+
+      const label = this.text(button.label, 13, 17.5,
+                              { size: button.label === "+" ? 15 : 11, weight: 600,
+                                fill: "#46566C", anchor: "middle" })
+      g.appendChild(label)
+
+      const title = document.createElementNS(svgNS, "title")
+      title.textContent = button.title
+      g.appendChild(title)
+
+      g.addEventListener("click", (event) => { event.stopPropagation(); button.run() })
+      g.addEventListener("pointerdown", (event) => event.stopPropagation())
+      wrap.appendChild(g)
+    })
+
+    return wrap
   }
 
   text(content, x, y, options = {}) {
@@ -318,14 +366,29 @@ export default class extends Controller {
     const walk = (node, depth) => {
       const kids = node.children
       const collapsed = this.collapsed.has(node.id)
+      const toggle = kids.length
+        ? `<span class="x-outline-toggle" data-outline-toggle="${node.id}" title="${collapsed ? "Mở" : "Thu gọn"}">
+             <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  style="transform:rotate(${collapsed ? 0 : 90}deg);transition:transform .12s">
+               <path d="M4 2.5L8 6l-4 3.5"/>
+             </svg>
+           </span>`
+        : `<span class="x-outline-bullet"></span>`
+
       lines.push(`
-        <div class="flex items-center gap-2 py-1.5 px-2 rounded-lg hover:bg-white cursor-pointer ${this.selectedId === node.id ? "bg-white shadow-sm" : ""}"
-             style="margin-left:${depth * 22}px" data-outline-id="${node.id}">
-          <span class="w-4 text-center text-[10px]" style="color:var(--ink-3)">${kids.length ? (collapsed ? "▸" : "▾") : "·"}</span>
-          ${node.icon ? `<span>${node.icon}</span>` : ""}
-          <span class="flex-1 text-[13.5px] ${depth === 0 ? "font-bold" : "font-medium"}">${this.escape(node.title)}</span>
-          ${node.parentId ? `<span class="x-chip" style="background:${node.statusColor}1A;color:${node.statusColor}">${node.statusLabel}</span>` : ""}
-          ${node.ownerName ? `<span class="x-muted">${this.escape(node.ownerName)}</span>` : ""}
+        <div class="x-outline-row ${this.selectedId === node.id ? "is-selected" : ""}"
+             style="margin-left:${depth * 24}px" data-outline-id="${node.id}">
+          ${toggle}
+          ${node.icon ? `<span class="flex-none">${node.icon}</span>` : ""}
+          <span class="flex-1 min-w-0 truncate text-[13.5px] ${depth === 0 ? "font-bold" : "font-medium"}">${this.escape(node.title)}</span>
+          ${node.parentId ? `<span class="x-chip flex-none" style="background:${node.statusColor}1A;color:${node.statusColor}">${node.statusLabel}</span>` : ""}
+          ${node.ownerName ? `<span class="x-muted flex-none hidden sm:block">${this.escape(node.ownerName)}</span>` : ""}
+          <button type="button" class="x-outline-add" data-outline-add="${node.id}" title="Thêm nút con">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M8 3.5v9M3.5 8h9"/>
+            </svg>
+          </button>
         </div>`)
       if (!collapsed) kids.forEach((kid) => walk(kid, depth + 1))
     }
@@ -333,10 +396,21 @@ export default class extends Controller {
 
     this.outlineTarget.innerHTML = `<div class="max-w-[760px] mx-auto">${lines.join("")}</div>`
     this.outlineTarget.querySelectorAll("[data-outline-id]").forEach((row) => {
-      row.addEventListener("click", (event) => {
-        const id = Number(row.dataset.outlineId)
-        if (event.target.textContent === "▸" || event.target.textContent === "▾") this.toggleCollapse(id)
-        else this.select(id)
+      const id = Number(row.dataset.outlineId)
+
+      row.querySelector("[data-outline-toggle]")?.addEventListener("click", (event) => {
+        event.stopPropagation()
+        this.toggleCollapse(id)
+      })
+      row.querySelector("[data-outline-add]")?.addEventListener("click", (event) => {
+        event.stopPropagation()
+        this.selectedId = id
+        this.addChild()
+      })
+      row.addEventListener("click", () => this.select(id))
+      row.addEventListener("dblclick", () => {
+        const node = this.findNode(id)
+        if (node) this.inlineEdit(node)
       })
     })
   }
@@ -409,7 +483,9 @@ export default class extends Controller {
     if (node.depth + 1 > this.maxDepthValue) {
       return this.toast(`Đã đạt giới hạn ${this.maxDepthValue} cấp. Không thể thêm nút con ở đây.`, "bad")
     }
-    const title = window.prompt("Tiêu đề nút con:", "Nút mới")
+    const title = await window.xPrompt("Thêm nút con", "", {
+      hint: `Nằm trong “${node.title}”`, placeholder: "Tên nhánh…", okLabel: "Thêm", maxLength: 120
+    })
     if (title === null) return
     this.collapsed.delete(node.id)
     await this.request(this.urlsValue.nodes, "POST", { parent_id: node.id, strategy_node: { title: title || "Nút mới" } })
@@ -421,7 +497,10 @@ export default class extends Controller {
   async addSibling() {
     const node = this.findNode(this.selectedId)
     if (!node || node.parentId === null) return this.addChild()
-    const title = window.prompt("Tiêu đề nút mới:", "Nút mới")
+    const parent = this.findNode(node.parentId)
+    const title = await window.xPrompt("Thêm nút cùng cấp", "", {
+      hint: parent ? `Nằm trong “${parent.title}”` : null, placeholder: "Tên nhánh…", okLabel: "Thêm", maxLength: 120
+    })
     if (title === null) return
     await this.request(this.urlsValue.nodes, "POST", { parent_id: node.parentId, strategy_node: { title: title || "Nút mới" } })
     this.reload()
@@ -444,8 +523,8 @@ export default class extends Controller {
   }
 
   async inlineEdit(node) {
-    const title = window.prompt("Sửa tiêu đề:", node.title)
-    if (title === null || title.trim() === "" || title === node.title) return
+    const title = await window.xPrompt("Sửa tiêu đề", node.title, { okLabel: "Lưu", maxLength: 120 })
+    if (title === null || title === "" || title === node.title) return
     const before = node.title
     await this.request(this.urlsValue.node.replace("__ID__", node.id), "PATCH", { strategy_node: { title: title.trim() } })
     this.pushUndo({
@@ -456,14 +535,15 @@ export default class extends Controller {
   }
 
   // ---- Xoá ---------------------------------------------------------------
-  remove() {
+  async remove() {
     const node = this.findNode(this.selectedId)
     if (!node) return
     if (node.parentId === null) return this.toast("Không xoá được nút gốc.", "warn")
 
     const count = this.countAll(node) - 1
     if (count === 0) {
-      if (!window.confirm(`Xoá nút “${node.title}”?`)) return
+      const ok = await window.xConfirm(`Xoá nút “${node.title}”?`, { destructive: true })
+      if (!ok) return
       return this.performDelete("cascade")
     }
     this.deleteTitleTarget.textContent = node.title

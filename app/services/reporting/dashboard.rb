@@ -1,7 +1,7 @@
 module Reporting
   # Toàn bộ số liệu cho trang Tổng quan (mục 3.8), gom bằng truy vấn tổng hợp.
   class Dashboard
-    Result = Struct.new(:financial, :monthly, :expense_breakdown, :by_project_type,
+    Result = Struct.new(:financial, :trend, :expense_breakdown, :by_project_type,
                         :top_projects, :worst_projects, :project_stats, :project_rows,
                         :workload, :my_tasks, :recent_activities, keyword_init: true)
 
@@ -14,7 +14,7 @@ module Reporting
     def call
       Result.new(
         financial:         financial,
-        monthly:           MonthlySeries.new(months: 12, project_type: @type).call,
+        trend:             TrendSeries.new(range: @range, project_type: @type).call,
         expense_breakdown: expense_breakdown,
         by_project_type:   by_project_type,
         top_projects:      profit_ranking.first(5),

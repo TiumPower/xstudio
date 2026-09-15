@@ -1,16 +1,23 @@
 <div class="x-col" data-column-id="<%= column.id %>">
-  <div class="x-col-head">
+  <div class="x-col-head" data-kanban-target="columnHandle">
+    <%# Tay nắm kéo đổi thứ tự cột — chỉ hiện khi rê chuột cho đỡ rối. %>
+    <span class="x-col-grip" title="Kéo để đổi thứ tự cột">
+      <svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor" aria-hidden="true">
+        <circle cx="3" cy="3" r="1.2"/><circle cx="7" cy="3" r="1.2"/>
+        <circle cx="3" cy="7" r="1.2"/><circle cx="7" cy="7" r="1.2"/>
+        <circle cx="3" cy="11" r="1.2"/><circle cx="7" cy="11" r="1.2"/>
+      </svg>
+    </span>
     <i class="w-2 h-2 rounded-full flex-none" style="background:<%= column.color.presence || '#6B7A8F' %>"></i>
     <span class="font-semibold text-[13.5px] flex-1 truncate"><%= column.name %></span>
-    <span class="x-num text-[12px] font-semibold px-1.5 py-0.5 rounded-md
-                 <%= 'x-chip-bad' if column.over_wip? %>"
-          style="<%= column.over_wip? ? 'background:var(--bad-soft);color:var(--bad)' : 'color:var(--ink-3)' %>">
+    <span class="x-num text-[12.5px] font-bold px-1.5 py-0.5 rounded-md"
+          style="<%= column.over_wip? ? 'background:var(--bad-soft);color:var(--bad)' : 'color:var(--ink-2)' %>">
       <%= tasks.size %><%= " / #{column.wip_limit}" if column.wip_limit %>
     </span>
 
     <div class="relative" data-controller="dropdown">
-      <button class="w-6 h-6 rounded-md grid place-items-center hover:bg-white text-[13px]"
-              style="color:var(--ink-3)" data-action="dropdown#toggle" aria-label="Tuỳ chọn cột">⋯</button>
+      <button class="w-7 h-7 rounded-md grid place-items-center hover:bg-white text-[14px] flex-none"
+              style="color:var(--ink-2)" data-action="dropdown#toggle" aria-label="Tuỳ chọn cột" title="Tuỳ chọn cột">⋯</button>
       <div class="absolute right-0 mt-1.5 w-[248px] x-card p-3 z-50" hidden data-dropdown-target="menu">
         <%= form_with url: project_board_column_path(@project, column), method: :patch, class: "space-y-2.5" do %>
           <div>
@@ -43,8 +50,13 @@
       </div>
     </div>
 
-    <button class="w-6 h-6 rounded-md grid place-items-center hover:bg-white text-[15px] leading-none"
-            style="color:var(--ink-3)" data-action="kanban#openComposer" data-column-id="<%= column.id %>" aria-label="Thêm công việc">+</button>
+    <button class="w-7 h-7 rounded-md grid place-items-center hover:bg-white flex-none"
+            style="color:var(--ink-2)" data-action="kanban#openComposer" data-column-id="<%= column.id %>"
+            aria-label="Thêm công việc" title="Thêm công việc">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M8 3.5v9M3.5 8h9"/>
+      </svg>
+    </button>
   </div>
 
   <div class="x-col-body" data-kanban-target="list" data-column-id="<%= column.id %>">
