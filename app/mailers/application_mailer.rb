@@ -1,5 +1,11 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: -> { ENV.fetch("MAIL_FROM", "Team Workspace <no-reply@xstudio.czin.net>") }
+  # Brevo chỉ cho gửi từ địa chỉ đã xác thực — cả nhà dùng chung no-reply@czin.net,
+  # chỉ khác tên hiển thị.
+  default from: -> {
+    address = ENV.fetch("MAIL_FROM", "no-reply@czin.net")
+    name    = ENV.fetch("MAIL_FROM_NAME", "Team Workspace")
+    address.include?("<") ? address : %("#{name}" <#{address}>)
+  }
   layout "mailer"
 
   helper :application

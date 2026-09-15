@@ -109,7 +109,11 @@ Rails.application.configure do
   config.action_mailer.perform_caching     = false
   config.action_mailer.raise_delivery_errors = true
 
-  if ENV["SMTP_ADDRESS"].present?
+  # Ưu tiên Brevo HTTP API (dùng chung tài khoản với Loyalty/Estate): gửi qua
+  # HTTPS nên không vướng chặn cổng SMTP ra ngoài.
+  if ENV["BREVO_API_KEY"].present?
+    config.action_mailer.delivery_method = :brevo
+  elsif ENV["SMTP_ADDRESS"].present?
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {
       address:              ENV["SMTP_ADDRESS"],
@@ -123,7 +127,7 @@ Rails.application.configure do
       read_timeout:         10
     }
   else
-    # Chưa cấu hình SMTP: ghi log thay vì nổ 500 — thông báo trong app vẫn chạy.
+    # Chưa cấu hình gì: ghi log thay vì nổ 500 — thông báo trong app vẫn chạy.
     config.action_mailer.delivery_method = :logger
     config.action_mailer.raise_delivery_errors = false
   end
