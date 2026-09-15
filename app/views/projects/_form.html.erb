@@ -1,4 +1,10 @@
-<%= form_with model: project, url: (project.persisted? ? project_path(project) : projects_path), local: true, class: "space-y-0" do |f| %>
+<%= form_with model: project, url: (project.persisted? ? project_path(project) : projects_path),
+              local: true, class: "space-y-0",
+              data: { controller: "project-type",
+                      project_type_product_label_value: "Đối tượng khách hàng",
+                      project_type_client_label_value: "Khách hàng",
+                      project_type_product_placeholder_value: "Chuỗi bán lẻ vừa, 10–50 cửa hàng",
+                      project_type_client_placeholder_value: "Coopmart · hợp đồng 3 giai đoạn" } do |f| %>
   <% if project.errors.any? %>
     <div class="x-toast x-toast-bad mb-4">
       <div><%= project.errors.full_messages.to_sentence %></div>
@@ -17,7 +23,7 @@
       <%= f.select :project_type,
                    Project.project_types.keys.map { |k| [t("project_types_long.#{k}"), k] },
                    {}, class: "x-select",
-                   onchange: "const l=this.closest('form').querySelector('[data-client-label]'); if(l) l.textContent = this.value==='product_sales' ? 'Đối tượng khách hàng' : 'Khách hàng';" %>
+                   data: { project_type_target: "select", action: "change->project-type#sync" } %>
     </div>
 
     <div class="x-field">
@@ -26,18 +32,32 @@
       <p class="x-hint">Để trống để hệ thống tự sinh theo loại hình.</p>
     </div>
 
+    <%# Nhìn form trống thì không đoán được dự án Product khác gì — nói thẳng ra. %>
+    <div class="md:col-span-2 xl:col-span-3 -mt-1 mb-4" data-project-type-target="productNote" hidden>
+      <div class="x-toast">
+        <div>
+          Dự án <strong>Product</strong> là sản phẩm của chính đội. Sau khi tạo,
+          dự án sẽ có thêm tab <strong>Sản phẩm</strong> để ghi mô tả, các
+          <strong>liên kết</strong> (trang web, kho mã, bảng thiết kế),
+          <strong>tài khoản truy cập</strong> từng dịch vụ và
+          <strong>tài liệu</strong> (viết bằng Markdown/HTML hoặc tải tệp lên).
+        </div>
+      </div>
+    </div>
+
     <div class="x-field md:col-span-2 xl:col-span-3">
       <%= f.label :description %>
       <%= f.text_area :description, class: "x-textarea", rows: 3, placeholder: "Phạm vi, mục tiêu, cách bàn giao…" %>
     </div>
 
     <div class="x-field">
-      <%# Dự án Products là sản phẩm của đội, không có "khách hàng" — ô này
+      <%# Dự án Product là sản phẩm của đội, không có "khách hàng" — ô này
           mang nghĩa nhóm người dùng mà sản phẩm nhắm tới. %>
-      <label data-client-label>
+      <label data-project-type-target="clientLabel">
         <%= project.product? ? "Đối tượng khách hàng" : "Khách hàng" %>
       </label>
       <%= f.text_field :client_name, class: "x-input",
+                       data: { project_type_target: "clientInput" },
                        placeholder: project.product? ? "Chuỗi bán lẻ vừa, 10–50 cửa hàng" : "Coopmart · hợp đồng 3 giai đoạn" %>
     </div>
 

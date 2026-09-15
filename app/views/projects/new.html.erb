@@ -2,7 +2,7 @@
   <%= turbo_frame_tag "modal" do %>
     <%= render layout: "shared/modal",
                locals: { title: "Tạo dự án mới", width: "max-w-[880px]",
-                         subtitle: "Mã dự án tự sinh theo loại hình: PRD cho Products, DX cho Chuyển đổi số." } do %>
+                         subtitle: "Mã dự án tự sinh theo loại hình: PRD cho Product, DX cho Chuyển đổi số." } do %>
       <%= render "form", project: @project %>
     <% end %>
   <% end %>
@@ -10,7 +10,7 @@
   <% page_title "Dự án mới" %>
   <div>
     <%= render "shared/page_header", title: "Tạo dự án mới",
-               subtitle: "Mã dự án tự sinh theo loại hình: PRD cho Products, DX cho Chuyển đổi số." %>
+               subtitle: "Mã dự án tự sinh theo loại hình: PRD cho Product, DX cho Chuyển đổi số." %>
     <div class="x-card"><div class="p-5"><%= render "form", project: @project %></div></div>
   </div>
 <% end %>

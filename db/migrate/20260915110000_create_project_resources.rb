@@ -1,5 +1,5 @@
 class CreateProjectResources < ActiveRecord::Migration[7.2]
-  # Dự án loại "Products" là sản phẩm của chính đội, nên cần chỗ gom: đường
+  # Dự án loại "Product" là sản phẩm của chính đội, nên cần chỗ gom: đường
   # dẫn tới trang/kho mã/thiết kế, tài khoản dùng để truy cập, và tài liệu.
   #
   # CỐ Ý KHÔNG có cột mật khẩu. Đây là nơi ghi chép "dùng tài khoản nào",

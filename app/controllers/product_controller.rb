@@ -1,4 +1,4 @@
-# Tab "Sản phẩm" — chỉ có ở dự án loại Products, vì đó là sản phẩm của chính
+# Tab "Sản phẩm" — chỉ có ở dự án loại Product, vì đó là sản phẩm của chính
 # đội chứ không phải việc làm cho khách.
 class ProductController < ApplicationController
   before_action :load_project
@@ -18,6 +18,6 @@ class ProductController < ApplicationController
     return if @project.product?
 
     redirect_to project_path(@project),
-                alert: "Tab Sản phẩm chỉ dành cho dự án loại Products."
+                alert: "Tab Sản phẩm chỉ dành cho dự án loại Product."
   end
 end

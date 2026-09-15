@@ -6,7 +6,7 @@
            title: (@scope == "archived" ? "Dự án đã lưu trữ" : "Dự án"),
            subtitle: (@scope == "archived" ?
              "Những dự án đã đóng lại. Dữ liệu và thu chi vẫn giữ nguyên." :
-             "Mọi dự án của đội, theo hai mảng: Products và Chuyển đổi số."),
+             "Mọi dự án của đội, theo hai mảng: Product và Chuyển đổi số."),
            actions: capture {
              concat link_to((@scope == "archived" ? "Dự án đang chạy" : "Đã lưu trữ"),
                             projects_path(view: @view, scope: @scope == "archived" ? "active" : "archived"),

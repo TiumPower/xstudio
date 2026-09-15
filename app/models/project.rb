@@ -22,7 +22,7 @@ class Project < ApplicationRecord
   has_many :comments, as: :commentable, dependent: :destroy
   has_many :project_resources, -> { ordered }, dependent: :destroy
 
-  # Mô tả sản phẩm — dài, có định dạng. Chỉ dùng cho dự án loại Products.
+  # Mô tả sản phẩm — dài, có định dạng. Chỉ dùng cho dự án loại Product.
   has_rich_text :product_brief
 
   validates :name, presence: true
@@ -94,7 +94,7 @@ class Project < ApplicationRecord
 
   def to_param = code
 
-  # Dự án loại Products là sản phẩm của chính đội, không phải việc làm thuê —
+  # Dự án loại Product là sản phẩm của chính đội, không phải việc làm thuê —
   # nên có thêm tab riêng và ô "Khách hàng" mang nghĩa khác.
   def product? = product_sales?
 
