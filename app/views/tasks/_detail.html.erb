@@ -22,7 +22,10 @@
           </div>
           <div class="x-field">
             <%= f.label :description, "Mô tả" %>
-            <%= f.rich_text_area :description, placeholder: "Mô tả rõ phạm vi, tiêu chí hoàn thành…" %>
+            <%# Bọc để thanh công cụ và vùng gõ thành một khối liền. %>
+            <div class="x-editor <%= "x-editor-sm" if compact %>">
+              <%= f.rich_text_area :description, placeholder: "Mô tả rõ phạm vi, tiêu chí hoàn thành…" %>
+            </div>
           </div>
           <%= f.submit "Lưu nội dung", class: "x-btn x-btn-primary x-btn-sm cursor-pointer" %>
         <% end %>

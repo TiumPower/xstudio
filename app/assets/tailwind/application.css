@@ -340,28 +340,64 @@ body {
 .trix-content a { color: var(--brand); text-decoration: underline; }
 .trix-content pre { background: var(--bg); padding: 10px 12px; border-radius: 8px; font-family: ui-monospace, monospace; font-size: 12.5px; overflow-x: auto; }
 .trix-content blockquote { border-left: 3px solid var(--line); padding-left: 12px; color: var(--ink-2); }
-/* Trix mặc định trông rất lạc lõng — kéo về đúng ngôn ngữ của app. */
-trix-toolbar { margin-bottom: 8px; }
-trix-toolbar .trix-button-group {
+/* ---------- Trình soạn thảo (Trix) ----------
+   Mặc định Trix vẽ mỗi nhóm nút thành một hộp có viền riêng, rồi hộp soạn
+   thảo lại là một hộp nữa — nhìn rời rạc. Gộp tất cả vào MỘT khung: thanh
+   công cụ dính trên, vùng gõ liền bên dưới, viền sáng khi đang gõ. */
+.x-editor {
   border: 1px solid var(--line); border-radius: var(--radius-sm);
-  margin-bottom: 6px; margin-right: 6px; overflow: hidden; background: var(--surface);
+  background: var(--surface); overflow: hidden; transition: .14s;
 }
-trix-toolbar .trix-button {
-  border: 0; border-right: 1px solid var(--line-2); background: transparent;
-  height: 30px; padding: 0 10px; color: var(--ink-2);
+.x-editor:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(46,107,192,.13); }
+
+.x-editor trix-toolbar {
+  margin: 0; padding: 5px 7px;
+  border-bottom: 1px solid var(--line-2); background: var(--bg-2);
 }
-trix-toolbar .trix-button:last-child { border-right: 0; }
-trix-toolbar .trix-button:hover { background: var(--bg); color: var(--ink); }
-trix-toolbar .trix-button.trix-active { background: var(--brand-soft); color: var(--brand-ink); }
-trix-toolbar .trix-button--icon::before { opacity: .7; }
-trix-toolbar .trix-button-group-spacer { flex-grow: 0; }
-trix-editor {
+.x-editor trix-toolbar .trix-button-row {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 1px;
+}
+.x-editor trix-toolbar .trix-button-group {
+  border: 0; margin: 0; padding: 0; background: transparent; border-radius: 0;
+}
+/* Ngăn cách các nhóm bằng một vạch mảnh thay vì viền quanh từng hộp. */
+.x-editor trix-toolbar .trix-button-group + .trix-button-group {
+  margin-left: 5px; padding-left: 5px; border-left: 1px solid var(--line);
+}
+/* Hoàn tác / Làm lại đẩy sang phải. */
+.x-editor trix-toolbar .trix-button-group--history-tools { margin-left: auto; }
+.x-editor trix-toolbar .trix-button-group-spacer { display: none; }
+
+.x-editor trix-toolbar .trix-button {
+  border: 0; background: transparent; color: var(--ink-2);
+  height: 28px; min-width: 28px; padding: 0 6px; border-radius: 6px;
+  font-size: 12px; transition: .12s;
+}
+.x-editor trix-toolbar .trix-button:not(:disabled):hover { background: rgba(13,27,46,.07); color: var(--ink); }
+.x-editor trix-toolbar .trix-button.trix-active { background: var(--brand-soft); color: var(--brand-ink); }
+.x-editor trix-toolbar .trix-button:disabled { opacity: .3; }
+.x-editor trix-toolbar .trix-button--icon::before { opacity: .78; top: 4%; bottom: 4%; }
+.x-editor trix-toolbar .trix-button.trix-active::before { opacity: 1; }
+
+/* Hộp nhập liên kết nổi lên trên thanh công cụ. */
+.x-editor trix-toolbar .trix-dialog {
   border: 1px solid var(--line); border-radius: var(--radius-sm);
-  padding: 10px 12px; min-height: 140px; background: var(--surface);
-  font-size: 14px; line-height: 1.7;
+  box-shadow: var(--shadow-md); padding: 12px; background: var(--surface);
 }
-trix-editor:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(46,107,192,.13); }
-trix-editor:empty:not(:focus)::before { color: var(--ink-3); }
+.x-editor trix-toolbar .trix-dialog .trix-input { border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; font-size: 13px; }
+.x-editor trix-toolbar .trix-dialog .trix-button { border: 1px solid var(--line); border-radius: 8px; padding: 0 10px; }
+
+.x-editor trix-editor {
+  border: 0; border-radius: 0; box-shadow: none;
+  padding: 12px 14px; min-height: 150px; background: transparent;
+  font-size: 14px; line-height: 1.7; color: var(--ink);
+}
+.x-editor trix-editor:focus { outline: none; box-shadow: none; border: 0; }
+.x-editor trix-editor:empty:not(:focus)::before { color: var(--ink-3); }
+.x-editor trix-editor .attachment { border-radius: 8px; }
+
+/* Bên trong panel hẹp thì thấp lại cho vừa. */
+.x-editor-sm trix-editor { min-height: 110px; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1023px) {
