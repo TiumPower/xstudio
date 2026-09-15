@@ -28,6 +28,8 @@ class InvitationsController < ApplicationController
   end
 
   def invite_params
-    params.require(:user).permit(:full_name, :job_title, :phone, :password, :password_confirmation)
+    # Chức danh và số điện thoại để người dùng tự điền sau ở Hồ sơ cá nhân —
+    # form kích hoạt chỉ hỏi những gì bắt buộc để vào được hệ thống.
+    params.require(:user).permit(:full_name, :password, :password_confirmation)
   end
 end

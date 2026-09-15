@@ -167,7 +167,7 @@ export default class extends Controller {
     const xs = placed.map((p) => coords(p).x)
     const ys = placed.map((p) => coords(p).y)
     this.bounds = {
-      minX: Math.min(...xs) - 40, maxX: Math.max(...xs) + NODE_W + 90,
+      minX: Math.min(...xs) - 40, maxX: Math.max(...xs) + NODE_W + 100,
       minY: Math.min(...ys) - 40, maxY: Math.max(...ys) + NODE_H + 40
     }
 
@@ -214,6 +214,7 @@ export default class extends Controller {
     group.setAttribute("data-node-id", node.id)
     group.setAttribute("class", "x-tree-node")
     group.style.cursor = "pointer"
+    group.appendChild(this.hoverBridge())
 
     const selected = this.selectedId === node.id
     const isRoot = node.parentId === null
@@ -269,7 +270,7 @@ export default class extends Controller {
 
     if (node.children.length && this.collapsed.has(node.id)) {
       const badge = document.createElementNS(svgNS, "g")
-      badge.setAttribute("transform", `translate(${NODE_W + 46}, ${NODE_H / 2 - 10})`)
+      badge.setAttribute("transform", `translate(${NODE_W + 62}, ${NODE_H / 2 - 10})`)
       badge.style.cursor = "pointer"
       const circle = document.createElementNS(svgNS, "circle")
       circle.setAttribute("cx", "10"); circle.setAttribute("cy", "10"); circle.setAttribute("r", "10")
@@ -284,40 +285,43 @@ export default class extends Controller {
     return this.wire(group, node)
   }
 
-  // SRS 7.4 — rê chuột vào một nút thì hiện 3 nút tròn bên phải:
-  // + thêm nút con · ✨ gợi ý AI · ⋯ menu. Đây là cách tạo nhánh nhanh nhất,
-  // không cần nhớ phím tắt.
+  // SRS 7.4 — rê chuột vào một nút thì hiện nút lệnh bên phải:
+  // + thêm nút con · ✨ gợi ý AI. Đây là cách tạo nhánh nhanh nhất.
+  //
+  // Hai điều phải giữ:
+  //  1) Xếp NGANG, không xếp dọc — xếp dọc thì nút thứ ba tràn xuống đè nút bên dưới.
+  //  2) Có một vùng trong suốt phủ cả nút lẫn cụm nút lệnh. Thiếu nó, con trỏ
+  //     đi qua khoảng hở là mất :hover, cụm nút trở lại pointer-events:none và
+  //     không bấm được.
   hoverActions(node) {
     const svgNS = "http://www.w3.org/2000/svg"
     const wrap = document.createElementNS(svgNS, "g")
     wrap.setAttribute("class", "x-node-actions")
-    wrap.setAttribute("transform", `translate(${NODE_W + 8}, ${NODE_H / 2 - 13})`)
+    wrap.setAttribute("transform", `translate(${NODE_W + 6}, ${NODE_H / 2 - 11})`)
 
     const buttons = [
-      { label: "+", title: "Thêm nút con", run: () => { this.select(node.id); this.addChild() } }
+      { label: "+", title: "Thêm nút con", size: 15, run: () => { this.selectedId = node.id; this.addChild() } }
     ]
     if (this.aiEnabledValue) {
-      buttons.push({ label: "✨", title: "Gợi ý nhánh con bằng AI", run: () => { this.select(node.id); this.runSuggest("children") } })
-    }
-    if (node.parentId !== null) {
-      buttons.push({ label: "⋯", title: "Sửa, nhân bản, xoá", run: () => this.select(node.id) })
+      buttons.push({
+        label: "✨", title: "Gợi ý nhánh con bằng AI", size: 10,
+        run: () => { this.select(node.id); this.runSuggest("children") }
+      })
     }
 
     buttons.forEach((button, index) => {
       const g = document.createElementNS(svgNS, "g")
-      g.setAttribute("transform", `translate(0, ${index * 28})`)
+      g.setAttribute("transform", `translate(${index * 25}, 0)`)
       g.style.cursor = "pointer"
 
       const circle = document.createElementNS(svgNS, "circle")
-      circle.setAttribute("cx", "13"); circle.setAttribute("cy", "13"); circle.setAttribute("r", "12")
+      circle.setAttribute("cx", "11"); circle.setAttribute("cy", "11"); circle.setAttribute("r", "10.5")
       circle.setAttribute("fill", "#FFFFFF")
-      circle.setAttribute("stroke", "#DDE4EE")
+      circle.setAttribute("stroke", "#D6DEE9")
       g.appendChild(circle)
 
-      const label = this.text(button.label, 13, 17.5,
-                              { size: button.label === "+" ? 15 : 11, weight: 600,
-                                fill: "#46566C", anchor: "middle" })
-      g.appendChild(label)
+      g.appendChild(this.text(button.label, 11, button.label === "+" ? 16 : 14.5,
+                              { size: button.size, weight: 600, fill: "#46566C", anchor: "middle" }))
 
       const title = document.createElementNS(svgNS, "title")
       title.textContent = button.title
@@ -329,6 +333,15 @@ export default class extends Controller {
     })
 
     return wrap
+  }
+
+  // Vùng bắt hover trong suốt, phủ cả nút lẫn cụm nút lệnh bên phải.
+  hoverBridge() {
+    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect")
+    rect.setAttribute("x", "0"); rect.setAttribute("y", "-6")
+    rect.setAttribute("width", NODE_W + 62); rect.setAttribute("height", NODE_H + 12)
+    rect.setAttribute("fill", "transparent")
+    return rect
   }
 
   text(content, x, y, options = {}) {
