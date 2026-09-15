@@ -88,3 +88,6 @@ end
 
 # Rails 7.2 gọi JSON.generate(quirks_mode:) — json 3.x đã bỏ keyword này.
 gem "json", "~> 2.21"
+
+# DigitalOcean Spaces dùng giao thức tương thích S3.
+gem "aws-sdk-s3", require: false

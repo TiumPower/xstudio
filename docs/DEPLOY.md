@@ -94,24 +94,53 @@ cấu hình workspace và danh mục thu chi, không đụng tới tài khoản 
 
 ## Lưu trữ tệp đính kèm
 
-ActiveStorage dùng **đĩa của chính server**, không dùng S3:
+App tự chọn nơi lưu theo biến môi trường trong `shared/.env`:
 
-```
-/var/www/xstudio/shared/storage      ← nơi lưu thật, sống qua mọi lần deploy
-/var/www/xstudio/current/storage     ← chỉ là symlink trỏ vào trên
-```
+| Có `DO_SPACES_KEY` + `DO_SPACES_BUCKET`? | Nơi lưu |
+|---|---|
+| Không | Đĩa server — `/var/www/xstudio/shared/storage` (symlink từ `current/storage`) |
+| Có | **DigitalOcean Spaces** (`config/storage.yml` → `spaces`) |
+| Có, kèm `DO_SPACES_MIRROR=1` | Ghi cả hai nơi, đọc từ đĩa — dùng tạm lúc chuyển đổi |
 
-Cấu hình ở `config/storage.yml` (`service: Disk`) và `production.rb`
-(`config.active_storage.service = :local`). Giới hạn 25MB/tệp theo NFR;
-nginx đặt `client_max_body_size 30M`.
+Thiếu khoá thì app quay về đĩa chứ không chết, nên đặt thiếu biến không làm
+hỏng việc tải tệp lên.
+
+### Bật DigitalOcean Spaces
+
+1. Tạo Space + Spaces access key trên DigitalOcean. **Đặt bucket ở chế độ
+   Private** — app tự phát đường dẫn ký tên có hạn khi người dùng tải tệp.
+2. Thêm vào `/var/www/xstudio/shared/.env` (chmod 600, không bao giờ vào git):
+
+   ```
+   DO_SPACES_KEY=...
+   DO_SPACES_SECRET=...
+   DO_SPACES_BUCKET=...
+   DO_SPACES_REGION=sgp1
+   ```
+
+3. Kiểm tra kết nối rồi mới dời tệp:
+
+   ```
+   cd /var/www/xstudio/current
+   RAILS_ENV=production bundle exec rails storage:check
+   DRY=1 RAILS_ENV=production bundle exec rails storage:to_spaces   # xem trước
+   RAILS_ENV=production bundle exec rails storage:to_spaces         # chép thật
+   ```
+
+   `storage:to_spaces` chạy lại được nhiều lần: chép xong từng tệp mới đổi
+   `service_name`, nên dừng giữa chừng thì phần chưa chép vẫn đọc từ đĩa.
+
+4. Khởi động lại app: `systemctl --user restart xstudio_puma_production`
+   và `sudo systemctl restart xstudio_sidekiq`.
+
+Giới hạn 25MB/tệp theo NFR; nginx đặt `client_max_body_size 30M`.
 
 Sao lưu (`bin/xstudio_backup.sh`, cron 03:15):
 - CSDL: dump mỗi đêm, giữ 30 ngày
-- Tệp: nén mỗi **Chủ nhật**, giữ 8 bản (~2 tháng)
+- Tệp trên đĩa: nén mỗi **Chủ nhật**, giữ 8 bản (~2 tháng)
 
-> Muốn chuyển sang S3/Cloudflare R2 thì thêm khối `amazon` vào `storage.yml`,
-> đổi `active_storage.service`, rồi `rails active_storage:migrate` để dời tệp cũ.
-> Ở quy mô 5–15 người và tệp ≤25MB thì đĩa server là đủ, ổ còn trống 28GB.
+> Khi đã chuyển hẳn lên Spaces, bản nén hằng tuần chỉ còn là tàn dư của giai
+> đoạn dùng đĩa. Bật versioning/backup phía DigitalOcean cho bucket thay thế.
 
 ## Những chỗ dễ vấp
 
