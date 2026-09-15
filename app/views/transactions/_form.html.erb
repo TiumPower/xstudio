@@ -8,12 +8,20 @@
 
   <div class="x-field">
     <label>Loại giao dịch</label>
+    <%# Cả ô tô màu theo nghĩa khi được chọn — xanh lá cho Thu, đỏ cam cho Chi —
+        để nhìn một cái là biết đang ghi khoản gì. %>
     <div class="grid grid-cols-2 gap-2.5">
-      <% [["income", "Thu", "var(--good)", "var(--good-soft)"], ["expense", "Chi", "var(--bad)", "var(--bad-soft)"]].each do |value, label, color, soft| %>
-        <label class="flex items-center justify-center gap-2 h-[42px] rounded-[10px] border cursor-pointer font-semibold text-[14px] transition has-[:checked]:border-2"
-               style="border-color:var(--line)">
-          <%= f.radio_button :kind, value, class: "x-check", data: { action: "change->transaction-form#sync" } %>
-          <span style="color:<%= color %>"><%= label %></span>
+      <% [["income", "Thu", "Tiền vào"], ["expense", "Chi", "Tiền ra"]].each do |value, label, hint| %>
+        <label class="x-kind x-kind-<%= value %>">
+          <%= f.radio_button :kind, value, class: "", data: { action: "change->transaction-form#sync" } %>
+          <span class="x-kind-mark">
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor"
+                 stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2.5 6.2l2.4 2.4L9.5 3.8"/>
+            </svg>
+          </span>
+          <span><%= label %></span>
+          <span class="text-[12px] font-normal opacity-70"><%= hint %></span>
         </label>
       <% end %>
     </div>

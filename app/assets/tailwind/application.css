@@ -201,6 +201,32 @@ body {
 
   .x-check { width: 16px; height: 16px; accent-color: var(--brand); cursor: pointer; }
 
+  /* Chọn Thu / Chi: cả ô tô màu theo nghĩa, không chỉ chấm tròn bé xíu. */
+  .x-kind {
+    position: relative; display: flex; align-items: center; justify-content: center; gap: 8px;
+    height: 46px; border-radius: var(--radius-sm); border: 1.5px solid var(--line);
+    background: var(--surface); cursor: pointer; transition: .14s;
+    font-weight: 600; font-size: 14.5px; color: var(--ink-3);
+  }
+  .x-kind input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .x-kind:hover { border-color: #CBD4E0; }
+  .x-kind .x-kind-mark {
+    display: grid; place-items: center; width: 18px; height: 18px; border-radius: 999px;
+    border: 1.5px solid currentColor; opacity: .45; transition: .14s;
+  }
+  .x-kind .x-kind-mark svg { opacity: 0; transition: .14s; }
+  .x-kind:has(:checked) .x-kind-mark { opacity: 1; background: currentColor; border-color: currentColor; }
+  .x-kind:has(:checked) .x-kind-mark svg { opacity: 1; color: #fff; }
+
+  .x-kind-income:has(:checked) {
+    background: var(--good-soft); border-color: var(--chart-income); color: var(--good);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--chart-income) 14%, transparent);
+  }
+  .x-kind-expense:has(:checked) {
+    background: var(--bad-soft); border-color: var(--chart-expense); color: var(--bad);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--chart-expense) 14%, transparent);
+  }
+
   /* Ô màu chọn nhanh */
   .x-swatch {
     width: 100%; aspect-ratio: 1; border-radius: 8px; cursor: pointer;
