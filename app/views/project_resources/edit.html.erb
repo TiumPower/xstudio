@@ -1,0 +1,10 @@
+<% page_title "Sửa #{@resource.label}" %>
+
+<div class="w-full space-y-4">
+  <%= link_to "← #{@resource.label}", project_project_resource_path(@project, @resource),
+              class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
+
+  <%= render "shared/page_header", title: "Sửa tài liệu" %>
+
+  <%= render "form", resource: @resource %>
+</div>

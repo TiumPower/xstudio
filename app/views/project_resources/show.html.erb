@@ -1,0 +1,40 @@
+<% page_title @resource.label %>
+
+<div class="w-full space-y-4">
+  <%= link_to "← Sản phẩm #{@project.name}", project_product_path(@project),
+              class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
+
+  <% actions = capture do %>
+    <% if @resource.written? %>
+      <%= link_to "Sửa", edit_project_project_resource_path(@project, @resource),
+                  class: "x-btn x-btn-ghost x-btn-sm" %>
+    <% end %>
+    <% if @resource.file.attached? %>
+      <%= link_to "Tải tệp về", rails_blob_path(@resource.file, disposition: "attachment"),
+                  class: "x-btn x-btn-ghost x-btn-sm", target: "_blank", rel: "noopener" %>
+    <% end %>
+    <%= button_to "Xoá", project_project_resource_path(@project, @resource), method: :delete,
+                  form: { data: { turbo_confirm: "Xoá tài liệu “#{@resource.label}”? Không khôi phục lại được." } },
+                  class: "x-btn x-btn-sm", style: "color:var(--bad);background:var(--bad-soft)" %>
+  <% end %>
+
+  <%= render "shared/page_header",
+             title: @resource.label,
+             subtitle: [
+               (@resource.written? ? "Viết trong app · #{@resource.content_format.to_s.upcase}"
+                                   : "Tệp #{@resource.file.filename.extension.to_s.upcase} · #{number_to_human_size(@resource.file.byte_size)}"),
+               ("#{@resource.created_by.display_name} tạo" if @resource.created_by),
+               "cập nhật #{time_ago(@resource.updated_at)}"
+             ].compact.join(" · "),
+             actions: actions %>
+
+  <% if @resource.note.present? %>
+    <div class="x-toast mb-4"><div><%= @resource.note %></div></div>
+  <% end %>
+
+  <div class="x-card">
+    <div class="px-6 py-6 sm:px-8 sm:py-7">
+      <div class="x-prose"><%= @resource.rendered_html %></div>
+    </div>
+  </div>
+</div>

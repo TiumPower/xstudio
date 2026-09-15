@@ -29,7 +29,10 @@ Rails.application.routes.draw do
     get "hoat-dong",   to: "project_activities#index", as: :activities
     get "san-pham",    to: "product#show",              as: :product
 
-    resources :project_resources, path: "tai-nguyen", only: [:create, :update, :destroy]
+    resources :project_resources, path: "tai-nguyen",
+              only: [:show, :new, :edit, :create, :update, :destroy] do
+      collection { post :preview }   # xem trước Markdown/HTML khi đang soạn
+    end
 
     resources :board_columns, path: "cot", only: [:create, :update, :destroy] do
       collection { patch :reorder }

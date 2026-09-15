@@ -1,0 +1,62 @@
+<%# Soạn tài liệu: ô gõ bên trái, bản xem trước bên phải. Bản xem trước do máy
+    chủ dựng qua đúng bộ lọc của trang đọc, nên thấy gì là lưu ra đúng thế. %>
+<%= form_with model: resource,
+              url: (resource.persisted? ? project_project_resource_path(@project, resource)
+                                        : project_project_resources_path(@project)),
+              method: (resource.persisted? ? :patch : :post),
+              local: true,
+              data: { controller: "doc-editor",
+                      doc_editor_url_value: preview_project_project_resources_path(@project) } do |f| %>
+  <%= f.hidden_field :kind, value: "doc" %>
+
+  <div class="x-card">
+    <div class="x-card-head gap-3">
+      <div class="flex-1 min-w-[200px]">
+        <%= f.text_field :label, class: "x-input h-9 text-[13.5px] font-semibold",
+                         placeholder: "Tên tài liệu (Đặc tả tính năng, Hướng dẫn cài đặt…)", required: true %>
+      </div>
+
+      <%# Chọn cách máy đọc chữ bạn gõ. %>
+      <div class="x-seg flex-none">
+        <% [["markdown", "Markdown"], ["html", "HTML"]].each do |value, text| %>
+          <label>
+            <%= f.radio_button :content_format, value, class: "sr-only",
+                               data: { doc_editor_target: "format", action: "change->doc-editor#reformat" } %>
+            <%= text %>
+          </label>
+        <% end %>
+      </div>
+
+      <button type="button" class="x-btn x-btn-ghost x-btn-sm flex-none lg:hidden"
+              data-doc-editor-target="toggle" data-action="doc-editor#toggle">Ẩn xem trước</button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-px" style="background:var(--line-2)">
+      <div style="background:var(--surface)">
+        <%= f.text_area :content, rows: 26, spellcheck: "false",
+                        class: "x-doc-input",
+                        placeholder: "# Tiêu đề\n\nViết mô tả ở đây.\n\n- gạch đầu dòng\n- **in đậm**, *in nghiêng*, `mã lệnh`\n\n| Cột | Cột |\n|---|---|\n| 1 | 2 |",
+                        data: { doc_editor_target: "input",
+                                action: "input->doc-editor#changed keydown->doc-editor#tab" } %>
+      </div>
+
+      <div style="background:var(--bg)" data-doc-editor-target="pane">
+        <div class="x-eyebrow px-5 pt-4">Xem trước</div>
+        <div class="px-5 pb-5 pt-2 overflow-auto x-scroll-thin" style="max-height:640px"
+             data-doc-editor-target="preview"></div>
+      </div>
+    </div>
+
+    <div class="px-5 py-3.5 border-t flex flex-wrap items-center gap-2.5" style="border-color:var(--line-2)">
+      <%= f.submit (resource.persisted? ? "Lưu tài liệu" : "Tạo tài liệu"),
+                   class: "x-btn x-btn-primary cursor-pointer" %>
+      <%= link_to "Huỷ",
+                  (resource.persisted? ? project_project_resource_path(@project, resource)
+                                       : project_product_path(@project)),
+                  class: "x-btn x-btn-ghost" %>
+      <p class="x-hint ml-auto">
+        Thẻ và thuộc tính không an toàn (script, iframe, onclick, style…) bị lọc bỏ khi hiển thị — xem trước cho thấy đúng kết quả sau khi lưu.
+      </p>
+    </div>
+  </div>
+<% end %>

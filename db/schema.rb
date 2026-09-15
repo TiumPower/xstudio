@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_09_15_110000) do
+ActiveRecord::Schema[7.2].define(version: 2026_09_15_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "unaccent"
@@ -180,6 +180,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_15_110000) do
     t.bigint "created_by_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "content"
+    t.integer "content_format", default: 0, null: false
     t.index ["created_by_id"], name: "index_project_resources_on_created_by_id"
     t.index ["project_id", "kind", "position"], name: "index_project_resources_on_project_id_and_kind_and_position"
     t.index ["project_id"], name: "index_project_resources_on_project_id"

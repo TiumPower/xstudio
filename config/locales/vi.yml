@@ -29,6 +29,14 @@ vi:
         separator: ","
         delimiter: "."
         precision: 0
+    # `number.format.precision: 0` ở trên là cho tiền đồng (không có phần lẻ),
+    # nhưng nó cũng rơi xuống number_to_human_size — làm 25MB hiện thành
+    # "30 MB". Trả về mặc định của Rails cho nhóm số "dễ đọc".
+    human:
+      format:
+        precision: 3
+        significant: true
+        strip_insignificant_zeros: true
   support:
     array:
       words_connector: ", "

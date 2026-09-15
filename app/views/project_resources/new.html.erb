@@ -1,0 +1,12 @@
+<% page_title "Tài liệu mới · #{@project.code}" %>
+
+<div class="w-full space-y-4">
+  <%= link_to "← Sản phẩm #{@project.name}", project_product_path(@project),
+              class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
+
+  <%= render "shared/page_header",
+             title: "Viết tài liệu",
+             subtitle: "Soạn thẳng trong app bằng Markdown hoặc HTML. Muốn tải tệp có sẵn lên thì dùng ô “Tải tệp lên” ở trang Sản phẩm." %>
+
+  <%= render "form", resource: @resource %>
+</div>

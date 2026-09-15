@@ -286,15 +286,18 @@ body {
 
   /* ---------- Segmented control ---------- */
   .x-seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--bg); border: 1px solid var(--line); border-radius: 11px; }
-  .x-seg > a, .x-seg > button {
+  .x-seg > a, .x-seg > button, .x-seg > label {
     padding: 6px 13px; border-radius: 8px; font-size: 13px; font-weight: 600;
     color: var(--ink-2); text-decoration: none; border: 0; background: transparent; cursor: pointer; transition: .14s;
   }
-  .x-seg > a:hover, .x-seg > button:hover { color: var(--ink); background: rgba(13,27,46,.05); }
+  .x-seg > a:hover, .x-seg > button:hover, .x-seg > label:hover { color: var(--ink); background: rgba(13,27,46,.05); }
   /* Mục đang chọn có nền navy — phải khoá chữ trắng, kể cả khi hover, nếu không
      quy tắc :hover ở trên (specificity cao hơn) làm chữ đen trên nền đen. */
   .x-seg > .is-active,
   .x-seg > .is-active:hover { background: var(--nav); color: #fff; box-shadow: var(--shadow); }
+  /* Dạng radio: ô nào được chọn thì tự sáng, không cần JS đổi class. */
+  .x-seg > label:has(:checked),
+  .x-seg > label:has(:checked):hover { background: var(--nav); color: #fff; box-shadow: var(--shadow); }
 
   /* ---------- Tabs ---------- */
   .x-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
@@ -454,6 +457,98 @@ body {
   .x-no-scrollbar::-webkit-scrollbar { width: 0; height: 0; display: none; }
   [hidden] { display: none !important; }
 }
+
+/* ---------- Tài liệu Markdown/HTML ----------
+   Dùng cho cả trang đọc lẫn ô xem trước khi soạn, nên cái nhìn thấy lúc gõ
+   đúng bằng cái hiện ra sau khi lưu. */
+.x-prose { font-size: 14px; line-height: 1.75; color: var(--ink); overflow-wrap: anywhere; }
+.x-prose > :first-child { margin-top: 0; }
+.x-prose > :last-child  { margin-bottom: 0; }
+
+.x-prose h1, .x-prose h2, .x-prose h3,
+.x-prose h4, .x-prose h5, .x-prose h6 {
+  font-weight: 700; line-height: 1.3; color: var(--ink);
+  margin: 1.6em 0 .55em; scroll-margin-top: 80px;
+}
+.x-prose h1 { font-size: 23px; letter-spacing: -.012em; }
+.x-prose h2 { font-size: 18.5px; letter-spacing: -.008em; padding-bottom: .3em; border-bottom: 1px solid var(--line-2); }
+.x-prose h3 { font-size: 16px; }
+.x-prose h4 { font-size: 14.5px; }
+.x-prose h5, .x-prose h6 { font-size: 13.5px; color: var(--ink-2); }
+
+.x-prose p { margin: .85em 0; }
+.x-prose ul { list-style: disc;    padding-left: 24px; margin: .85em 0; }
+.x-prose ol { list-style: decimal; padding-left: 24px; margin: .85em 0; }
+.x-prose li { margin: .3em 0; }
+.x-prose li > ul, .x-prose li > ol { margin: .3em 0; }
+.x-prose dl { margin: .85em 0; }
+.x-prose dt { font-weight: 600; margin-top: .6em; }
+.x-prose dd { margin: .2em 0 .2em 20px; color: var(--ink-2); }
+
+.x-prose a { color: var(--brand); text-decoration: underline; text-underline-offset: 2px; }
+/* Liên kết bị bộ lọc gỡ href (ví dụ javascript:…) còn lại cái thẻ rỗng — để
+   nguyên màu xanh gạch chân thì trông như bấm được mà bấm không ra gì. */
+.x-prose a:not([href]) { color: inherit; text-decoration: none; cursor: default; }
+.x-prose a:hover { text-decoration-thickness: 2px; }
+
+.x-prose strong { font-weight: 650; }
+.x-prose mark { background: var(--warn-soft); color: var(--ink); padding: 0 3px; border-radius: 3px; }
+.x-prose del { color: var(--ink-3); }
+
+.x-prose code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .875em;
+  background: var(--bg); border: 1px solid var(--line-2);
+  padding: .1em .38em; border-radius: 5px;
+}
+.x-prose pre {
+  background: var(--bg); border: 1px solid var(--line-2); border-radius: var(--radius-sm);
+  padding: 13px 15px; margin: 1em 0; overflow-x: auto;
+  font-size: 12.5px; line-height: 1.6;
+}
+.x-prose pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+
+.x-prose blockquote {
+  border-left: 3px solid var(--brand); background: var(--brand-soft);
+  padding: .6em 1em; margin: 1em 0; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--ink-2);
+}
+.x-prose blockquote > :first-child { margin-top: 0; }
+.x-prose blockquote > :last-child  { margin-bottom: 0; }
+
+.x-prose hr { border: 0; border-top: 1px solid var(--line-2); margin: 1.8em 0; }
+
+/* Bảng rộng hơn khung thì cuộn ngang trong chính nó, không đẩy cả trang. */
+.x-prose table {
+  width: 100%; border-collapse: collapse; margin: 1em 0;
+  font-size: 13px; display: block; overflow-x: auto; white-space: nowrap;
+}
+.x-prose th, .x-prose td { border: 1px solid var(--line-2); padding: 7px 11px; text-align: left; }
+.x-prose th { background: var(--bg); font-weight: 650; }
+.x-prose caption { caption-side: bottom; color: var(--ink-3); font-size: 12.5px; padding-top: 6px; }
+
+.x-prose img { max-width: 100%; height: auto; border-radius: var(--radius-sm); margin: .6em 0; }
+
+.x-prose details {
+  border: 1px solid var(--line-2); border-radius: var(--radius-sm);
+  padding: .55em .9em; margin: .9em 0; background: var(--bg);
+}
+.x-prose summary { cursor: pointer; font-weight: 600; }
+
+.x-prose kbd {
+  font-family: ui-monospace, monospace; font-size: 11.5px;
+  border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px;
+  padding: 1px 5px; background: var(--surface);
+}
+
+/* Ô gõ tài liệu: chữ đều nét để căn bảng, thụt lề Markdown cho thẳng hàng. */
+.x-doc-input {
+  width: 100%; min-height: 420px; border: 0; outline: none; resize: vertical;
+  background: transparent; color: var(--ink);
+  padding: 16px 20px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px; line-height: 1.65; tab-size: 2;
+}
+.x-doc-input::placeholder { color: var(--ink-3); }
 
 /* ---------- Rich text (ActionText / Trix) ---------- */
 .trix-content { font-size: 14px; line-height: 1.7; color: var(--ink); }
