@@ -33,9 +33,9 @@
       <div class="absolute inset-0 flex items-end gap-[3px]">
         <% points.each do |row| %>
           <div class="flex-1 flex items-end justify-center gap-[2px] h-full group relative">
-            <div class="w-[42%] rounded-t-[3px]" style="background:var(--brand);height:<%= (row[:income] * 100.0 / max).round(1) %>%"></div>
+            <div class="w-[42%] rounded-t-[3px]" style="background:var(--chart-income);height:<%= (row[:income] * 100.0 / max).round(1) %>%"></div>
             <%# Chi dùng đỏ nhạt cho khớp với quy ước màu ở mọi nơi khác. %>
-            <div class="w-[42%] rounded-t-[3px]" style="background:#E8A39E;height:<%= (row[:expense] * 100.0 / max).round(1) %>%"></div>
+            <div class="w-[42%] rounded-t-[3px]" style="background:var(--chart-expense);height:<%= (row[:expense] * 100.0 / max).round(1) %>%"></div>
             <div class="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 hidden group-hover:block z-10 whitespace-nowrap
                         px-2.5 py-1.5 rounded-lg text-[11px] text-white shadow-lg" style="background:var(--nav)">
               <div class="font-semibold mb-0.5"><%= row[:label] %></div>

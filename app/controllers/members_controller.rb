@@ -1,11 +1,21 @@
 class MembersController < ApplicationController
-  before_action :require_admin!, only: [:invite, :resend_invitation, :disable, :enable, :update]
-  before_action :load_member,    only: [:show, :update, :resend_invitation, :disable, :enable]
+  before_action :require_admin!, only: [:invite, :resend_invitation, :disable, :enable, :update, :destroy]
+  before_action :load_member,    only: [:show, :update, :resend_invitation, :disable, :enable, :destroy]
 
   def index
     @members = User.order(Arel.sql("CASE status WHEN 1 THEN 0 WHEN 0 THEN 1 ELSE 2 END"), :full_name)
     @project_counts = ProjectMembership.group(:user_id).count
     @pending = @members.count { |m| m.status_invited? }
+
+    # Người nào đã để lại dấu vết thì không cho xoá. Gom bằng vài truy vấn
+    # tổng hợp thay vì hỏi từng người (tránh N+1 trên bảng thành viên).
+    @has_content = [
+      Project.unscoped.group(:owner_id).count, Project.unscoped.group(:created_by_id).count,
+      Task.unscoped.group(:reporter_id).count, Task.unscoped.group(:assignee_id).count,
+      Transaction.unscoped.group(:created_by_id).count,
+      Comment.unscoped.group(:user_id).count,
+      StrategyNode.unscoped.group(:created_by_id).count
+    ].flat_map(&:keys).compact.to_set
   end
 
   def show
@@ -69,6 +79,31 @@ class MembersController < ApplicationController
   def enable
     @member.update!(status: @member.invitation_accepted_at ? :active : :invited)
     redirect_to members_path, notice: "Đã kích hoạt lại #{@member.display_name}."
+  end
+
+  # Xoá vĩnh viễn — chỉ khi người đó chưa để lại dấu vết nào. Còn lại phải
+  # dùng vô hiệu hoá, để dữ liệu cũ giữ đúng tên người làm (FR-AUTH-09).
+  def destroy
+    if @member.id == current_user.id
+      return redirect_to members_path, alert: "Không thể tự xoá tài khoản của chính mình."
+    end
+
+    if @member.role_admin? && User.where(role: User.roles[:admin]).count <= 1
+      return redirect_to members_path, alert: "Đây là quản trị viên duy nhất — không xoá được."
+    end
+
+    blockers = @member.deletion_blockers
+    if blockers.any?
+      detail = blockers.map { |label, count| "#{count} #{label}" }.to_sentence
+      return redirect_to members_path,
+        alert: "Không xoá được #{@member.display_name}: đã có #{detail}. " \
+               "Hãy dùng “Vô hiệu hoá” để giữ nguyên dữ liệu cũ mà vẫn chặn đăng nhập."
+    end
+
+    name = @member.display_name
+    @member.destroy
+    log_activity("deleted", summary: "đã xoá thành viên #{name}")
+    redirect_to members_path, notice: "Đã xoá vĩnh viễn #{name}."
   end
 
   private

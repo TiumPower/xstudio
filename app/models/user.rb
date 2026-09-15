@@ -10,14 +10,25 @@ class User < ApplicationRecord
   belongs_to :invited_by, class_name: "User", optional: true
   has_many   :invitees, class_name: "User", foreign_key: :invited_by_id, dependent: :nullify
 
-  has_many :owned_projects,      class_name: "Project", foreign_key: :owner_id,   dependent: :nullify
+  has_many :owned_projects,      class_name: "Project", foreign_key: :owner_id,      dependent: :nullify
+  has_many :created_projects,    class_name: "Project", foreign_key: :created_by_id, dependent: :nullify
   has_many :project_memberships, dependent: :destroy
   has_many :projects,            through: :project_memberships
-  has_many :assigned_tasks,      class_name: "Task", foreign_key: :assignee_id,   dependent: :nullify
+  has_many :assigned_tasks,      class_name: "Task", foreign_key: :assignee_id, dependent: :nullify
+  has_many :reported_tasks,      class_name: "Task", foreign_key: :reporter_id, dependent: :nullify
+  has_many :created_transactions, class_name: "Transaction", foreign_key: :created_by_id, dependent: :nullify
   has_many :comments,            dependent: :destroy
+  has_many :mentions,            dependent: :destroy
   has_many :notifications,       dependent: :destroy
+  has_many :acted_notifications, class_name: "Notification", foreign_key: :actor_id, dependent: :nullify
   has_many :notification_settings, dependent: :destroy
   has_many :activities,          dependent: :nullify
+  has_many :ai_suggestion_logs,  dependent: :destroy
+  has_many :created_trees,       class_name: "StrategyTree", foreign_key: :created_by_id, dependent: :nullify
+  has_many :created_snapshots,   class_name: "StrategySnapshot", foreign_key: :created_by_id, dependent: :nullify
+  has_many :created_nodes,       class_name: "StrategyNode", foreign_key: :created_by_id, dependent: :nullify
+  has_many :updated_nodes,       class_name: "StrategyNode", foreign_key: :updated_by_id, dependent: :nullify
+  has_many :owned_nodes,         class_name: "StrategyNode", foreign_key: :owner_id,      dependent: :nullify
 
   validates :full_name, presence: true
   validate  :password_has_letter_and_digit, if: -> { password.present? }
@@ -82,6 +93,25 @@ class User < ApplicationRecord
   end
 
   def display_name = full_name.presence || email
+
+  # ---- Xoá vĩnh viễn ------------------------------------------------------
+  #
+  # SRS (FR-AUTH-09) cố ý chỉ cho VÔ HIỆU HOÁ, để dữ liệu cũ còn giữ đúng tên
+  # người làm. Nên chỉ cho xoá hẳn khi người đó chưa để lại dấu vết nào —
+  # tức là mời nhầm, hoặc vào rồi chưa làm gì. Còn lại vẫn dùng vô hiệu hoá.
+  def deletion_blockers
+    {
+      "dự án phụ trách"   => owned_projects.count,
+      "dự án đã tạo"      => created_projects.count,
+      "công việc đã tạo"  => reported_tasks.count,
+      "công việc được giao" => assigned_tasks.count,
+      "giao dịch đã ghi"  => created_transactions.count,
+      "bình luận"         => comments.count,
+      "nút định hướng đã tạo" => created_nodes.count
+    }.reject { |_, count| count.zero? }
+  end
+
+  def deletable? = deletion_blockers.empty?
 
   def notification_setting_for(event_type)
     notification_settings.find_or_initialize_by(event_type: event_type.to_s)

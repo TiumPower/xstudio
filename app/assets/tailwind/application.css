@@ -36,6 +36,13 @@
   --bad-soft:      #FCECEB;
   --info:          #0EA5E9;
 
+  /* Màu Thu / Chi trên BIỂU ĐỒ.
+     Chữ và số dùng --good/--bad (đậm, dễ đọc); cột và mảng màu dùng cặp dưới
+     đây (nhạt hơn một bậc, cân trọng lượng thị giác). Cùng tông với --good/--bad
+     nên nhìn đâu cũng thấy Thu là xanh lá, Chi là đỏ. */
+  --chart-income:  #1F9D62;
+  --chart-expense: #E2766D;
+
   /* Loại hình dự án */
   --type-ps:       #6D3BD4;   /* Products */
   --type-ps-soft:  #F1EBFC;

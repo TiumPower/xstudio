@@ -55,7 +55,7 @@ Rails.application.routes.draw do
   end
 
   # ---- Thành viên & quản trị --------------------------------------------
-  resources :members, path: "thanh-vien", only: [:index, :show, :update] do
+  resources :members, path: "thanh-vien", only: [:index, :show, :update, :destroy] do
     collection { post :invite }
     member do
       post  :resend_invitation

@@ -75,6 +75,17 @@
                                     form: { data: { turbo_confirm: "Vô hiệu hoá #{member.display_name}? Dữ liệu cũ vẫn giữ tên." } },
                                     class: "text-[12.5px] font-semibold hover:underline", style: "color:var(--bad)" %>
                     <% end %>
+
+                    <%# Chỉ hiện nút xoá khi người đó chưa để lại dấu vết nào.
+                        Có dữ liệu rồi thì vô hiệu hoá mới là cách đúng. %>
+                    <% if !@has_content.include?(member.id) %>
+                      <%= button_to "Xoá", member_path(member), method: :delete,
+                                    form: { data: { turbo_confirm: "Xoá vĩnh viễn #{member.display_name}? Không khôi phục lại được." } },
+                                    class: "text-[12.5px] font-semibold hover:underline", style: "color:var(--bad)" %>
+                    <% else %>
+                      <span class="text-[12.5px]" style="color:var(--ink-3)"
+                            title="Đã có dữ liệu trong hệ thống — dùng Vô hiệu hoá để giữ nguyên tên ở dữ liệu cũ">Không xoá được</span>
+                    <% end %>
                   </div>
                 <% end %>
               </td>
