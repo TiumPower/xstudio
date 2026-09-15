@@ -87,7 +87,7 @@ group :test do
 end
 
 # Rails 7.2 gọi JSON.generate(quirks_mode:) — json 3.x đã bỏ keyword này.
-gem "json", "~> 2.21"
+gem "json", "~> 3.0"
 
 # Tài liệu sản phẩm viết bằng Markdown.
 gem "redcarpet", "~> 3.6"
