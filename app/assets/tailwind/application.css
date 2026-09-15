@@ -55,6 +55,12 @@
 
 * { box-sizing: border-box; }
 
+/* Tailwind v4 lấy `currentColor` làm màu viền mặc định, nên mọi `border-t`,
+   `divide-y`… không ghi màu đều ra gần như ĐEN (màu chữ). Đặt lại về màu
+   đường kẻ của hệ thiết kế. Bộ chọn `*` có specificity 0 nên mọi class hay
+   style ghi màu cụ thể vẫn thắng. */
+*, ::before, ::after { border-color: var(--line-2); }
+
 body {
   background: var(--bg);
   color: var(--ink);
@@ -375,9 +381,13 @@ body {
 }
 .x-editor trix-toolbar .trix-button:not(:disabled):hover { background: rgba(13,27,46,.07); color: var(--ink); }
 .x-editor trix-toolbar .trix-button.trix-active { background: var(--brand-soft); color: var(--brand-ink); }
-.x-editor trix-toolbar .trix-button:disabled { opacity: .3; }
-.x-editor trix-toolbar .trix-button--icon::before { opacity: .78; top: 4%; bottom: 4%; }
-.x-editor trix-toolbar .trix-button.trix-active::before { opacity: 1; }
+.x-editor trix-toolbar .trix-button:disabled { opacity: 1; cursor: default; }
+/* Icon của Trix vẽ bằng ảnh nền màu gần đen. Hạ độ đậm xuống cho ngang với
+   chữ phụ của giao diện, chỉ đậm lên khi rê chuột hoặc đang bật. */
+.x-editor trix-toolbar .trix-button--icon::before { opacity: .42; top: 12%; bottom: 12%; }
+.x-editor trix-toolbar .trix-button--icon:not(:disabled):hover::before { opacity: .68; }
+.x-editor trix-toolbar .trix-button.trix-active::before { opacity: .95; }
+.x-editor trix-toolbar .trix-button--icon:disabled::before { opacity: .18; }
 
 /* Hộp nhập liên kết nổi lên trên thanh công cụ. */
 .x-editor trix-toolbar .trix-dialog {
