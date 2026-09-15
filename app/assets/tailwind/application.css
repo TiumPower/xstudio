@@ -343,6 +343,15 @@ body {
   .x-node-actions g:hover circle { fill: var(--brand-soft); stroke: var(--brand); }
   .x-node-actions g.x-node-action-danger:hover circle { fill: var(--bad-soft); stroke: var(--bad); }
 
+  /* Màn hẹp vốn ẩn panel chi tiết. Khi người dùng chủ động bấm ✨ hoặc chọn
+     một nút thì phải cho panel nổi lên, nếu không bấm xong chẳng thấy gì. */
+  @media (max-width: 1023px) {
+    .x-panel-forced {
+      position: fixed; top: 56px; right: 0; bottom: 0; width: min(380px, 92vw);
+      z-index: 62; box-shadow: var(--shadow-lg);
+    }
+  }
+
   /* Chế độ danh sách phân cấp */
   .x-outline-row {
     display: flex; align-items: center; gap: 9px;

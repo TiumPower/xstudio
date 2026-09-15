@@ -92,6 +92,27 @@ cấu hình workspace và danh mục thu chi, không đụng tới tài khoản 
 | 23:00 | `TreeSnapshotJob` | ảnh chụp cây định hướng nếu có thay đổi |
 | 03:15 | cron hệ thống | sao lưu CSDL, giữ 30 ngày |
 
+## Lưu trữ tệp đính kèm
+
+ActiveStorage dùng **đĩa của chính server**, không dùng S3:
+
+```
+/var/www/xstudio/shared/storage      ← nơi lưu thật, sống qua mọi lần deploy
+/var/www/xstudio/current/storage     ← chỉ là symlink trỏ vào trên
+```
+
+Cấu hình ở `config/storage.yml` (`service: Disk`) và `production.rb`
+(`config.active_storage.service = :local`). Giới hạn 25MB/tệp theo NFR;
+nginx đặt `client_max_body_size 30M`.
+
+Sao lưu (`bin/xstudio_backup.sh`, cron 03:15):
+- CSDL: dump mỗi đêm, giữ 30 ngày
+- Tệp: nén mỗi **Chủ nhật**, giữ 8 bản (~2 tháng)
+
+> Muốn chuyển sang S3/Cloudflare R2 thì thêm khối `amazon` vào `storage.yml`,
+> đổi `active_storage.service`, rồi `rails active_storage:migrate` để dời tệp cũ.
+> Ở quy mô 5–15 người và tệp ≤25MB thì đĩa server là đủ, ổ còn trống 28GB.
+
 ## Những chỗ dễ vấp
 
 | Triệu chứng | Nguyên nhân | Cách xử lý |

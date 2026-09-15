@@ -841,6 +841,14 @@ export default class extends Controller {
     const results = this.panelBodyTarget.querySelector('[data-slot="aiResults"]')
     if (!results) return this.toast("Chọn một nút rồi bấm gợi ý.", "warn")
 
+    // Kết quả hiện ở panel bên phải. Bấm ✨ ngay trên canvas mà panel đang đóng
+    // hoặc đang cuộn ở chỗ khác thì trông như không có gì xảy ra — nên mở panel,
+    // cuộn tới đúng khu AI và báo ngay là đang chạy.
+    this.panelTarget.classList.remove("hidden")
+    this.panelTarget.classList.add("x-panel-forced")
+    results.closest('[data-slot="ai"]')?.scrollIntoView({ behavior: "smooth", block: "center" })
+    this.toast(`Đang hỏi AI gợi ý nhánh con cho “${node.title}”…`, "warn")
+
     const instruction = this.panelBodyTarget.querySelector('[data-slot="aiInstruction"]')?.value || ""
     this.aiAbort = new AbortController()
     results.innerHTML = `
@@ -869,6 +877,8 @@ export default class extends Controller {
       const badge = this.panelBodyTarget.querySelector('[data-slot="aiRemaining"]')
       if (badge) badge.textContent = payload.remaining
       this.renderSuggestions(results, payload, node)
+      results.scrollIntoView({ behavior: "smooth", block: "center" })
+      this.toast(`AI đề xuất ${payload.suggestions.length} nhánh — tick chọn rồi bấm “Thêm vào cây”.`, "good")
     } catch (error) {
       if (error.name === "AbortError") return
       results.innerHTML = '<div class="x-toast x-toast-bad text-[12.5px]">Mạng có vấn đề. Cây của bạn không thay đổi.</div>'
