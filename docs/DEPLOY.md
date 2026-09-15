@@ -96,11 +96,18 @@ cấu hình workspace và danh mục thu chi, không đụng tới tài khoản 
 
 App tự chọn nơi lưu theo biến môi trường trong `shared/.env`:
 
-| Có `DO_SPACES_KEY` + `DO_SPACES_BUCKET`? | Nơi lưu |
+| Có `SPACES_KEY` + `SPACES_BUCKET`? | Nơi lưu |
 |---|---|
 | Không | Đĩa server — `/var/www/xstudio/shared/storage` (symlink từ `current/storage`) |
-| Có | **DigitalOcean Spaces** (`config/storage.yml` → `spaces`) |
-| Có, kèm `DO_SPACES_MIRROR=1` | Ghi cả hai nơi, đọc từ đĩa — dùng tạm lúc chuyển đổi |
+| Có | **DigitalOcean Spaces** là kho chính, đĩa giữ bản sao (`config/storage.yml` → `spaces_mirrored`) |
+| Có, kèm `SPACES_MIRROR_LOCAL=false` | Chỉ ghi lên Spaces, đĩa không giữ bản sao nào |
+
+Bucket `czin` dùng chung với boidat, estate và loyalty, nên tệp của Xstudio nằm
+dưới tiền tố `xstudio/` — tiền tố do `lib/active_storage/service/prefixed_s3_service.rb`
+gắn ở tầng service, cột `key` trong CSDL không chứa nó.
+
+Bản sao trên đĩa không thừa: `bin/xstudio_backup.sh` nén `shared/storage` mỗi
+chủ nhật, và đó là bản sao thứ hai duy nhất. DO Spaces không có versioning.
 
 Thiếu khoá thì app quay về đĩa chứ không chết, nên đặt thiếu biến không làm
 hỏng việc tải tệp lên.
@@ -112,10 +119,10 @@ hỏng việc tải tệp lên.
 2. Thêm vào `/var/www/xstudio/shared/.env` (chmod 600, không bao giờ vào git):
 
    ```
-   DO_SPACES_KEY=...
-   DO_SPACES_SECRET=...
-   DO_SPACES_BUCKET=...
-   DO_SPACES_REGION=sgp1
+   SPACES_KEY=...
+   SPACES_SECRET=...
+   SPACES_BUCKET=...
+   SPACES_REGION=sgp1
    ```
 
 3. Kiểm tra kết nối rồi mới dời tệp:
