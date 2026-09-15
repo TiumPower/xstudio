@@ -13,7 +13,8 @@
   <% else %>
     <div class="space-y-1">
       <% data[:recent].each do |task| %>
-        <%= link_to task_path(task), class: "block px-2.5 py-2 rounded-lg hover:bg-[var(--bg)]" do %>
+        <%= link_to task_path(task), class: "block px-2.5 py-2 rounded-lg hover:bg-[var(--bg)]",
+                    data: { turbo_frame: "modal" } do %>
           <div class="text-[13px] font-medium x-clamp-1 mb-0.5"><%= task.title %></div>
           <div class="flex items-center gap-2 text-[11.5px]" style="color:var(--ink-3)">
             <span class="x-code"><%= task.code %></span>

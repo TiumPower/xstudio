@@ -76,10 +76,13 @@ export default class extends Controller {
     form.nextElementSibling?.classList?.remove("hidden")
   }
 
+  // Mở chi tiết trong panel trượt để không mất chỗ đang đứng trên bảng.
   openTask(event) {
     if (event.target.closest("button, a, input")) return
     const code = event.currentTarget.dataset.taskCode
-    window.Turbo.visit(`/cong-viec/${encodeURIComponent(code)}`)
+    const frame = document.getElementById("modal")
+    if (!frame) return window.Turbo.visit(`/cong-viec/${encodeURIComponent(code)}`)
+    frame.src = `/cong-viec/${encodeURIComponent(code)}`
   }
 
   toast(message) {

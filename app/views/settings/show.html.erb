@@ -1,12 +1,12 @@
 <% page_title t("nav.settings") %>
 
-<div class="max-w-[860px]">
+<div>
   <%= render "shared/page_header",
              title: "Cài đặt workspace",
              subtitle: "Tên và nhận diện của không gian làm việc, cùng danh mục thu chi dùng chung." %>
 </div>
 
-<div class="max-w-[860px] space-y-4">
+<div class="w-full space-y-4">
   <% unless current_user.role_admin? %>
     <div class="x-toast x-toast-warn">Chỉ quản trị viên mới sửa được cài đặt workspace. Bạn đang xem ở chế độ chỉ đọc.</div>
   <% end %>
@@ -29,7 +29,7 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5">
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-5">
             <div class="x-field">
               <label>Tên workspace</label>
               <%= f.text_field :name, class: "x-input" %>
@@ -38,7 +38,7 @@
               <label>Dòng phụ (hiển thị dưới tên)</label>
               <%= f.text_field :tagline, class: "x-input", placeholder: "Xstudio" %>
             </div>
-            <div class="x-field md:col-span-2">
+            <div class="x-field md:col-span-2 xl:col-span-4">
               <label>Mô tả lĩnh vực của đội</label>
               <%= f.text_area :about, rows: 3, class: "x-textarea" %>
               <p class="x-hint">Dùng làm ngữ cảnh cho AI khi gợi ý nhánh cây định hướng.</p>

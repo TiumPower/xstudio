@@ -10,7 +10,8 @@ class ActivitiesController < ApplicationController
     if params[:to].present?
       @activities = @activities.where("activities.created_at <= ?", Date.parse(params[:to]).end_of_day)
     end
-    @activities = @activities.limit(300)
+    @pagy       = Pagination.new(@activities, page: params[:page])
+    @activities = @pagy.records
     @users    = User.alphabetical
     @projects = Project.kept.order(:name)
   rescue Date::Error

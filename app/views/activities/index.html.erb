@@ -2,13 +2,13 @@
 <% base = request.query_parameters %>
 <% has_filter = params.values_at(:user_id, :project_id, :action_type, :from, :to).any?(&:present?) %>
 
-<div class="max-w-[960px]">
+<div>
   <%= render "shared/page_header",
              title: "Nhật ký hoạt động",
              subtitle: "Dòng thời gian mọi thao tác trong workspace — ai làm gì, lúc nào." %>
 </div>
 
-<div class="max-w-[960px] space-y-4">
+<div class="w-full space-y-4">
   <div class="x-card p-3">
     <%= form_with url: activities_path, method: :get, class: "flex flex-wrap items-center gap-2" do %>
       <%= select_tag :user_id, options_from_collection_for_select(@users, :id, :display_name, params[:user_id]),
@@ -29,7 +29,7 @@
         <% if has_filter %>
           <%= link_to "Xoá lọc", activities_path, class: "x-btn x-btn-ghost x-btn-sm" %>
         <% end %>
-        <span class="x-muted whitespace-nowrap"><%= @activities.size %> thao tác</span>
+        <span class="x-muted whitespace-nowrap"><%= number_with_delimiter(@pagy.total_count, delimiter: ".") %> thao tác</span>
       </div>
     <% end %>
   </div>
@@ -42,5 +42,6 @@
       <span class="x-muted">Giữ tối thiểu 12 tháng</span>
     </div>
     <%= render "shared/activity_list", activities: @activities %>
+    <%= render "shared/pagination", paginator: @pagy, unit: "thao tác" %>
   </div>
 </div>

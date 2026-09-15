@@ -1,12 +1,12 @@
 <% page_title t("nav.profile") %>
 
-<div class="max-w-[820px]">
+<div>
   <%= render "shared/page_header",
              title: "Hồ sơ cá nhân",
              subtitle: "Thông tin hiển thị của bạn, mật khẩu, và những loại thông báo bạn muốn nhận." %>
 </div>
 
-<div class="max-w-[820px] space-y-4">
+<div class="w-full space-y-4">
   <div class="x-card">
     <div class="x-card-head"><h2 class="x-h3 x-section-title">Thông tin cá nhân</h2></div>
     <div class="p-5">
@@ -20,7 +20,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-5">
           <div class="x-field">
             <%= f.label :full_name %>
             <%= f.text_field :full_name, class: "x-input" %>

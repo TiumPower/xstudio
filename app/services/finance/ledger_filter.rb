@@ -24,10 +24,7 @@ module Finance
       scope = scope.where("transactions.occurred_on <= ?", to)   if to
       scope = scope.where("transactions.amount >= ?", digits(params[:min_amount])) if params[:min_amount].present?
       scope = scope.where("transactions.amount <= ?", digits(params[:max_amount])) if params[:max_amount].present?
-      if params[:q].present?
-        scope = scope.where("transactions.description ILIKE :q OR transactions.counterparty ILIKE :q",
-                            q: "%#{params[:q].strip}%")
-      end
+      scope = scope.search_like(:description, :counterparty, term: params[:q]) if params[:q].present?
       scope
     end
 

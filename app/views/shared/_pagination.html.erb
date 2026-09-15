@@ -1,0 +1,40 @@
+<%# paginator: đối tượng Pagination. Giữ nguyên mọi tham số lọc khi đổi trang. %>
+<% if paginator.total_count.positive? %>
+  <% base = request.query_parameters.except("page") %>
+  <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t"
+       style="border-color:var(--line-2);background:var(--bg-2)">
+    <span class="x-muted">
+      Hiển thị <strong class="x-num" style="color:var(--ink-2)"><%= paginator.from %>–<%= paginator.to %></strong>
+      trên <strong class="x-num" style="color:var(--ink-2)"><%= number_with_delimiter(paginator.total_count, delimiter: ".") %></strong>
+      <%= local_assigns[:unit] || "dòng" %>
+    </span>
+
+    <% if paginator.many? %>
+      <div class="flex items-center gap-1">
+        <% if paginator.prev_page %>
+          <%= link_to "‹", url_for(base.merge(page: paginator.prev_page)),
+                      class: "x-btn x-btn-ghost x-btn-sm", "aria-label": "Trang trước" %>
+        <% else %>
+          <span class="x-btn x-btn-ghost x-btn-sm opacity-40 cursor-default">‹</span>
+        <% end %>
+
+        <% paginator.page_numbers.each do |n| %>
+          <% if n == :gap %>
+            <span class="px-1.5 x-muted">…</span>
+          <% elsif n == paginator.current_page %>
+            <span class="x-btn x-btn-sm x-num" style="background:var(--nav);color:#fff"><%= n %></span>
+          <% else %>
+            <%= link_to n, url_for(base.merge(page: n)), class: "x-btn x-btn-ghost x-btn-sm x-num" %>
+          <% end %>
+        <% end %>
+
+        <% if paginator.next_page %>
+          <%= link_to "›", url_for(base.merge(page: paginator.next_page)),
+                      class: "x-btn x-btn-ghost x-btn-sm", "aria-label": "Trang sau" %>
+        <% else %>
+          <span class="x-btn x-btn-ghost x-btn-sm opacity-40 cursor-default">›</span>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

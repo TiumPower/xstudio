@@ -37,7 +37,7 @@
   --info:          #0EA5E9;
 
   /* Loại hình dự án */
-  --type-ps:       #6D3BD4;   /* Sản phẩm & Kinh doanh */
+  --type-ps:       #6D3BD4;   /* Products */
   --type-ps-soft:  #F1EBFC;
   --type-dx:       #0E7490;   /* Chuyển đổi số (Data & AI) */
   --type-dx-soft:  #E4F2F5;
@@ -152,6 +152,12 @@ body {
   .x-chip-ps    { background: var(--type-ps-soft); color: var(--type-ps); }
   .x-chip-dx    { background: var(--type-dx-soft); color: var(--type-dx); }
   .x-chip-dot::before { content: ""; width: 6px; height: 6px; border-radius: 999px; background: currentColor; }
+  /* Dấu × gỡ điều kiện lọc: nới vùng bấm cho đủ ngón tay chạm. */
+  .x-chip a[title^="Bỏ"], .x-chip > a:last-child {
+    display: inline-grid; place-items: center; width: 18px; height: 18px;
+    margin: -2px -4px -2px 2px; border-radius: 999px; line-height: 1;
+  }
+  .x-chip > a:last-child:hover { background: rgba(13,27,46,.10); }
 
   /* ---------- Ô nhập ---------- */
   .x-input, .x-select, .x-textarea {
@@ -259,6 +265,19 @@ body {
     border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30;
   }
 
+  /* ---------- Hộp xác nhận (thẻ <dialog> gốc) ---------- */
+  .x-confirm {
+    border: 0; padding: 0; background: transparent;
+    max-width: 420px; width: calc(100vw - 32px); color: var(--ink);
+  }
+  .x-confirm::backdrop { background: rgba(12,29,52,.45); }
+  .x-confirm .x-confirm-body {
+    background: var(--surface); border-radius: 16px; padding: 22px 24px;
+    box-shadow: var(--shadow-lg); text-align: left;
+  }
+  .x-confirm[open] { animation: x-pop-in .14s ease-out; }
+  @keyframes x-pop-in { from { transform: scale(.97); opacity: 0 } to { transform: none; opacity: 1 } }
+
   /* ---------- Modal / Panel ---------- */
   .x-overlay { position: fixed; inset: 0; background: rgba(12,29,52,.45); z-index: 60; }
   .x-modal {
@@ -266,9 +285,11 @@ body {
     width: 100%; max-height: calc(100vh - 64px); overflow: auto;
   }
   .x-panel {
-    position: fixed; top: 0; right: 0; bottom: 0; width: 640px; max-width: 100vw;
+    position: fixed; top: 0; right: 0; bottom: 0; width: 720px; max-width: 100vw;
     background: var(--surface); box-shadow: var(--shadow-lg); z-index: 61; overflow: auto;
+    animation: x-slide-in .18s ease-out;
   }
+  @keyframes x-slide-in { from { transform: translateX(24px); opacity: .6 } to { transform: none; opacity: 1 } }
 
   /* ---------- Kanban ---------- */
   .x-board { display: flex; gap: 14px; align-items: flex-start; overflow-x: auto; padding-bottom: 14px; }
@@ -303,6 +324,11 @@ body {
   .x-scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
   .x-scroll-thin::-webkit-scrollbar-thumb { background: #D3DBE6; border-radius: 999px; }
   .x-scroll-thin::-webkit-scrollbar-track { background: transparent; }
+
+  /* Vẫn cuộn được nhưng không vẽ thanh cuộn — dùng cho các dải ngang ngắn
+     (thanh tab, dải chọn cây) mà thanh cuộn chỉ làm rối mắt. */
+  .x-no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+  .x-no-scrollbar::-webkit-scrollbar { width: 0; height: 0; display: none; }
   [hidden] { display: none !important; }
 }
 

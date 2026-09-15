@@ -1,13 +1,13 @@
 <% page_title t("nav.notifications") %>
 
-<div class="max-w-[760px]">
+<div>
   <%= render "shared/page_header",
              title: "Thông báo",
              subtitle: "#{current_user.notifications.unread.count} chưa đọc trên tổng #{current_user.notifications.count}.",
              actions: capture { concat button_to("Đánh dấu tất cả đã đọc", read_all_notifications_path, method: :patch, class: "x-btn x-btn-ghost x-btn-sm") } %>
 </div>
 
-<div class="max-w-[760px] space-y-4">
+<div class="w-full space-y-4">
 
   <div class="x-card overflow-hidden">
     <% if @notifications.empty? %>
@@ -30,6 +30,7 @@
           <% unless n.read? %><i class="w-2 h-2 rounded-full flex-none mt-2" style="background:var(--brand)"></i><% end %>
         <% end %>
       <% end %>
+      <%= render "shared/pagination", paginator: @pagy, unit: "thông báo" %>
     <% end %>
   </div>
 </div>

@@ -1,12 +1,12 @@
 <% page_title "Tìm kiếm" %>
 
-<div class="max-w-[900px]">
+<div>
   <%= render "shared/page_header",
              title: "Tìm kiếm",
              subtitle: "Tìm trong tên dự án, tiêu đề công việc, diễn giải giao dịch và nút cây định hướng." %>
 </div>
 
-<div class="max-w-[900px] space-y-4">
+<div class="w-full space-y-4">
   <%= form_with url: search_path, method: :get do %>
     <input type="search" name="q" value="<%= @q %>" autofocus class="x-input x-btn-lg h-[46px] text-[15px]"
            placeholder="Tìm dự án, công việc, giao dịch, nút định hướng…">

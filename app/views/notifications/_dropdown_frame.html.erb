@@ -1,0 +1,5 @@
+<%# Turbo yêu cầu phần trả về phải chứa đúng khung có cùng id, nếu không sẽ
+    hiện "Content missing". %>
+<%= turbo_frame_tag "notifications_dropdown" do %>
+  <%= render "notifications/dropdown", notifications: notifications %>
+<% end %>

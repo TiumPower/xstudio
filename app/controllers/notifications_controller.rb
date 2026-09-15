@@ -1,8 +1,13 @@
 class NotificationsController < ApplicationController
   def index
-    @notifications = current_user.notifications.newest.includes(:actor)
-    @notifications = @notifications.limit(params[:compact] ? 10 : 100)
-    render partial: "notifications/dropdown", locals: { notifications: @notifications } if params[:compact]
+    scope = current_user.notifications.newest.includes(:actor)
+
+    if params[:compact]
+      return render partial: "notifications/dropdown_frame", locals: { notifications: scope.limit(10) }
+    end
+
+    @pagy          = Pagination.new(scope, page: params[:page])
+    @notifications = @pagy.records
   end
 
   def read

@@ -9,8 +9,7 @@
             <p class="x-muted mt-0.5"><%= subtitle %></p>
           <% end %>
         </div>
-        <button type="button" class="w-8 h-8 rounded-lg grid place-items-center hover:bg-[var(--bg)] text-[17px] leading-none"
-                style="color:var(--ink-3)" data-action="modal#close" aria-label="Đóng">&times;</button>
+        <%= render "shared/close_button", action: "modal#close" %>
       </div>
       <div class="p-5"><%= yield %></div>
     </div>

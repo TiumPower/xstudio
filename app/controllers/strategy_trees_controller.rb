@@ -77,7 +77,7 @@ class StrategyTreesController < ApplicationController
   end
 
   TEMPLATES = {
-    "year" => ["Sản phẩm & Kinh doanh", "Chuyển đổi số (Data & AI)", "Năng lực nội bộ", "Tài chính & Vận hành"],
+    "year" => ["Products", "Chuyển đổi số (Data & AI)", "Năng lực nội bộ", "Tài chính & Vận hành"],
     "product" => ["Khám phá khách hàng", "Sản phẩm lõi", "Kênh bán", "Hỗ trợ & Vận hành"],
     "blank" => []
   }.freeze

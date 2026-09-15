@@ -52,6 +52,20 @@ class ApplicationController < ActionController::Base
     Sentry.set_user(id: current_user&.id, email: current_user&.email)
   end
 
+  # Form mở trong popup thì đóng popup rồi điều hướng cả trang. Không dùng
+  # redirect thường được: bên trong turbo-frame, redirect sẽ nạp trang đích vào
+  # chính cái popup đó. `turbo_stream.refresh` cũng không được vì Turbo bỏ qua
+  # refresh cho chính request vừa gửi.
+  def close_modal_and_go(path, notice: nil)
+    flash[:notice] = notice if notice.present?
+    if turbo_frame_request?
+      render turbo_stream: [turbo_stream.update("modal", ""),
+                            turbo_stream.action(:redirect, path)]
+    else
+      redirect_to path
+    end
+  end
+
   # Ghi nhật ký hoạt động gọn trong controller.
   def log_activity(action, trackable: nil, project: nil, summary: nil, changes_payload: {})
     Activity.log!(user: current_user, action: action, trackable: trackable,

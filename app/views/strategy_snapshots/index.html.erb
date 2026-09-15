@@ -1,6 +1,6 @@
 <% page_title "Ảnh chụp phiên bản" %>
 
-<div class="max-w-[820px] space-y-4">
+<div class="w-full space-y-4">
   <div class="flex items-center justify-between gap-3">
     <div>
       <%= link_to "← #{@tree.name}", strategy_tree_path(@tree), class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
@@ -46,6 +46,7 @@
           <% end %>
         </tbody>
       </table>
+      <%= render "shared/pagination", paginator: @pagy, unit: "phiên bản" %>
     <% end %>
   </div>
 </div>

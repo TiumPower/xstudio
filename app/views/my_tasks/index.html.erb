@@ -1,12 +1,12 @@
 <% page_title t("nav.my_tasks") %>
 
-<div class="max-w-[1000px] mx-auto">
+<div>
   <%= render "shared/page_header",
              title: "Việc của tôi",
              subtitle: "Mọi công việc đang mở được giao cho bạn, gộp từ tất cả dự án và xếp theo hạn." %>
 </div>
 
-<div class="max-w-[1000px] mx-auto space-y-4">
+<div class="w-full space-y-4">
   <% if @groups.empty? %>
     <div class="x-card">
       <%= render "shared/empty", icon: "✓", title: "Bạn không còn việc nào đang mở",

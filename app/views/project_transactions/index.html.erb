@@ -40,7 +40,7 @@
     <div class="x-card-head">
       <h2 class="x-h3 x-section-title x-section-title-good">Giao dịch của dự án</h2>
       <div class="flex items-center gap-2">
-        <span class="x-muted"><%= @transactions.size %> giao dịch</span>
+        <span class="x-muted"><%= @pagy.total_count %> giao dịch</span>
         <%= link_to "+ Giao dịch mới", new_transaction_path(project_id: @project.id),
                     class: "x-btn x-btn-primary x-btn-sm", data: { turbo_frame: "modal" } %>
       </div>
@@ -79,6 +79,7 @@
           </tbody>
         </table>
       </div>
+      <%= render "shared/pagination", paginator: @pagy, unit: "giao dịch" %>
     <% end %>
   </div>
 </div>

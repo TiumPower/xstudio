@@ -4,7 +4,12 @@
       <% next if message.blank? %>
       <div class="x-toast <%= { "notice" => "x-toast-good", "success" => "x-toast-good", "alert" => "x-toast-bad", "error" => "x-toast-bad", "warning" => "x-toast-warn" }[type.to_s] %>">
         <span class="flex-1"><%= message %></span>
-        <button type="button" class="opacity-50 hover:opacity-100" data-action="flash#dismiss" aria-label="Đóng">&times;</button>
+        <button type="button" class="w-6 h-6 -mr-1 -my-0.5 rounded-md grid place-items-center opacity-50 hover:opacity-100 flex-none"
+                data-action="flash#dismiss" aria-label="Đóng" title="Đóng">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M4 4l8 8M12 4l-8 8"/>
+          </svg>
+        </button>
       </div>
     <% end %>
   </div>

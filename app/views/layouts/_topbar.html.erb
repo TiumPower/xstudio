@@ -17,7 +17,7 @@
 
   <%# Ô tìm kiếm bị bóp còn một ký tự trên điện thoại — ẩn đi, đã có mục
       Tìm kiếm riêng khi cần. %>
-  <div class="flex-1 hidden md:flex justify-center px-2">
+  <div class="flex-1 <%= current_page?(search_path) ? "hidden" : "hidden md:flex" %> justify-center px-2">
     <%= form_with url: search_path, method: :get, class: "w-full max-w-[420px] relative", data: { turbo_frame: "_top" } do %>
       <svg class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="15" height="15" viewBox="0 0 16 16" fill="none">
         <circle cx="7" cy="7" r="5" stroke="#8A98AC" stroke-width="1.5"/><path d="M11 11l3 3" stroke="#8A98AC" stroke-width="1.5" stroke-linecap="round"/>
@@ -38,7 +38,8 @@
           <%# Đang ở trong một dự án thì tạo mới phải gắn sẵn dự án đó. %>
           <div class="px-3 pt-1.5 pb-1 x-eyebrow">Trong <%= project.code %></div>
           <%= link_to new_task_path(project_id: project.id),
-                      class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" do %>
+                      class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]",
+                      data: { turbo_frame: "modal" } do %>
             Công việc mới
           <% end %>
           <%= link_to new_transaction_path(project_id: project.id),
@@ -50,9 +51,11 @@
           <div class="px-3 pt-0.5 pb-1 x-eyebrow">Toàn workspace</div>
         <% end %>
 
-        <%= link_to "Dự án mới", new_project_path, class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
+        <%= link_to "Dự án mới", new_project_path, class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]",
+                    data: { turbo_frame: "modal" } %>
         <% unless current_project %>
-          <%= link_to "Công việc mới", new_task_path,        class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
+          <%= link_to "Công việc mới", new_task_path, class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]",
+                      data: { turbo_frame: "modal" } %>
           <%= link_to "Giao dịch mới", new_transaction_path, class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]",
                       data: { turbo_frame: "modal" } %>
         <% end %>
@@ -70,9 +73,9 @@
                 style="background:var(--bad)"><%= unread_notifications_count > 9 ? "9+" : unread_notifications_count %></span>
         <% end %>
       </button>
-      <div class="absolute right-0 mt-2 w-[340px] x-card z-50 overflow-hidden" hidden data-dropdown-target="menu">
+      <div class="absolute right-0 mt-2 x-card z-50 overflow-hidden" hidden data-dropdown-target="menu">
         <%= turbo_frame_tag "notifications_dropdown", src: notifications_path(compact: 1), loading: :lazy do %>
-          <div class="p-6 text-center x-muted">Đang tải…</div>
+          <div class="w-[340px] p-8 text-center x-muted">Đang tải…</div>
         <% end %>
       </div>
     </div>

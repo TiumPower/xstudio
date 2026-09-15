@@ -19,7 +19,7 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5">
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-5">
     <div class="x-field">
       <label>Số tiền (₫) <span style="color:var(--bad)">*</span></label>
       <%= f.text_field :amount, value: (transaction.amount ? number_with_delimiter(transaction.amount, delimiter: ".") : nil),
@@ -52,7 +52,7 @@
       <p class="x-hint">Để trống nếu là chi phí/thu nhập chung của cả đội.</p>
     </div>
 
-    <div class="x-field md:col-span-2">
+    <div class="x-field md:col-span-2 xl:col-span-3">
       <label>Diễn giải</label>
       <%= f.text_field :description, class: "x-input", placeholder: "Thanh toán server AWS tháng 9" %>
     </div>
@@ -67,7 +67,7 @@
       <%= f.select :payment_method, Transaction.payment_methods.keys.map { |k| [t("payment_methods.#{k}"), k] }, {}, class: "x-select" %>
     </div>
 
-    <div class="x-field md:col-span-2">
+    <div class="x-field md:col-span-2 xl:col-span-3">
       <label>Chứng từ đính kèm</label>
       <%= vn_file_field(f, :receipts, multiple: true, button_label: "Chọn chứng từ…") %>
       <% if transaction.receipts.attached? %>

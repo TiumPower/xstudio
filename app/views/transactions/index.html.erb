@@ -100,7 +100,7 @@
           </tbody>
           <tfoot>
             <tr>
-              <td colspan="6">Tổng cộng <%= @transactions.size %> giao dịch đang hiển thị</td>
+              <td colspan="6">Tổng của toàn bộ kết quả lọc (<%= number_with_delimiter(@pagy.total_count, delimiter: ".") %> giao dịch)</td>
               <td class="x-td-num">
                 <div class="x-money x-in">+ <%= number_with_delimiter(@totals[:income], delimiter: ".") %> ₫</div>
                 <div class="x-money x-out">− <%= number_with_delimiter(@totals[:expense], delimiter: ".") %> ₫</div>
@@ -111,11 +111,7 @@
           </tfoot>
         </table>
       </div>
-      <% if @scope.count > @transactions.size %>
-        <div class="px-4 py-3 x-muted text-center border-t" style="border-color:var(--line-2)">
-          Hiển thị <%= @transactions.size %> / <%= @scope.count %> giao dịch. Thu hẹp bộ lọc hoặc xuất Excel để xem đầy đủ.
-        </div>
-      <% end %>
+      <%= render "shared/pagination", paginator: @pagy, unit: "giao dịch" %>
     <% end %>
   </div>
 </div>

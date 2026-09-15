@@ -4,7 +4,7 @@
     <div class="x-modal max-w-[720px]" onclick="event.stopPropagation()">
       <div class="x-card-head">
         <h2 class="x-h3">Dán danh sách thụt lề vào cây</h2>
-        <button class="w-7 h-7 rounded-md hover:bg-[var(--bg)]" data-action="tree#closePaste" aria-label="Đóng">×</button>
+        <%= render "shared/close_button", action: "tree#closePaste" %>
       </div>
       <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>

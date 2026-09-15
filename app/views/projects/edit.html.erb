@@ -1,10 +1,15 @@
-<% page_title "Sửa dự án" %>
-<div class="max-w-[860px]">
-  <div class="x-card">
-    <div class="x-card-head">
-      <h2 class="x-h3">Sửa dự án</h2>
-      <span class="x-code"><%= @project.code %></span>
-    </div>
-    <div class="p-5"><%= render "form", project: @project %></div>
+<% if turbo_frame_request? %>
+  <%= turbo_frame_tag "modal" do %>
+    <%= render layout: "shared/modal",
+               locals: { title: "Sửa dự án", width: "max-w-[880px]", subtitle: @project.name } do %>
+      <%= render "form", project: @project %>
+    <% end %>
+  <% end %>
+<% else %>
+  <% page_title "Sửa dự án" %>
+  <% content_for :back_path, project_path(@project) %>
+  <div>
+    <%= render "shared/page_header", title: "Sửa dự án", subtitle: "#{@project.code} · #{@project.name}" %>
+    <div class="x-card"><div class="p-5"><%= render "form", project: @project %></div></div>
   </div>
-</div>
+<% end %>

@@ -1,0 +1,10 @@
+<%# Nút đóng chuẩn: vùng bấm 34×34, icon 16px. Dùng ở mọi popup/panel. %>
+<button type="button"
+        class="x-btn x-btn-ghost x-btn-icon flex-none <%= local_assigns[:extra_class] %>"
+        <%= local_assigns[:action].present? ? "data-action=#{action}".html_safe : "" %>
+        aria-label="Đóng" title="Đóng">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+       stroke-width="1.8" stroke-linecap="round">
+    <path d="M4 4l8 8M12 4l-8 8"/>
+  </svg>
+</button>

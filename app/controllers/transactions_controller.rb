@@ -12,7 +12,8 @@ class TransactionsController < ApplicationController
       general_income:  @scope.income.general.sum(:amount),
       general_expense: @scope.expense.general.sum(:amount)
     }
-    @transactions = @scope.newest.limit(500)
+    @pagy         = Pagination.new(@scope.newest, page: params[:page])
+    @transactions = @pagy.records
     @categories   = TransactionCategory.active.ordered
     @projects     = Project.kept.order(:name)
   end

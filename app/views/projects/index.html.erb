@@ -6,12 +6,13 @@
            title: (@scope == "archived" ? "Dự án đã lưu trữ" : "Dự án"),
            subtitle: (@scope == "archived" ?
              "Những dự án đã đóng lại. Dữ liệu và thu chi vẫn giữ nguyên." :
-             "Mọi dự án của đội, theo hai mảng: Sản phẩm & Kinh doanh và Chuyển đổi số."),
+             "Mọi dự án của đội, theo hai mảng: Products và Chuyển đổi số."),
            actions: capture {
              concat link_to((@scope == "archived" ? "Dự án đang chạy" : "Đã lưu trữ"),
                             projects_path(view: @view, scope: @scope == "archived" ? "active" : "archived"),
                             class: "x-btn x-btn-ghost x-btn-sm")
-             concat link_to("+ Dự án mới", new_project_path, class: "x-btn x-btn-primary x-btn-sm")
+             concat link_to("+ Dự án mới", new_project_path, class: "x-btn x-btn-primary x-btn-sm",
+                            data: { turbo_frame: "modal" })
            } %>
 
 <div class="space-y-4">
@@ -115,7 +116,8 @@
                  title: (has_filter ? "Không có dự án nào khớp bộ lọc" : "Chưa có dự án nào"),
                  body: (has_filter ? "Thử bỏ bớt điều kiện lọc." : "Tạo dự án đầu tiên để bắt đầu."),
                  action_label: (has_filter ? "Xoá bộ lọc" : "Tạo dự án"),
-                 action_path: (has_filter ? projects_path(view: @view) : new_project_path) %>
+                 action_path: (has_filter ? projects_path(view: @view) : new_project_path),
+                 turbo_frame: (has_filter ? nil : "modal") %>
     </div>
   <% elsif @view == "table" %>
     <div class="x-card overflow-hidden"><%= render "table", projects: @projects %></div>

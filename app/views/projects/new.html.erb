@@ -1,7 +1,16 @@
-<% page_title "Dự án mới" %>
-<div class="max-w-[860px]">
-  <div class="x-card">
-    <div class="x-card-head"><h2 class="x-h3">Tạo dự án mới</h2></div>
-    <div class="p-5"><%= render "form", project: @project %></div>
+<% if turbo_frame_request? %>
+  <%= turbo_frame_tag "modal" do %>
+    <%= render layout: "shared/modal",
+               locals: { title: "Tạo dự án mới", width: "max-w-[880px]",
+                         subtitle: "Mã dự án tự sinh theo loại hình: PRD cho Products, DX cho Chuyển đổi số." } do %>
+      <%= render "form", project: @project %>
+    <% end %>
+  <% end %>
+<% else %>
+  <% page_title "Dự án mới" %>
+  <div>
+    <%= render "shared/page_header", title: "Tạo dự án mới",
+               subtitle: "Mã dự án tự sinh theo loại hình: PRD cho Products, DX cho Chuyển đổi số." %>
+    <div class="x-card"><div class="p-5"><%= render "form", project: @project %></div></div>
   </div>
-</div>
+<% end %>

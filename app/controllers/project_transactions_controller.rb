@@ -3,7 +3,8 @@ class ProjectTransactionsController < ApplicationController
 
   def index
     @tab = "finance"
-    @transactions = @project.transactions.kept.includes(:category, :created_by).newest.limit(300)
+    @pagy         = Pagination.new(@project.transactions.kept.includes(:category, :created_by).newest, page: params[:page])
+    @transactions = @pagy.records
     @income  = @project.income_total
     @expense = @project.expense_total
     @monthly = Reporting::MonthlySeries.new(project: @project).call

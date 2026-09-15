@@ -1,6 +1,6 @@
 <% page_title t("nav.members") %>
 
-<div class="max-w-[1080px]">
+<div>
   <%= render "shared/page_header",
              title: "Thành viên",
              subtitle: "#{@members.size} người trong workspace#{@pending.positive? ? " · #{@pending} đang chờ kích hoạt" : ''}. Mọi thành viên đều thấy toàn bộ dự án và thu chi.",
@@ -20,7 +20,7 @@
              <% end : nil) %>
 </div>
 
-<div class="max-w-[1080px] space-y-4">
+<div class="w-full space-y-4">
   <div class="x-card overflow-hidden">
     <div class="overflow-x-auto x-scroll-thin">
       <table class="x-table min-w-[860px]">

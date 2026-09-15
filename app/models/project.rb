@@ -1,5 +1,6 @@
 class Project < ApplicationRecord
   include Discard::Model
+  include Searchable
 
   PRODUCT_SALES_COLOR = "#6D3BD4".freeze
   DX_COLOR            = "#0E7490".freeze

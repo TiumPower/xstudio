@@ -5,8 +5,9 @@
     </div>
   <% end %>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-5">
-    <div class="x-field md:col-span-2">
+  <%# Trường ngắn xếp 3 cột ở màn rộng để không có input dài cả mét. %>
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-5">
+    <div class="x-field md:col-span-2 xl:col-span-3">
       <%= f.label :name %>
       <%= f.text_field :name, class: "x-input", autofocus: true, placeholder: "Kho dữ liệu & Báo cáo bán lẻ" %>
     </div>
@@ -24,7 +25,7 @@
       <p class="x-hint">Để trống để hệ thống tự sinh theo loại hình.</p>
     </div>
 
-    <div class="x-field md:col-span-2">
+    <div class="x-field md:col-span-2 xl:col-span-3">
       <%= f.label :description %>
       <%= f.text_area :description, class: "x-textarea", rows: 3, placeholder: "Phạm vi, mục tiêu, cách bàn giao…" %>
     </div>
@@ -63,9 +64,9 @@
       </div>
     </div>
 
-    <div class="x-field md:col-span-2">
+    <div class="x-field md:col-span-2 xl:col-span-3">
       <label>Thành viên tham gia</label>
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-2 p-3 rounded-[10px] border" style="border-color:var(--line);background:var(--bg-2)">
+      <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2 p-3 rounded-[10px] border" style="border-color:var(--line);background:var(--bg-2)">
         <% User.assignable.each do |user| %>
           <label class="flex items-center gap-2.5 px-2 py-1.5 rounded-lg cursor-pointer hover:bg-white">
             <%= check_box_tag "project[member_ids][]", user.id, project.member?(user) || project.owner_id == user.id, class: "x-check", id: "member_#{user.id}" %>
@@ -77,7 +78,7 @@
       <p class="x-hint">Chỉ thành viên tham gia mới được gán công việc. Mọi người vẫn xem được dự án.</p>
     </div>
 
-    <div class="x-field md:col-span-2">
+    <div class="x-field md:col-span-2 xl:col-span-3">
       <label>Tiến độ</label>
       <div class="flex flex-wrap items-center gap-4 p-3 rounded-[10px] border" style="border-color:var(--line);background:var(--bg-2)">
         <label class="flex items-center gap-2 text-[13px] cursor-pointer">

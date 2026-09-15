@@ -38,7 +38,8 @@
           <p class="x-muted text-center py-6">Không có công việc nào đến hạn trong 2 tuần tới.</p>
         <% else %>
           <% @upcoming_tasks.each do |task| %>
-            <%= link_to task_path(task), class: "flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-[var(--bg)]" do %>
+            <%= link_to task_path(task), class: "flex items-center gap-2.5 px-3 py-2.5 rounded-lg hover:bg-[var(--bg)]",
+                        data: { turbo_frame: "modal" } do %>
               <%= avatar_for task.assignee, size: :sm %>
               <span class="x-code w-[86px] flex-none hidden sm:block"><%= task.code %></span>
               <span class="flex-1 min-w-0 truncate text-[13.5px]"><%= task.title %></span>

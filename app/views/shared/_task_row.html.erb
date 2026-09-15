@@ -1,5 +1,6 @@
 <% show_project = local_assigns.fetch(:show_project, false) %>
-<%= link_to task_path(task), class: "flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[var(--bg)] group" do %>
+<%= link_to task_path(task), class: "flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[var(--bg)] group",
+            data: { turbo_frame: "modal" } do %>
   <span class="w-4 h-4 rounded-[5px] border flex-none" style="border-color:var(--line)"></span>
   <span class="x-code w-[92px] flex-none hidden sm:block truncate"><%= task.code %></span>
   <span class="flex-1 min-w-0 truncate text-[13.5px] font-medium"><%= task.title %></span>

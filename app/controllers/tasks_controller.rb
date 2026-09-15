@@ -9,9 +9,7 @@ class TasksController < ApplicationController
     @tasks = @tasks.where(assignee_id: params[:assignee_id]) if params[:assignee_id].present?
     @tasks = @tasks.where(priority: params[:priority])       if params[:priority].present?
     @tasks = @tasks.where(board_column_id: params[:column_id]) if params[:column_id].present?
-    if params[:q].present?
-      @tasks = @tasks.where("tasks.title ILIKE :q OR tasks.code ILIKE :q", q: "%#{params[:q].strip}%")
-    end
+    @tasks = @tasks.search_like(:title, :code, term: params[:q]) if params[:q].present?
 
     @tasks = case params[:sort]
              when "due"      then @tasks.order(Arel.sql("due_date NULLS LAST"))
@@ -19,6 +17,9 @@ class TasksController < ApplicationController
              when "created"  then @tasks.order(created_at: :desc)
              else @tasks.order(:board_column_id, :position)
              end
+
+    @pagy  = Pagination.new(@tasks, page: params[:page])
+    @tasks = @pagy.records
   end
 
   def show; end
@@ -36,16 +37,19 @@ class TasksController < ApplicationController
       apply_labels
       log_activity("created", trackable: @task, project: @project, summary: "đã tạo công việc #{@task.code}")
       Notifications::Dispatch.task_assigned(@task, actor: current_user) if @task.assignee_id
-      redirect_back fallback_location: project_board_path(@project), notice: "Đã tạo #{@task.code}."
+      if turbo_frame_request?
+        close_modal_and_go(task_path(@task), notice: "Đã tạo công việc #{@task.code}.")
+      else
+        redirect_back fallback_location: project_board_path(@project), notice: "Đã tạo #{@task.code}."
+      end
     else
       redirect_back fallback_location: project_board_path(@project),
                     alert: @task.errors.full_messages.to_sentence
     end
   end
 
-  def edit
-    @projects = Project.active.order(:name)
-  end
+  # Không có màn sửa riêng: mọi thứ sửa ngay trong chi tiết công việc.
+  def edit = redirect_to task_path(@task)
 
   def update
     previous = { assignee_id: @task.assignee_id, board_column_id: @task.board_column_id, status: @task.status }
@@ -54,7 +58,13 @@ class TasksController < ApplicationController
       apply_labels
       log_activity("updated", trackable: @task, project: @task.project, summary: "đã cập nhật #{@task.code}")
       notify_changes(previous)
-      redirect_back fallback_location: task_path(@task), notice: "Đã lưu công việc #{@task.code}."
+      # Trong panel thì quay lại chính công việc đó (Turbo nạp lại vào panel),
+      # ngoài panel thì về nơi vừa bấm.
+      if turbo_frame_request?
+        redirect_to task_path(@task)
+      else
+        redirect_back fallback_location: task_path(@task), notice: "Đã lưu công việc #{@task.code}."
+      end
     else
       redirect_back fallback_location: task_path(@task), alert: @task.errors.full_messages.to_sentence
     end
@@ -109,7 +119,15 @@ class TasksController < ApplicationController
     authorize_owner_or_admin!(@task.reporter_id)
     @task.discard
     log_activity("deleted", trackable: @task, project: @task.project, summary: "đã xoá #{@task.code}")
-    redirect_to project_board_path(@task.project), notice: "Đã xoá công việc #{@task.code}."
+    flash[:notice] = "Đã xoá công việc #{@task.code}."
+    if turbo_frame_request?
+      # Đóng panel rồi điều hướng cả trang — nếu redirect thường, trang bảng
+      # sẽ bị nạp vào bên trong panel.
+      render turbo_stream: [turbo_stream.update("modal", ""),
+                            turbo_stream.action(:redirect, project_board_path(@task.project))]
+    else
+      redirect_to project_board_path(@task.project)
+    end
   end
 
   private

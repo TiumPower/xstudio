@@ -52,7 +52,7 @@
               <tr>
                 <td><%= check_box_tag "codes[]", task.code, false, class: "x-check", data: { action: "bulk#toggle", bulk_target: "box" } %></td>
                 <td>
-                  <%= link_to task_path(task), class: "block" do %>
+                  <%= link_to task_path(task), class: "block", data: { turbo_frame: "modal" } do %>
                     <div class="font-medium text-[13.5px]"><%= task.title %></div>
                     <div class="x-code"><%= task.code %></div>
                   <% end %>
@@ -78,6 +78,7 @@
           </tbody>
         </table>
       </div>
+      <%= render "shared/pagination", paginator: @pagy, unit: "công việc" %>
     <% end %>
   <% end %>
 </div>

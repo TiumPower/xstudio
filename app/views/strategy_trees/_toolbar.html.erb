@@ -1,6 +1,6 @@
 <div class="flex-none bg-white border-b" style="border-color:var(--line)">
   <!-- Thanh chọn cây -->
-  <div class="flex items-center gap-2 px-5 lg:px-7 py-2.5 border-b overflow-x-auto x-scroll-thin" style="border-color:var(--line-2)">
+  <div class="flex items-center gap-2 px-5 lg:px-7 py-2.5 border-b overflow-x-auto x-no-scrollbar" style="border-color:var(--line-2)">
     <span class="x-eyebrow flex-none mr-1">Cây của workspace</span>
     <% @trees.each do |tree| %>
       <%= link_to strategy_tree_path(tree),

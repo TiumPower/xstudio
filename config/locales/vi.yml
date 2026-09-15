@@ -89,10 +89,10 @@ vi:
     logout: "Đăng xuất"
 
   project_types:
-    product_sales: "Sản phẩm & Kinh doanh"
+    product_sales: "Products"
     digital_transformation: "Chuyển đổi số"
   project_types_long:
-    product_sales: "Sản phẩm & Kinh doanh"
+    product_sales: "Products"
     digital_transformation: "Chuyển đổi số (Data & AI)"
   project_statuses:
     planning: "Lên kế hoạch"

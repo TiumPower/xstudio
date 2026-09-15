@@ -2,7 +2,8 @@ class StrategySnapshotsController < ApplicationController
   before_action :load_tree
 
   def index
-    @snapshots = @tree.strategy_snapshots.newest.includes(:created_by).limit(120)
+    @pagy      = Pagination.new(@tree.strategy_snapshots.newest.includes(:created_by), page: params[:page])
+    @snapshots = @pagy.records
   end
 
   def create

@@ -1,0 +1,27 @@
+<%# Panel trượt từ phải (SRS 7.4 — chi tiết công việc). Dùng trong turbo_frame "modal".
+    Nền ngoài mờ, Esc hoặc bấm ra ngoài để đóng. %>
+<div class="x-overlay" data-controller="modal" data-action="click->modal#backdrop">
+  <div class="x-panel x-scroll-thin">
+    <div class="sticky top-0 z-20 bg-white border-b" style="border-color:var(--line)">
+      <div class="flex items-start justify-between gap-3 px-5 py-3.5">
+        <div class="min-w-0">
+          <div class="x-eyebrow mb-0.5"><%= local_assigns[:eyebrow] %></div>
+          <h2 class="x-h3 truncate"><%= title %></h2>
+        </div>
+        <div class="flex items-center gap-1.5 flex-none">
+          <% if local_assigns[:full_page_path].present? %>
+            <%= link_to full_page_path, class: "x-btn x-btn-ghost x-btn-icon", title: "Mở ở trang riêng",
+                        data: { turbo_frame: "_top" } do %>
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+                   stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 3H3v10h10v-3M9.5 2.5H13V6M13 3L7.5 8.5"/>
+              </svg>
+            <% end %>
+          <% end %>
+          <%= render "shared/close_button", action: "modal#close" %>
+        </div>
+      </div>
+    </div>
+    <div class="p-5"><%= yield %></div>
+  </div>
+</div>

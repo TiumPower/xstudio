@@ -1,5 +1,6 @@
 class Task < ApplicationRecord
   include Discard::Model
+  include Searchable
 
   enum :priority, { low: 0, medium: 1, high: 2, urgent: 3 }, prefix: true
   enum :status,   { open: 0, done: 1, cancelled: 2 },        prefix: true

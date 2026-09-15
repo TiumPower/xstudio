@@ -1,5 +1,6 @@
 class Transaction < ApplicationRecord
   include Discard::Model
+  include Searchable
 
   self.table_name = "transactions"
 

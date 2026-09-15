@@ -11,17 +11,17 @@ class ProjectsController < ApplicationController
     @projects = @projects.where(status: params[:status])       if params[:status].present?
     @projects = @projects.where(owner_id: params[:owner_id])   if params[:owner_id].present?
     @projects = @projects.where(client_name: params[:client])  if params[:client].present?
-    if params[:q].present?
-      like = "%#{params[:q].strip}%"
-      @projects = @projects.where("projects.name ILIKE :q OR projects.code ILIKE :q OR projects.client_name ILIKE :q", q: like)
-    end
+    @projects = @projects.search_like(:name, :code, :client_name, term: params[:q]) if params[:q].present?
 
     @projects = case params[:sort]
                 when "due"      then @projects.order(Arel.sql("due_date NULLS LAST"))
                 when "name"     then @projects.order(:name)
                 when "progress" then @projects.order(updated_at: :desc)
                 else @projects.recent
-                end.to_a
+                end
+
+    @pagy     = Pagination.new(@projects, page: params[:page])
+    @projects = @pagy.records
 
     # Chỉ chế độ Thẻ hiện số tiền; chế độ Bảng không cần truy vấn tổng hợp này.
     @stats = @view == "cards" ? Finance::ProjectTotals.new(@projects.map(&:id)).call : {}
@@ -52,7 +52,7 @@ class ProjectsController < ApplicationController
       log_activity("created", trackable: @project, project: @project,
                    summary: "đã tạo dự án #{@project.name}")
       Notifications::Dispatch.added_to_project(@project, @project.members - [current_user], actor: current_user)
-      redirect_to project_path(@project), notice: "Đã tạo dự án #{@project.code}."
+      close_modal_and_go(project_path(@project), notice: "Đã tạo dự án #{@project.code}.")
     else
       render :new, status: :unprocessable_entity
     end
@@ -70,7 +70,7 @@ class ProjectsController < ApplicationController
         @project.update_column(:completed_at, Time.current) if @project.status_completed? && @project.completed_at.blank?
         Notifications::Dispatch.project_status_changed(@project, actor: current_user)
       end
-      redirect_to project_path(@project), notice: "Đã lưu thay đổi."
+      close_modal_and_go(project_path(@project), notice: "Đã lưu thay đổi.")
     else
       render :edit, status: :unprocessable_entity
     end
