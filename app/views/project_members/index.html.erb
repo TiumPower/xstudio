@@ -8,7 +8,7 @@
       <span class="x-muted"><%= @memberships.size %> người</span>
     </div>
     <table class="x-table">
-      <thead><tr><th>Thành viên</th><th>Chức danh</th><th>Tham gia</th><th class="text-right">Việc đang mở</th><th></th></tr></thead>
+      <thead><tr><th>Thành viên</th><th>Tham gia</th><th class="text-right">Việc đang mở</th><th></th></tr></thead>
       <tbody>
         <% @memberships.each do |membership| %>
           <% user = membership.user %>
@@ -25,7 +25,6 @@
                 </div>
               </div>
             </td>
-            <td style="color:var(--ink-2)"><%= blank_dash user.job_title %></td>
             <td class="x-num" style="color:var(--ink-2)"><%= membership.joined_at ? l(membership.joined_at.to_date) : "—" %></td>
             <td class="x-td-num font-semibold"><%= @open_counts[user.id] || 0 %></td>
             <td class="text-right">

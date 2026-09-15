@@ -26,9 +26,10 @@
 <div class="w-full space-y-4">
   <div class="x-card overflow-hidden">
     <div class="overflow-x-auto x-scroll-thin">
-      <table class="x-table min-w-[980px]">
+      <table class="x-table min-w-[880px]">
         <thead>
-          <tr><th>Thành viên</th><th>Chức danh</th><th>Vai trò</th><th>Trạng thái</th>
+          <%# Cột Chức danh tạm ẩn — dữ liệu vẫn giữ trong CSDL, bật lại lúc nào cũng được. %>
+              <tr><th>Thành viên</th><th>Vai trò</th><th>Trạng thái</th>
               <th>Ngày tham gia</th><th class="text-right">Dự án</th><th class="text-right w-[220px]">Thao tác</th></tr>
         </thead>
         <tbody>
@@ -43,7 +44,6 @@
                   </div>
                 <% end %>
               </td>
-              <td style="color:var(--ink-2)"><%= blank_dash member.job_title %></td>
               <td>
                 <% if current_user.role_admin? && member.id != current_user.id %>
                   <%= form_with url: member_path(member), method: :patch, class: "inline" do %>
