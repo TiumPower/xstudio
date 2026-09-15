@@ -1,0 +1,30 @@
+<%#
+  Bảng màu chọn nhanh: 8 ô, 2 hàng, kèm ô chọn tuỳ ý.
+  name  — tên trường gửi lên server
+  value — màu đang chọn
+%>
+<% swatches = [
+     ["#2E6BC0", "Xanh dương"], ["#6D3BD4", "Tím"],      ["#0E7490", "Xanh ngọc"], ["#0EA06B", "Xanh lá"],
+     ["#D98324", "Vàng cam"],   ["#E8452E", "Đỏ cam"],   ["#B4479E", "Hồng"],      ["#5A6B82", "Xám"]
+   ] %>
+<div data-controller="color-picker">
+  <%= hidden_field_tag name, value,
+                       data: { color_picker_target: "input" }.merge(local_assigns[:input_data] || {}),
+                       id: nil %>
+
+  <div class="grid grid-cols-4 gap-1.5 mb-2" style="max-width:168px">
+    <% swatches.each do |hex, label| %>
+      <button type="button" class="x-swatch <%= "is-picked" if value.to_s.casecmp?(hex) %>"
+              style="background:<%= hex %>" title="<%= label %>"
+              data-color="<%= hex %>" data-color-picker-target="swatch"
+              data-action="color-picker#pick" aria-label="<%= label %>"></button>
+    <% end %>
+  </div>
+
+  <label class="inline-flex items-center gap-2 text-[12px] cursor-pointer" style="color:var(--ink-3)">
+    <input type="color" value="<%= value.presence || swatches.first.first %>"
+           class="h-7 w-9 rounded-[7px] border cursor-pointer p-0" style="border-color:var(--line)"
+           data-color-picker-target="custom" data-action="input->color-picker#syncCustom">
+    Màu khác
+  </label>
+</div>

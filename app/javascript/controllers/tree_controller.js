@@ -466,7 +466,12 @@ export default class extends Controller {
     field("status").value = node.status
     field("owner_id").value = node.ownerId || ""
     field("icon").value = node.icon || ""
-    field("color").value = node.ownColor || node.color
+    // Bảng màu là ô ẩn + các ô màu; đặt giá trị xong phải báo cho
+    // color_picker biết để tô sáng đúng ô đang chọn.
+    const colorInput = field("color")
+    colorInput.value = node.ownColor || node.color
+    const custom = colorInput.closest('[data-controller="color-picker"]')?.querySelector('input[type="color"]')
+    if (custom) custom.value = node.ownColor || node.color
     field("note").value = node.note || ""
 
     fragment.querySelector('[data-slot="meta"]').textContent =

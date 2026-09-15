@@ -33,17 +33,16 @@
       </select>
     </div>
 
-    <div class="flex items-end gap-2.5">
-      <div class="flex-1">
-        <label class="x-label block mb-1.5">Biểu tượng</label>
-        <input type="text" maxlength="4" class="x-input h-9 text-[15px] text-center" data-field="icon"
-               data-action="change->tree#saveField" placeholder="📦">
-      </div>
-      <div>
-        <label class="x-label block mb-1.5">Màu nhánh</label>
-        <input type="color" class="h-9 w-[54px] rounded-[9px] border cursor-pointer" style="border-color:var(--line)"
-               data-field="color" data-action="change->tree#saveField">
-      </div>
+    <div>
+      <label class="x-label block mb-1.5">Biểu tượng</label>
+      <input type="text" maxlength="4" class="x-input h-9 text-[15px] text-center" data-field="icon"
+             data-action="change->tree#saveField" placeholder="📦">
+    </div>
+
+    <div>
+      <label class="x-label block mb-1.5">Màu nhánh</label>
+      <%= render "shared/color_picker", name: "strategy_node_color", value: "",
+                 input_data: { field: "color", action: "change->tree#saveField" } %>
     </div>
 
     <div>

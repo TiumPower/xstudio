@@ -24,17 +24,15 @@
             <label class="x-label block mb-1">Tên cột</label>
             <input type="text" name="board_column[name]" value="<%= column.name %>" class="x-input h-9 text-[13px]">
           </div>
-          <div class="flex items-center gap-2">
-            <div class="flex-1">
-              <label class="x-label block mb-1">Giới hạn WIP</label>
-              <input type="number" name="board_column[wip_limit]" value="<%= column.wip_limit %>" min="0"
-                     placeholder="không giới hạn" class="x-input h-9 text-[13px]">
-            </div>
-            <div>
-              <label class="x-label block mb-1">Màu</label>
-              <input type="color" name="board_column[color]" value="<%= column.color.presence || '#6B7A8F' %>"
-                     class="h-9 w-[44px] rounded-[9px] border cursor-pointer" style="border-color:var(--line)">
-            </div>
+          <div>
+            <label class="x-label block mb-1">Giới hạn WIP</label>
+            <input type="number" name="board_column[wip_limit]" value="<%= column.wip_limit %>" min="0"
+                   placeholder="không giới hạn" class="x-input h-9 text-[13px]">
+          </div>
+          <div>
+            <label class="x-label block mb-1.5">Màu</label>
+            <%= render "shared/color_picker", name: "board_column[color]",
+                       value: (column.color.presence || "#5A6B82") %>
           </div>
           <label class="flex items-center gap-2 text-[12.5px] cursor-pointer">
             <input type="hidden" name="board_column[is_done_column]" value="0">

@@ -57,11 +57,9 @@
 
     <div class="x-field">
       <%= f.label :color %>
-      <div class="flex items-center gap-2">
-        <%= f.color_field :color, value: project.color.presence || project.type_color,
-                          class: "h-[38px] w-[54px] rounded-[10px] border cursor-pointer", style: "border-color:var(--line)" %>
-        <span class="x-hint m-0">Mặc định theo loại hình dự án.</span>
-      </div>
+      <%= render "shared/color_picker", name: "project[color]",
+                 value: (project.color.presence || project.type_color) %>
+      <p class="x-hint">Mặc định theo loại hình dự án.</p>
     </div>
 
     <div class="x-field md:col-span-2 xl:col-span-3">

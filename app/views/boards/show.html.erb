@@ -35,11 +35,9 @@
           <%= form_with url: project_board_columns_path(@project), method: :post do %>
             <label class="x-label block mb-1.5">Thêm cột mới</label>
             <input type="text" name="board_column[name]" placeholder="Tên cột" class="x-input h-9 text-[13px] mb-2" required>
-            <div class="flex items-center gap-2">
-              <input type="color" name="board_column[color]" value="#6B7A8F"
-                     class="h-9 w-[44px] rounded-[9px] border cursor-pointer flex-none" style="border-color:var(--line)">
-              <button class="x-btn x-btn-primary x-btn-sm flex-1">Thêm cột</button>
-            </div>
+            <label class="x-label block mb-1.5">Màu</label>
+            <%= render "shared/color_picker", name: "board_column[color]", value: "#5A6B82" %>
+            <button class="x-btn x-btn-primary x-btn-sm x-btn-block mt-2.5">Thêm cột</button>
           <% end %>
         </div>
       </div>
