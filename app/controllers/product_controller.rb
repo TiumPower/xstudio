@@ -4,10 +4,10 @@ class ProductController < ApplicationController
   before_action :load_project
 
   def show
-    @tab       = "product"
-    @links     = @project.project_resources.kind_link.ordered
-    @accounts  = @project.project_resources.kind_account.ordered
-    @docs      = @project.project_resources.kind_doc.ordered.includes(file_attachment: :blob)
+    @tab  = "product"
+    # Liên kết & tài khoản truy cập đã bỏ khỏi tab này: URL và tài khoản của
+    # từng portal nằm trong mô tả sản phẩm và trong tài liệu bàn giao.
+    @docs = @project.project_resources.kind_doc.ordered.includes(file_attachment: :blob)
   end
 
   private
