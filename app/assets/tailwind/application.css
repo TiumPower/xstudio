@@ -87,6 +87,19 @@ body {
 }
 
 @layer components {
+  /* ---------- Con trỏ chuột ---------- */
+  /* Mọi thứ bấm được phải đổi con trỏ khi rê vào. Trình duyệt để <button> trần
+     là mũi tên thường, nên phải nói rõ một lần ở đây — thêm class cursor-pointer
+     từng chỗ thì luôn sót (đã sót ở menu ⋯, nút thu/phóng, thêm việc, gỡ thành
+     viên…). Đặt sớm trong layer để các quy tắc riêng bên dưới vẫn đè được:
+     thẻ Kanban kéo–thả dùng grab, nút trong thanh Trix khi khoá dùng default. */
+  button, [role="button"], summary,
+  label:has(input[type="checkbox"]), label:has(input[type="radio"]),
+  .x-row-link {
+    cursor: pointer;
+  }
+  button:disabled, [aria-disabled="true"] { cursor: not-allowed; }
+
   /* ---------- Chữ & số ---------- */
   .x-h1 { font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
   .x-h2 { font-size: 20px; font-weight: 600; letter-spacing: -.015em; }
