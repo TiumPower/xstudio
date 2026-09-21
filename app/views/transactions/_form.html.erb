@@ -1,6 +1,6 @@
 <%= form_with model: transaction, url: (transaction.persisted? ? transaction_path(transaction) : transactions_path),
               local: true, multipart: true, data: { controller: "transaction-form" } do |f| %>
-  <%= hidden_field_tag :return_to, params[:return_to] %>
+  <%= return_to_field %>
 
   <% if transaction.errors.any? %>
     <div class="x-toast x-toast-bad mb-4"><div><%= transaction.errors.full_messages.to_sentence %></div></div>
@@ -91,7 +91,7 @@
 
   <div class="flex items-center gap-2.5 pt-1">
     <%= f.submit(transaction.persisted? ? "Lưu giao dịch" : "Ghi giao dịch", class: "x-btn x-btn-primary cursor-pointer") %>
-    <%= link_to "Huỷ", (params[:return_to].presence || transactions_path), class: "x-btn x-btn-ghost" %>
+    <%= link_to "Huỷ", return_to_path(transactions_path), class: "x-btn x-btn-ghost" %>
     <% if transaction.persisted? && (current_user.role_admin? || transaction.created_by_id == current_user.id) %>
       <%= button_to "Xoá giao dịch", transaction_path(transaction), method: :delete,
                     form: { data: { turbo_confirm: "Xoá giao dịch này?" }, class: "ml-auto" },

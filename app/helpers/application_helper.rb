@@ -153,4 +153,14 @@ module ApplicationHelper
   end
 
   def blank_dash(value) = value.presence || tag.span("—", class: "x-muted")
+
+  # Ô ẩn mang theo nơi cần quay về sau khi lưu.
+  # Ngoài popup, trang đang đứng chính là nơi cần quay về. Trong popup thì
+  # request.fullpath là URL của chính popup (ví dụ /giao-dich/moi) chứ không
+  # phải trang người dùng đang xem — lúc đó chỉ nhận return_to do link mở popup
+  # truyền vào, không có thì để controller tự quyết.
+  def return_to_field
+    back = params[:return_to].presence || (request.fullpath unless turbo_frame_request?)
+    hidden_field_tag(:return_to, back) if back.present?
+  end
 end

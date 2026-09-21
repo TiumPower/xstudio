@@ -83,6 +83,16 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # Nơi quay về sau khi lưu. Dùng để người dùng đang đứng ở tab nào của dự án
+  # thì ở nguyên đó, thay vì bị đẩy về tab đầu.
+  # Chỉ nhận đường dẫn nội bộ: "//host" hay "https://..." bị bỏ qua để không ai
+  # dựng được link đẩy người dùng sang tên miền khác sau khi lưu.
+  def return_to_path(default)
+    back = params[:return_to].to_s
+    back.start_with?("/") && !back.start_with?("//") ? back : default
+  end
+  helper_method :return_to_path
+
   # Ghi nhật ký hoạt động gọn trong controller.
   def log_activity(action, trackable: nil, project: nil, summary: nil, changes_payload: {})
     Activity.log!(user: current_user, action: action, trackable: trackable,

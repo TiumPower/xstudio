@@ -88,11 +88,11 @@ class TransactionsController < ApplicationController
   def close_modal_or_redirect(notice)
     flash[:notice] = notice
     if turbo_frame_request?
-      back = params[:return_to].presence || request.referer.presence || transactions_path
+      back = return_to_path(request.referer.presence || transactions_path)
       render turbo_stream: [turbo_stream.update("modal", ""),
                             turbo_stream.action(:redirect, back)]
     else
-      redirect_to(params[:return_to].presence || transactions_path)
+      redirect_to return_to_path(transactions_path)
     end
   end
 

@@ -54,16 +54,16 @@
           <div class="relative" data-controller="dropdown">
             <button class="x-btn x-btn-primary x-btn-sm" data-action="dropdown#toggle">+ Thêm mới</button>
             <div class="absolute right-0 mt-2 w-[196px] x-card p-1.5 z-50" hidden data-dropdown-target="menu">
-              <%= link_to "Công việc mới", new_task_path(project_id: @project.id),
+              <%= link_to "Công việc mới", new_task_path(project_id: @project.id, return_to: request.fullpath),
                           class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]",
                           data: { turbo_frame: "modal" } %>
-              <%= link_to "Giao dịch mới", new_transaction_path(project_id: @project.id),
+              <%= link_to "Giao dịch mới", new_transaction_path(project_id: @project.id, return_to: request.fullpath),
                           class: "block px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]",
                           data: { turbo_frame: "modal" } %>
             </div>
           </div>
 
-          <%= link_to "Sửa", edit_project_path(@project), class: "x-btn x-btn-ghost x-btn-sm",
+          <%= link_to "Sửa", edit_project_path(@project, return_to: request.fullpath), class: "x-btn x-btn-ghost x-btn-sm",
                       data: { turbo_frame: "modal" } %>
 
           <div class="relative" data-controller="dropdown">
@@ -71,9 +71,13 @@
             <div class="absolute right-0 mt-2 w-[196px] x-card p-1.5 z-50" hidden data-dropdown-target="menu">
               <% if @project.archived? %>
                 <%= button_to "Bỏ lưu trữ", unarchive_project_path(@project), method: :patch,
+                              params: { return_to: request.fullpath },
                               class: "w-full text-left px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
               <% else %>
+                <%# Lưu trữ không đưa về danh sách dự án nữa: dự án vẫn xem được,
+                    người dùng ở lại đúng tab đang mở. %>
                 <%= button_to "Lưu trữ dự án", archive_project_path(@project), method: :patch,
+                              params: { return_to: request.fullpath },
                               class: "w-full text-left px-3 py-2 rounded-lg text-[13.5px] hover:bg-[var(--bg)]" %>
               <% end %>
               <% if current_user.role_admin? || @project.created_by_id == current_user.id %>

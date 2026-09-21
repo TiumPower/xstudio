@@ -5,6 +5,7 @@
       <% else %>
         <% selected = @projects.find { |p| p.id.to_s == params[:project_id].to_s } || @projects.first %>
         <%= form_with url: project_tasks_path(selected), method: :post, local: true, id: "new_task_form" do |f| %>
+          <%= return_to_field %>
           <div class="x-field">
             <label>Dự án</label>
             <select class="x-select" data-action="change->task-form#switchProject" data-task-form-target="project">
