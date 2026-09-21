@@ -7,11 +7,12 @@ const NODE_W = 196
 const NODE_H = 62
 const GAP_X  = 62
 const GAP_Y  = 14
+const EMPTY_GAP = 26   // khoảng cách từ đáy nút gốc tới khối hướng dẫn khi cây rỗng
 
 export default class extends Controller {
   static targets = [
     "stage", "canvasWrap", "canvas", "outline", "panel", "panelBody", "panelTemplate",
-    "zoomBar", "zoomLabel", "minimap", "minimapSvg", "empty", "hint", "search",
+    "zoomBar", "zoomLabel", "minimap", "minimapSvg", "empty", "emptyBox", "hint", "search",
     "statusFilter", "ownerFilter", "aiCounter",
     "pasteOverlay", "pasteInput", "pastePreview", "pasteCount",
     "deleteOverlay", "deleteTitle", "deleteCount", "deleteCount2", "events"
@@ -140,10 +141,13 @@ export default class extends Controller {
 
   // ---- Vẽ ---------------------------------------------------------------
   render() {
-    this.emptyTarget.classList.toggle("hidden", Boolean(this.root && this.root.children.length))
+    this.emptyTarget.classList.toggle("hidden", !this.bareRoot)
+    this.positionEmpty()
 
     // Bảng phím tắt chỉ có nghĩa trên canvas; ở chế độ danh sách nó che mất nội dung.
-    if (this.hasHintTarget) this.hintTarget.classList.toggle("hidden", this.viewValue === "outline")
+    // Bật/tắt bằng "xl:block": lớp "hidden" trong markup yếu hơn nó nên thêm
+    // "hidden" ở đây không có tác dụng gì trên màn ≥1280px.
+    if (this.hasHintTarget) this.hintTarget.classList.toggle("xl:block", this.viewValue !== "outline")
 
     if (this.viewValue === "outline") {
       this.canvasWrapTarget.classList.add("hidden")
@@ -726,6 +730,32 @@ export default class extends Controller {
     if (!this.viewport) return
     this.viewport.setAttribute("transform", `translate(${this.pan.x},${this.pan.y}) scale(${this.scale})`)
     this.zoomLabelTarget.textContent = `${Math.round(this.scale * 100)}%`
+    this.positionEmpty()
+  }
+
+  // Cây chưa có nhánh nào: chỉ trơ mỗi nút gốc.
+  get bareRoot() { return !(this.root && this.root.children.length) }
+
+  // Đặt khối hướng dẫn ngay DƯỚI thẻ nút gốc. Cả hai đều canh giữa canvas nên
+  // nếu để mặc định thì chữ đè lên thẻ nút (thấy rõ khi cây chỉ có nút gốc).
+  positionEmpty() {
+    if (!this.hasEmptyBoxTarget || this.emptyTarget.classList.contains("hidden")) return
+    const box  = this.emptyBoxTarget
+    const item = this.viewValue === "outline" ? null : this.positions?.get(this.root?.id)
+    if (!item) {
+      box.style.left = "50%"
+      box.style.top = "50%"
+      box.style.transform = "translate(-50%,-50%)"
+      return
+    }
+    const rect  = this.canvasWrapTarget.getBoundingClientRect()
+    const point = this.coords(item)
+    const x = this.pan.x + (point.x + NODE_W / 2) * this.scale
+    const y = this.pan.y + (point.y + NODE_H) * this.scale + EMPTY_GAP
+    const limit = Math.max(8, rect.height - box.offsetHeight - 8)
+    box.style.left = `${Math.round(x)}px`
+    box.style.top = `${Math.round(Math.min(Math.max(y, 8), limit))}px`
+    box.style.transform = "translateX(-50%)"
   }
 
   zoomBy(factor) {
@@ -741,10 +771,17 @@ export default class extends Controller {
     const rect = this.canvasWrapTarget.getBoundingClientRect()
     const width = this.bounds.maxX - this.bounds.minX
     const height = this.bounds.maxY - this.bounds.minY
-    this.scale = Math.min(2, Math.max(0.25, Math.min(rect.width / width, rect.height / height) * 0.94))
+    // Cây trơ mỗi nút gốc mà fit thì nó bị phóng lên 200% — chặn ở 100%.
+    const ceiling = this.bareRoot ? 1 : 2
+    this.scale = Math.min(ceiling, Math.max(0.25, Math.min(rect.width / width, rect.height / height) * 0.94))
     this.pan = {
       x: rect.width / 2 - (this.bounds.minX + width / 2) * this.scale,
       y: rect.height / 2 - (this.bounds.minY + height / 2) * this.scale
+    }
+    // Trạng thái rỗng còn có khối hướng dẫn nằm dưới nút gốc: nâng nút gốc lên
+    // nửa chiều cao khối đó để cả cụm nằm giữa khung, không đè bảng phím tắt.
+    if (this.bareRoot && this.hasEmptyBoxTarget) {
+      this.pan.y -= Math.round((this.emptyBoxTarget.offsetHeight + EMPTY_GAP) / 2)
     }
     this.applyTransform()
   }

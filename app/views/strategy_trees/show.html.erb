@@ -64,8 +64,11 @@
       </div>
 
       <!-- Trạng thái rỗng -->
-      <div class="absolute inset-0 grid place-items-center pointer-events-none hidden" data-tree-target="empty">
-        <div class="text-center pointer-events-auto max-w-[360px]">
+      <%# Khối hướng dẫn bám ngay dưới thẻ nút gốc — vị trí do tree_controller đặt.
+          Để giữa khung thì nó đè đúng lên nút gốc, vì nút gốc cũng nằm giữa canvas. %>
+      <div class="absolute inset-0 overflow-hidden pointer-events-none hidden" data-tree-target="empty">
+        <div class="absolute text-center pointer-events-auto w-[340px] max-w-[calc(100%-2rem)]"
+             style="left:50%;top:50%;transform:translate(-50%,-50%)" data-tree-target="emptyBox">
           <div class="text-[34px] mb-3">🌱</div>
           <h3 class="x-h3 mb-1.5">Bắt đầu bằng những mảng lớn team đang theo đuổi</h3>
           <p class="x-sub mb-5">Mỗi mảng là một nhánh. Bên trong mỗi nhánh là những phần nhỏ hơn.</p>
