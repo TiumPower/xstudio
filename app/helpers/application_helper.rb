@@ -76,16 +76,18 @@ module ApplicationHelper
   end
 
   PROJECT_STATUS_CHIP = {
-    "planning"    => "x-chip",
+    "planning"    => "x-chip-plan",
     "in_progress" => "x-chip-brand",
     "on_hold"     => "x-chip-warn",
     "completed"   => "x-chip-good",
     "cancelled"   => "x-chip-bad"
   }.freeze
 
+  # Chấm màu ở đầu chip: để người dùng nhận ra "đây là trạng thái" ngay cả khi
+  # chưa đọc chữ, và để trạng thái không bị nhầm với chip loại hình bên cạnh.
   def project_status_chip(project)
     tag.span t("project_statuses.#{project.status}"),
-             class: "x-chip #{PROJECT_STATUS_CHIP[project.status]}"
+             class: "x-chip x-chip-dot #{PROJECT_STATUS_CHIP[project.status]}"
   end
 
   PRIORITY_CHIP = { "low" => "x-chip", "medium" => "x-chip-brand", "high" => "x-chip-warn", "urgent" => "x-chip-bad" }.freeze

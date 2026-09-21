@@ -50,11 +50,13 @@
   --chart-income:  #2E7FD6;   /* Thu — xanh dương */
   --chart-expense: #E8452E;   /* Chi — đỏ cam */
 
-  /* Loại hình dự án */
-  --type-ps:       #6D3BD4;   /* Product */
-  --type-ps-soft:  #F1EBFC;
-  --type-dx:       #0E7490;   /* Chuyển đổi số (Data & AI) */
-  --type-dx-soft:  #E4F2F5;
+  /* Loại hình dự án — hai màu cố ý ở hai phía đối nhau của vòng màu (tím với
+     lục lam) và CÙNG độ tươi. Bản cũ (#6D3BD4 với #0E7490) đều tối và trầm,
+     dán lên vạch 3px thì nhìn lướt ra cùng một màu sẫm. */
+  --type-ps:       #7C3AED;   /* Product — tím */
+  --type-ps-soft:  #F1EBFE;
+  --type-dx:       #0891B2;   /* Chuyển đổi số (Data & AI) — lục lam */
+  --type-dx-soft:  #E1F5FA;
 
   --radius:        14px;
   --radius-sm:     10px;
@@ -167,6 +169,10 @@ body {
     background: var(--bg); color: var(--ink-2); white-space: nowrap;
   }
   .x-chip-brand { background: var(--brand-soft); color: var(--brand-ink); }
+  /* Đang chuẩn bị: dự án chưa chạy nên không lấy màu nào của trạng thái đang
+     chạy, nhưng phải đậm hơn nền chip mặc định thì mới đọc ra là một trạng
+     thái. Xám xanh thép, không đụng tím/lục lam của chip loại hình. */
+  .x-chip-plan  { background: #DFE5EF; color: #3C5270; }
   .x-chip-good  { background: var(--good-soft); color: var(--good); }
   .x-chip-income { background: var(--income-soft); color: var(--income); }
   .x-chip-warn  { background: var(--warn-soft); color: #B4700F; }
@@ -175,11 +181,12 @@ body {
   .x-chip-dx    { background: var(--type-dx-soft); color: var(--type-dx); }
   .x-chip-dot::before { content: ""; width: 6px; height: 6px; border-radius: 999px; background: currentColor; }
   /* Dấu × gỡ điều kiện lọc: nới vùng bấm cho đủ ngón tay chạm. */
-  .x-chip a[title^="Bỏ"], .x-chip > a:last-child {
+  .x-chip a[title^="Bỏ"], .x-chip > a:last-child, .x-chip > button:last-child {
     display: inline-grid; place-items: center; width: 18px; height: 18px;
     margin: -2px -4px -2px 2px; border-radius: 999px; line-height: 1;
+    cursor: pointer; font-size: 14px; color: inherit;
   }
-  .x-chip > a:last-child:hover { background: rgba(13,27,46,.10); }
+  .x-chip > a:last-child:hover, .x-chip > button:last-child:hover { background: rgba(13,27,46,.10); }
 
   /* ---------- Ô nhập ---------- */
   .x-input, .x-select, .x-textarea {
@@ -249,6 +256,17 @@ body {
 
   /* Input file gốc được giấu; nút + tên tệp do file_input_controller vẽ. */
   .x-file-native { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+
+  /* ---------- Chọn tệp đính kèm ---------- */
+  /* Tệp đã chọn hiện thành chip có tên, dung lượng và dấu × để bỏ riêng từng
+     tệp. Trước đây chỉ là một dòng chữ xám, nhìn không ra là đã đính kèm được
+     gì và muốn bỏ thì phải chọn lại từ đầu. */
+  .x-filepick { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; min-width: 0; }
+  .x-filepick-list { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; min-width: 0; }
+  .x-filepick-empty { font-size: 12.5px; color: var(--ink-3); }
+  .x-filepick-chip { max-width: 100%; background: var(--brand-soft); color: var(--brand-ink); }
+  .x-filepick-name { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .x-filepick-size { font-weight: 500; opacity: .7; font-variant-numeric: tabular-nums; }
 
   /* ---------- Bảng ---------- */
   .x-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }

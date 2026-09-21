@@ -103,7 +103,7 @@ vi:
     product_sales: "Product"
     digital_transformation: "Chuyển đổi số (Data & AI)"
   project_statuses:
-    planning: "Lên kế hoạch"
+    planning: "Đang chuẩn bị"
     in_progress: "Đang thực hiện"
     on_hold: "Tạm dừng"
     completed: "Hoàn thành"

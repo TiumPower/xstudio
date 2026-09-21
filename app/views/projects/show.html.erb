@@ -27,7 +27,9 @@
     </div>
   <% end %>
 
-  <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+  <%# Việc sắp đến hạn và bình luận là thứ cần xử lý — để trên. Hoạt động gần
+      đây chỉ để tra lại, đẩy xuống cuối. %>
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start">
     <div class="x-card">
       <div class="x-card-head">
         <h2 class="x-h3 x-section-title">Công việc sắp đến hạn</h2>
@@ -53,16 +55,16 @@
     </div>
 
     <div class="x-card">
-      <div class="x-card-head">
-        <h2 class="x-h3 x-section-title">Hoạt động gần đây</h2>
-        <%= link_to "Xem tất cả →", project_activities_path(@project), class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
-      </div>
-      <div class="p-2"><%= render "shared/activity_list", activities: @recent_activities, compact: true %></div>
+      <div class="x-card-head"><h2 class="x-h3 x-section-title">Bình luận dự án</h2></div>
+      <div class="p-5"><%= render "comments/section", commentable: @project %></div>
     </div>
   </div>
 
   <div class="x-card">
-    <div class="x-card-head"><h2 class="x-h3 x-section-title">Bình luận dự án</h2></div>
-    <div class="p-5"><%= render "comments/section", commentable: @project %></div>
+    <div class="x-card-head">
+      <h2 class="x-h3 x-section-title">Hoạt động gần đây</h2>
+      <%= link_to "Xem tất cả →", project_activities_path(@project), class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
+    </div>
+    <div class="p-2"><%= render "shared/activity_list", activities: @recent_activities, compact: true %></div>
   </div>
 </div>

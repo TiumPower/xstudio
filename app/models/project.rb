@@ -2,8 +2,9 @@ class Project < ApplicationRecord
   include Discard::Model
   include Searchable
 
-  PRODUCT_SALES_COLOR = "#6D3BD4".freeze
-  DX_COLOR            = "#0E7490".freeze
+  # Phải khớp với --type-ps / --type-dx trong app/assets/tailwind/application.css.
+  PRODUCT_SALES_COLOR = "#7C3AED".freeze
+  DX_COLOR            = "#0891B2".freeze
 
   enum :project_type,  { product_sales: 0, digital_transformation: 1 }
   enum :status,        { planning: 0, in_progress: 1, on_hold: 2, completed: 3, cancelled: 4 }, prefix: true

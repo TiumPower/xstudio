@@ -1,9 +1,16 @@
 <%= link_to project_path(project), class: "x-card p-4 block hover:shadow-md transition relative overflow-hidden" do %>
-  <span class="absolute left-0 top-4 bottom-4 w-[3px] rounded-r" style="background:<%= project.type_color %>"></span>
+  <%# Vạch loại hình: 3px quá mảnh để nhận ra màu, nhất là khi tiến độ 0%
+      thì thanh tiến độ không tô màu gì. %>
+  <span class="absolute left-0 top-4 bottom-4 w-[5px] rounded-r" style="background:<%= project.type_color %>"></span>
 
   <div class="pl-3">
     <div class="flex items-start justify-between gap-2 mb-1.5">
-      <span class="x-code"><%= project.code %></span>
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="x-code"><%= project.code %></span>
+        <%# Gọi thẳng tên loại hình: chỉ dựa vào màu thì người dùng phải nhớ
+            màu nào là gì, mà hai thẻ khác loại hiếm khi nằm cạnh nhau. %>
+        <%= project_type_chip(project) %>
+      </div>
       <%= project_status_chip(project) %>
     </div>
 
