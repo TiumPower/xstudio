@@ -71,7 +71,9 @@ class ProjectsController < ApplicationController
         @project.update_column(:completed_at, Time.current) if @project.status_completed? && @project.completed_at.blank?
         Notifications::Dispatch.project_status_changed(@project, actor: current_user)
       end
-      close_modal_and_go(project_path(@project), notice: "Đã lưu thay đổi.")
+      # Sửa dự án mở được từ mọi tab, và "Lưu mô tả" nằm hẳn trong tab Sản phẩm
+      # — quay về tab đang đứng chứ không đẩy về Tổng quan.
+      close_modal_and_go(return_to_path(project_path(@project)), notice: "Đã lưu thay đổi.")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -87,12 +89,12 @@ class ProjectsController < ApplicationController
   def archive
     @project.archive!
     log_activity("archived", trackable: @project, project: @project, summary: "đã lưu trữ dự án #{@project.name}")
-    redirect_to projects_path, notice: "Đã lưu trữ dự án #{@project.code}."
+    redirect_to return_to_path(projects_path), notice: "Đã lưu trữ dự án #{@project.code}."
   end
 
   def unarchive
     @project.unarchive!
-    redirect_to project_path(@project), notice: "Đã bỏ lưu trữ."
+    redirect_to return_to_path(project_path(@project)), notice: "Đã bỏ lưu trữ."
   end
 
   private
@@ -109,6 +111,11 @@ class ProjectsController < ApplicationController
   end
 
   def sync_members
+    # Chỉ form nào thật sự có ô chọn thành viên mới được ghi đè danh sách.
+    # "Lưu mô tả" ở tab Sản phẩm cũng gọi update nhưng chỉ gửi product_brief —
+    # trước đây nó lặng lẽ xoá sạch thành viên và bỏ gán công việc của họ.
+    return unless params[:project].key?(:member_ids)
+
     ids = Array(params[:project][:member_ids]).reject(&:blank?).map(&:to_i)
     ids |= [@project.owner_id].compact
     existing = @project.project_memberships.pluck(:user_id)

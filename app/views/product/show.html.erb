@@ -10,6 +10,7 @@
     </div>
     <div class="p-5">
       <%= form_with model: @project, url: project_path(@project), method: :patch, local: true do |f| %>
+        <%= return_to_field %>
         <div class="x-editor">
           <%= f.rich_text_area :product_brief,
                                placeholder: "Sản phẩm giải quyết vấn đề gì · Điểm khác biệt · Trạng thái hiện tại · Kế hoạch sắp tới…" %>
@@ -86,7 +87,9 @@
         <span class="x-eyebrow flex-none">Tải tệp lên</span>
         <input type="text" name="project_resource[label]" placeholder="Tên tài liệu" class="x-input h-9 text-[13px] w-[220px]" required>
         <%= vn_file_field_tag("project_resource[file]", button_label: "Chọn tệp…") %>
-        <button class="x-btn x-btn-ghost x-btn-sm">Tải lên</button>
+        <%# Nút kết thúc hành động: để primary cho tách hẳn khỏi nút "Chọn tệp…"
+            dạng viền, nếu không hai nút trông như nhau và không rõ bấm cái nào. %>
+        <button class="x-btn x-btn-primary flex-none">↑ Tải lên</button>
       <% end %>
       <p class="x-hint mt-2">
         Tệp lưu trên DigitalOcean Spaces, tối đa 25MB mỗi tệp. Tệp

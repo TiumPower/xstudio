@@ -5,6 +5,8 @@
                       project_type_client_label_value: "Khách hàng",
                       project_type_product_placeholder_value: "Chuỗi bán lẻ vừa, 10–50 cửa hàng",
                       project_type_client_placeholder_value: "Coopmart · hợp đồng 3 giai đoạn" } do |f| %>
+  <%= return_to_field if project.persisted? %>
+
   <% if project.errors.any? %>
     <div class="x-toast x-toast-bad mb-4">
       <div><%= project.errors.full_messages.to_sentence %></div>
@@ -91,6 +93,10 @@
     <div class="x-field md:col-span-2 xl:col-span-3">
       <label>Thành viên tham gia</label>
       <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2 p-3 rounded-[10px] border" style="border-color:var(--line);background:var(--bg-2)">
+        <%# Bỏ tích hết thì trình duyệt không gửi member_ids nào cả; ô rỗng này
+            giữ cho khoá luôn có mặt, để controller phân biệt được "form này không
+            đụng tới thành viên" với "form này bỏ hết thành viên". %>
+        <%= hidden_field_tag "project[member_ids][]", "", id: nil %>
         <% User.assignable.each do |user| %>
           <label class="flex items-center gap-2.5 px-2 py-1.5 rounded-lg cursor-pointer hover:bg-white">
             <%= check_box_tag "project[member_ids][]", user.id, project.member?(user) || project.owner_id == user.id, class: "x-check", id: "member_#{user.id}" %>
@@ -121,6 +127,6 @@
 
   <div class="flex items-center gap-2.5 pt-2">
     <%= f.submit(project.persisted? ? "Lưu thay đổi" : "Tạo dự án", class: "x-btn x-btn-primary cursor-pointer") %>
-    <%= link_to "Huỷ", (project.persisted? ? project_path(project) : projects_path), class: "x-btn x-btn-ghost" %>
+    <%= link_to "Huỷ", (project.persisted? ? return_to_path(project_path(project)) : projects_path), class: "x-btn x-btn-ghost" %>
   </div>
 <% end %>
