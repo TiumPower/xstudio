@@ -37,13 +37,22 @@ class TasksController < ApplicationController
       apply_labels
       log_activity("created", trackable: @task, project: @project, summary: "đã tạo công việc #{@task.code}")
       Notifications::Dispatch.task_assigned(@task, actor: current_user) if @task.assignee_id
-      if turbo_frame_request?
+      if params[:board_composer].present?
+        # Thêm ngay trên bảng Kanban: chỉ chèn thẻ vào đúng cột, không nạp lại
+        # trang — người dùng giữ nguyên chỗ cuộn và gõ tiếp việc kế tiếp.
+        render turbo_stream: turbo_stream.append("column_tasks_#{@task.board_column_id}",
+                                                 partial: "tasks/card", locals: { task: @task })
+      elsif turbo_frame_request?
         # Mở từ trong một tab của dự án thì quay lại đúng tab đó; mở từ thanh
         # trên (không có return_to) thì vào thẳng công việc vừa tạo.
         close_modal_and_go(return_to_path(task_path(@task)), notice: "Đã tạo công việc #{@task.code}.")
       else
         redirect_back fallback_location: project_board_path(@project), notice: "Đã tạo #{@task.code}."
       end
+    elsif params[:board_composer].present?
+      flash.now[:alert] = @task.errors.full_messages.to_sentence
+      render turbo_stream: turbo_stream.replace("flash", partial: "layouts/flash"),
+             status: :unprocessable_entity
     else
       redirect_back fallback_location: project_board_path(@project),
                     alert: @task.errors.full_messages.to_sentence

@@ -8,6 +8,10 @@ export default class extends Controller {
 
   connect() {
     this.initColumnSorting()
+    // Thẻ mới do turbo_stream chèn vào: đếm lại sau khi stream đã vẽ xong.
+    // turbo:submit-end bắn TRƯỚC lúc stream chạm DOM nên đếm ở đó sẽ hụt một thẻ.
+    this.onStream = () => requestAnimationFrame(() => this.refreshCounts())
+    document.addEventListener("turbo:before-stream-render", this.onStream)
     this.sortables = this.listTargets.map((list) =>
       new window.Sortable(list, {
         group: "kanban",
@@ -21,6 +25,7 @@ export default class extends Controller {
   }
 
   disconnect() {
+    document.removeEventListener("turbo:before-stream-render", this.onStream)
     this.sortables?.forEach((s) => s.destroy())
     this.columnSortable?.destroy()
   }
@@ -97,7 +102,28 @@ export default class extends Controller {
       const limit = badge.textContent.includes("/") ? badge.textContent.split("/")[1] : null
       const count = list.querySelectorAll(".x-tcard").length
       badge.textContent = limit ? `${count} /${limit}` : String(count)
+      // Vượt giới hạn WIP thì tô đỏ ngay, khỏi chờ nạp lại trang.
+      const over = limit && count > Number(limit.trim())
+      badge.style.background = over ? "var(--bad-soft)" : ""
+      badge.style.color = over ? "var(--bad)" : "var(--ink-2)"
     })
+  }
+
+  // Enter thêm luôn, Shift+Enter xuống dòng — gõ liên tiếp nhiều việc cho nhanh.
+  submitComposer(event) {
+    if (event.shiftKey) return
+    event.preventDefault()
+    event.target.form?.requestSubmit()
+  }
+
+  // Thêm xong: thẻ đã được turbo_stream chèn vào cột, chỉ cần dọn ô nhập.
+  // Giữ nguyên người làm / độ ưu tiên / hạn để gõ tiếp việc cùng loại.
+  composerDone(event) {
+    if (!event.detail?.success) return
+    const input = event.target.querySelector("textarea")
+    if (!input) return
+    input.value = ""
+    input.focus()
   }
 
   openComposer(event) {
@@ -106,7 +132,7 @@ export default class extends Controller {
       const match = form.dataset.columnId === id
       form.classList.toggle("hidden", !match)
       form.nextElementSibling?.classList?.toggle("hidden", match)
-      if (match) form.querySelector("input[type=text]")?.focus()
+      if (match) form.querySelector("textarea")?.focus()
     })
   }
 

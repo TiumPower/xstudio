@@ -57,23 +57,45 @@
     </button>
   </div>
 
-  <div class="x-col-body" data-kanban-target="list" data-column-id="<%= column.id %>">
+  <div class="x-col-body" id="column_tasks_<%= column.id %>" data-kanban-target="list" data-column-id="<%= column.id %>">
     <% tasks.each do |task| %>
       <%= render "tasks/card", task: task %>
     <% end %>
   </div>
 
   <div class="px-2.5 pb-2.5">
-    <%= form_with url: project_tasks_path(@project), method: :post, class: "hidden" ,
-                  data: { kanban_target: "composer", column_id: column.id } do %>
+    <%# Thêm việc ngay trên bảng: gửi bằng turbo_stream nên thẻ hiện ra tại chỗ,
+        không nạp lại cả trang và không mất chỗ đang cuộn. Ngoài tiêu đề còn đặt
+        được người làm, độ ưu tiên và hạn — ba thứ hay phải sửa ngay sau khi tạo. %>
+    <%= form_with url: project_tasks_path(@project), method: :post,
+                  class: "x-composer hidden",
+                  data: { kanban_target: "composer", column_id: column.id,
+                          action: "turbo:submit-end->kanban#composerDone" } do %>
       <%= hidden_field_tag "task[board_column_id]", column.id %>
-      <input type="text" name="task[title]" placeholder="Tiêu đề công việc…"
-             class="x-input h-9 text-[13px] mb-2" data-kanban-target="composerInput">
+      <%= hidden_field_tag :board_composer, "1" %>
+
+      <textarea name="task[title]" rows="2" required placeholder="Tiêu đề công việc…"
+                class="x-textarea text-[13px] leading-snug mb-1.5" data-kanban-target="composerInput"
+                data-action="keydown.enter->kanban#submitComposer"></textarea>
+
+      <div class="grid grid-cols-2 gap-1.5 mb-1.5">
+        <%= select_tag "task[assignee_id]",
+                       options_from_collection_for_select(@project.members, :id, :display_name),
+                       include_blank: "Chưa giao", class: "x-select h-8 text-[12px]" %>
+        <%= select_tag "task[priority]",
+                       options_for_select(Task.priorities.keys.map { |k| [t("priorities.#{k}"), k] }, "medium"),
+                       class: "x-select h-8 text-[12px]" %>
+      </div>
+      <input type="date" name="task[due_date]" class="x-input h-8 text-[12px] mb-2"
+             aria-label="Hạn hoàn thành">
+
       <div class="flex gap-2">
-        <button class="x-btn x-btn-primary x-btn-sm flex-1">Thêm</button>
+        <button class="x-btn x-btn-primary x-btn-sm flex-1">Thêm việc</button>
         <button type="button" class="x-btn x-btn-ghost x-btn-sm" data-action="kanban#closeComposer">Huỷ</button>
       </div>
+      <p class="x-hint mt-1.5 mb-0">Enter để thêm nhanh · Shift+Enter xuống dòng</p>
     <% end %>
+
     <button class="w-full text-left px-2.5 py-2 rounded-lg text-[13px] font-medium hover:bg-white transition"
             style="color:var(--ink-3)" data-action="kanban#openComposer" data-column-id="<%= column.id %>">
       + Thêm công việc

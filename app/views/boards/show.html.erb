@@ -2,20 +2,26 @@
 <%= render "projects/header" %>
 
 <div class="mt-4 space-y-3.5">
-  <%= form_with url: project_board_path(@project), method: :get, class: "flex flex-wrap items-center gap-2" do %>
-    <%= select_tag :assignee_id, options_from_collection_for_select(@project.members, :id, :display_name, params[:assignee_id]),
-                   include_blank: "Người thực hiện", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
-    <%= select_tag :priority, options_for_select(Task.priorities.keys.map { |k| [t("priorities.#{k}"), k] }, params[:priority]),
-                   include_blank: "Độ ưu tiên", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
-    <% if @labels.any? %>
-      <%= select_tag :label_id, options_from_collection_for_select(@labels, :id, :name, params[:label_id]),
-                     include_blank: "Nhãn", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+  <%# Form lọc và khối quản lý cột phải là hai form TÁCH RỜI: HTML không cho lồng
+      form trong form, trình duyệt sẽ vứt cái bên trong đi — trước đây "Thêm cột
+      mới" nằm lọt trong form lọc nên bấm vào chỉ nạp lại trang chứ không thêm. %>
+  <div class="flex flex-wrap items-center gap-2">
+    <%= form_with url: project_board_path(@project), method: :get, class: "contents" do %>
+      <%= select_tag :assignee_id, options_from_collection_for_select(@project.members, :id, :display_name, params[:assignee_id]),
+                     include_blank: "Người thực hiện", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+      <%= select_tag :priority, options_for_select(Task.priorities.keys.map { |k| [t("priorities.#{k}"), k] }, params[:priority]),
+                     include_blank: "Độ ưu tiên", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+      <% if @labels.any? %>
+        <%= select_tag :label_id, options_from_collection_for_select(@labels, :id, :name, params[:label_id]),
+                       include_blank: "Nhãn", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+      <% end %>
+      <%= select_tag :due, options_for_select([["Quá hạn", "overdue"], ["Tuần này", "this_week"], ["Không hạn", "none"]], params[:due]),
+                     include_blank: "Hạn", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
+      <% if params.values_at(:assignee_id, :priority, :label_id, :due).any?(&:present?) %>
+        <%= link_to "Xoá lọc", project_board_path(@project), class: "x-btn x-btn-ghost x-btn-sm" %>
+      <% end %>
     <% end %>
-    <%= select_tag :due, options_for_select([["Quá hạn", "overdue"], ["Tuần này", "this_week"], ["Không hạn", "none"]], params[:due]),
-                   include_blank: "Hạn", class: "x-select h-9 w-auto text-[13px]", onchange: "this.form.requestSubmit()" %>
-    <% if params.values_at(:assignee_id, :priority, :label_id, :due).any?(&:present?) %>
-      <%= link_to "Xoá lọc", project_board_path(@project), class: "x-btn x-btn-ghost x-btn-sm" %>
-    <% end %>
+
     <div class="ml-auto flex items-center gap-2">
       <span class="x-muted hidden lg:block">Kéo–thả thẻ để đổi cột · lưu ngay</span>
 
@@ -42,14 +48,7 @@
         </div>
       </div>
     </div>
-  <% end %>
-
-  <div class="x-board x-scroll-thin" data-controller="kanban" data-kanban-target="board"
-       data-kanban-move-url-value="<%= move_task_path(code: "__CODE__") %>"
-       data-kanban-reorder-url-value="<%= reorder_project_board_columns_path(@project) %>">
-    <% @columns.each do |column| %>
-      <%= render "column", column: column, tasks: (@tasks_by_column[column.id] || []) %>
-    <% end %>
-
   </div>
+
+  <%= render "board" %>
 </div>

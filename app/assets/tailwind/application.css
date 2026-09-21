@@ -197,6 +197,15 @@ body {
   }
   .x-textarea { height: auto; padding: 10px 12px; min-height: 88px; resize: vertical; line-height: 1.6; }
   .x-input::placeholder, .x-textarea::placeholder { color: var(--ink-3); }
+
+  /* Ô thêm việc ngay trên cột Kanban: trông như một thẻ đang được soạn, để
+     người dùng thấy ngay cái mình sắp tạo nằm ở đâu. */
+  .x-composer {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius-sm); padding: 9px; margin-bottom: 6px;
+    box-shadow: var(--shadow-md);
+  }
+  .x-composer .x-textarea { min-height: 52px; padding: 8px 10px; }
   .x-input:focus, .x-select:focus, .x-textarea:focus {
     outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(46,107,192,.13);
   }
