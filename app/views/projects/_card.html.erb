@@ -34,7 +34,11 @@
           <span class="x-num text-[12px] <%= 'x-chip x-chip-bad' if project.overdue? %>"
                 style="<%= 'color:var(--ink-2)' unless project.overdue? %>"><%= l(project.due_date) %></span>
         <% end %>
-        <span class="x-muted"><%= project.tasks.kept.size %> việc</span>
+        <%# Số việc là thứ người ta quét mắt tìm trên thẻ — cho hẳn dạng chip
+            thay vì chữ xám mờ ngang hàng với ngày. Không việc nào thì để chip
+            xám, đừng tô xanh như một thành tích. %>
+        <% task_count = project.tasks.kept.size %>
+        <span class="x-chip x-num <%= 'x-chip-brand' if task_count.positive? %>"><%= task_count %> việc</span>
       </div>
     </div>
   </div>
