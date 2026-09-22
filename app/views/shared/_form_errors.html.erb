@@ -1,0 +1,19 @@
+<%# Bảng tóm tắt lỗi cho các form Devise. Thiếu nó thì mọi lỗi validation đều
+    im lặng: trang render lại 422 y hệt lúc đầu, người dùng tưởng nút hỏng.
+    Lỗi của reset_password_token (sai/hết hạn) không gắn với ô nhập nào trên
+    màn hình nên bắt buộc phải hiện ở đây. %>
+<% if resource.errors.any? %>
+  <div class="x-toast x-toast-bad mb-4" role="alert">
+    <div class="flex-1">
+      <% if resource.errors.count == 1 %>
+        <%= resource.errors.full_messages.first %>
+      <% else %>
+        <ul style="margin:0;padding-left:18px;">
+          <% resource.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      <% end %>
+    </div>
+  </div>
+<% end %>

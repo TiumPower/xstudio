@@ -2,15 +2,32 @@
 <h1 class="x-h2 mb-1">Đặt mật khẩu mới</h1>
 <p class="x-sub mb-6">Tối thiểu 8 ký tự, có cả chữ và số.</p>
 
+<%= render "shared/form_errors", resource: resource %>
+
 <%= form_with model: resource, url: password_path(resource_name), method: :put, local: true do |f| %>
   <%= f.hidden_field :reset_password_token %>
-  <div class="x-field">
+  <div class="x-field <%= "x-field-error" if resource.errors[:password].any? %>">
     <%= f.label :password, "Mật khẩu mới" %>
-    <%= f.password_field :password, autofocus: true, autocomplete: "new-password", class: "x-input" %>
+    <%= f.password_field :password, autofocus: true, autocomplete: "new-password", class: "x-input",
+                         "aria-invalid" => resource.errors[:password].any?.to_s %>
+    <% resource.errors[:password].each do |message| %>
+      <p class="x-error"><%= message %></p>
+    <% end %>
   </div>
-  <div class="x-field">
+  <div class="x-field <%= "x-field-error" if resource.errors[:password_confirmation].any? %>">
     <%= f.label :password_confirmation, "Nhập lại mật khẩu" %>
-    <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "x-input" %>
+    <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "x-input",
+                         "aria-invalid" => resource.errors[:password_confirmation].any?.to_s %>
+    <% resource.errors[:password_confirmation].each do |message| %>
+      <p class="x-error"><%= message %></p>
+    <% end %>
   </div>
   <%= f.submit "Đổi mật khẩu", class: "x-btn x-btn-primary x-btn-lg x-btn-block cursor-pointer" %>
+<% end %>
+
+<% if resource.errors[:reset_password_token].any? %>
+  <p class="text-center mt-5">
+    <%= link_to "Gửi lại liên kết đặt lại mật khẩu", new_password_path(resource_name),
+                class: "text-[13px] font-semibold", style: "color:var(--brand)" %>
+  </p>
 <% end %>

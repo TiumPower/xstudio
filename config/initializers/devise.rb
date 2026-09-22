@@ -30,7 +30,10 @@ Devise.setup do |config|
   # config.mailer = 'Devise::Mailer'
 
   # Configure the parent class responsible to send e-mails.
-  # config.parent_mailer = 'ActionMailer::Base'
+  # Kế thừa ApplicationMailer để thư của Devise dùng chung layout "mailer",
+  # biến @workspace và địa chỉ gửi với 4 loại thư còn lại — mặc định
+  # ActionMailer::Base không có layout nên thư ra trơ mấy thẻ <p>.
+  config.parent_mailer = 'ApplicationMailer'
 
   # ==> ORM configuration
   # Load and configure the ORM. Supports :active_record (default) and

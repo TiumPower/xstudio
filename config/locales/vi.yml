@@ -256,6 +256,9 @@ vi:
         record_invalid: "Dữ liệu chưa hợp lệ: %{errors}"
         taken: "đã được dùng"
         blank: "không được để trống"
+        # Mặc định của Rails là "không khớp với %{attribute}" nên ra câu lặp
+        # "Xác nhận mật khẩu không khớp với xác nhận".
+        confirmation: "không khớp"
   errors_format:
     format: "%{attribute} %{message}"
 

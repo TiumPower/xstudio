@@ -2,10 +2,16 @@
 <h1 class="x-h2 mb-1">Quên mật khẩu</h1>
 <p class="x-sub mb-6">Nhập email, chúng tôi sẽ gửi liên kết đặt lại mật khẩu. Liên kết có hiệu lực 2 giờ.</p>
 
+<%= render "shared/form_errors", resource: resource %>
+
 <%= form_with model: resource, url: password_path(resource_name), local: true do |f| %>
-  <div class="x-field">
+  <div class="x-field <%= "x-field-error" if resource.errors[:email].any? %>">
     <%= f.label :email, "Email" %>
-    <%= f.email_field :email, autofocus: true, class: "x-input", placeholder: "ban@xstudio.vn" %>
+    <%= f.email_field :email, autofocus: true, class: "x-input", placeholder: "ban@xstudio.vn",
+                      "aria-invalid" => resource.errors[:email].any?.to_s %>
+    <% resource.errors[:email].each do |message| %>
+      <p class="x-error"><%= message %></p>
+    <% end %>
   </div>
   <%= f.submit "Gửi liên kết đặt lại", class: "x-btn x-btn-primary x-btn-lg x-btn-block cursor-pointer" %>
 <% end %>
