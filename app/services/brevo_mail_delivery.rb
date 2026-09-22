@@ -31,7 +31,12 @@ class BrevoMailDelivery
       textContent: text_body(mail)
     }.compact
 
-    response = connection.post(ENDPOINT, JSON.generate(body))
+    # Gắn khoá theo TỪNG request: đối tượng Faraday được nhớ đệm suốt vòng đời
+    # tiến trình, nếu gắn khoá lúc dựng thì đổi BREVO_API_KEY mà không restart
+    # sẽ khiến tiến trình cũ âm thầm gửi bằng khoá cũ.
+    response = connection.post(ENDPOINT, JSON.generate(body)) do |req|
+      req.headers["api-key"] = key
+    end
 
     if response.status >= 300
       Rails.logger.error("[Brevo] #{response.status}: #{response.body.to_s.truncate(400)}")
@@ -46,7 +51,6 @@ class BrevoMailDelivery
 
   def connection
     @connection ||= Faraday.new do |f|
-      f.headers["api-key"]      = ENV["BREVO_API_KEY"].to_s
       f.headers["Content-Type"] = "application/json"
       f.headers["Accept"]       = "application/json"
       f.request :retry, max: 2, interval: 0.5, backoff_factor: 2,
