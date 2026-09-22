@@ -112,7 +112,7 @@ Rails.application.configure do
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
   # ---- Xstudio production --------------------------------------------------
-  host = ENV.fetch("APP_HOST", "xstudio.czin.net")
+  host = ENV.fetch("APP_HOST", "xstudio.tiumpower.com")
   config.action_mailer.default_url_options = { host: host, protocol: "https" }
   config.action_mailer.asset_host          = "https://#{host}"
   config.action_mailer.perform_caching     = false
@@ -144,6 +144,9 @@ Rails.application.configure do
   config.action_cable.allowed_request_origins = ["https://#{host}"]
 
   config.hosts << host
+  config.hosts << /.*\.tiumpower\.com/
+  # Tên miền cũ (czin.net) — nginx đã 301 sang domain mới, giữ lại cho chắc.
+  config.hosts << "xstudio.czin.net"
   config.hosts << /.*\.czin\.net/
 
 end

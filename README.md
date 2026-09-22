@@ -6,7 +6,7 @@ thông báo, và cây định hướng có AI gợi ý nhánh.
 Toàn bộ giao diện, email và thông báo lỗi **bằng tiếng Việt**. Tiền tệ **VND**
 (`15.000.000 ₫`), ngày `dd/mm/yyyy`, múi giờ `Asia/Ho_Chi_Minh`.
 
-- Sản phẩm: <https://xstudio.czin.net>
+- Sản phẩm: <https://xstudio.tiumpower.com>
 - Mã nguồn: <https://github.com/vietlee/xstudio>
 - Tài liệu yêu cầu: `docs/SRS-Team-Workspace.md`
 
@@ -60,7 +60,7 @@ cap production deploy
 ```
 
 Lần đầu trên server cần làm tay (xem `docs/DEPLOY.md`): tạo DB + user Postgres,
-`shared/.env`, nginx vhost (`config/nginx/xstudio.czin.net.conf`), chứng chỉ
+`shared/.env`, nginx vhost (`config/nginx/xstudio.tiumpower.com.conf`), chứng chỉ
 Certbot, và unit `sidekiq-xstudio.service`.
 
 ## Bố cục mã nguồn

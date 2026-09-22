@@ -9,5 +9,5 @@ class InvitationMailer < ApplicationMailer
 
   private
 
-  def mail_host = ENV.fetch("APP_HOST", "xstudio.czin.net")
+  def mail_host = ENV.fetch("APP_HOST", "xstudio.tiumpower.com")
 end

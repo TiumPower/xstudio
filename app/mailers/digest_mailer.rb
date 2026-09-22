@@ -13,7 +13,7 @@ class DigestMailer < ApplicationMailer
 
     return if @overdue.empty? && @due_today.empty? && @due_week.empty? && @activities.empty?
 
-    @host = ENV.fetch("APP_HOST", "xstudio.czin.net")
+    @host = ENV.fetch("APP_HOST", "xstudio.tiumpower.com")
     mail to: @user.email, subject: "[#{@workspace.name}] Bản tin ngày #{I18n.l(Date.current)}"
   end
 end

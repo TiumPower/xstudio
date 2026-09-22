@@ -1,4 +1,4 @@
-# Triển khai Xstudio — xstudio.czin.net
+# Triển khai Xstudio — xstudio.tiumpower.com
 
 Chạy trên cùng server VOX với Loyalty, Estate và Bơi Đạt (`103.116.38.152`).
 
@@ -18,7 +18,7 @@ sudo chown -R deploy:deploy /var/www/xstudio
 `/var/www/xstudio/shared/.env` (theo `.env.example`):
 
 ```
-APP_HOST=xstudio.czin.net
+APP_HOST=xstudio.tiumpower.com
 RAILS_ENV=production
 DATABASE_NAME=xstudio_production
 DATABASE_USER=xstudio
@@ -26,7 +26,7 @@ DATABASE_PASSWORD=<mật khẩu>
 REDIS_URL=redis://localhost:6379/5
 SECRET_KEY_BASE=<bin/rails secret>
 ANTHROPIC_API_KEY=<khoá Claude>
-MAIL_FROM=Team Workspace <no-reply@xstudio.czin.net>
+MAIL_FROM=Team Workspace <no-reply@xstudio.tiumpower.com>
 ```
 
 > **Lưu ý Redis:** mỗi app dùng một số database riêng để hàng đợi không lẫn nhau
@@ -49,14 +49,14 @@ ssh-add -l   # phải thấy khoá; nếu trống thì ssh-add ~/.ssh/id_ed25519
 ## 3. nginx + TLS (làm tay, một lần)
 
 ```bash
-sudo cp config/nginx/xstudio.czin.net.conf /etc/nginx/sites-available/xstudio.czin.net
-sudo ln -sf /etc/nginx/sites-available/xstudio.czin.net /etc/nginx/sites-enabled/
-sudo certbot --nginx -d xstudio.czin.net
+sudo cp config/nginx/xstudio.tiumpower.com.conf /etc/nginx/sites-available/xstudio.tiumpower.com
+sudo ln -sf /etc/nginx/sites-available/xstudio.tiumpower.com /etc/nginx/sites-enabled/
+sudo certbot --nginx -d xstudio.tiumpower.com
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
 > **Bắt buộc cho realtime cây định hướng:** vhost phải có khối `location ^~ /cable`
-> với `Upgrade`/`Connection` (đã có sẵn trong `config/nginx/xstudio.czin.net.conf`).
+> với `Upgrade`/`Connection` (đã có sẵn trong `config/nginx/xstudio.tiumpower.com.conf`).
 > Thiếu nó thì WebSocket không nâng cấp được và thay đổi của người này không
 > hiện sang người khác — trang vẫn chạy bình thường nên rất dễ bỏ sót.
 

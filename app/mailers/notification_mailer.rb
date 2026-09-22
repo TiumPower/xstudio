@@ -31,5 +31,5 @@ class NotificationMailer < ApplicationMailer
     path.start_with?("http") ? path : "https://#{mail_host}#{path}"
   end
 
-  def mail_host = ENV.fetch("APP_HOST", "xstudio.czin.net")
+  def mail_host = ENV.fetch("APP_HOST", "xstudio.tiumpower.com")
 end

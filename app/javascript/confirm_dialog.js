@@ -1,4 +1,4 @@
-// Thay hộp xác nhận mặc định của trình duyệt (kèm dòng "xstudio.czin.net says")
+// Thay hộp xác nhận mặc định của trình duyệt (kèm dòng "xstudio.tiumpower.com says")
 // bằng hộp thoại HTML của chính app.
 //
 // Turbo cho phép thay hàm xác nhận: trả về Promise<boolean>.
