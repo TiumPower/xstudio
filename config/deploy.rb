@@ -3,7 +3,7 @@ lock "~> 3.18"
 set :application, "xstudio"
 # Server clone từ GitHub bằng SSH agent forwarding (xem ssh_options ở
 # config/deploy/production.rb) — giống Loyalty và Estate.
-set :repo_url,    ENV.fetch("REPO_URL", "git@github.com:vietlee/xstudio.git")
+set :repo_url,    ENV.fetch("REPO_URL", "git@github.com:TiumPower/xstudio.git")
 
 set :deploy_to,   "/var/www/xstudio"
 set :branch,      ENV.fetch("BRANCH", "main")
