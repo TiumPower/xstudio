@@ -1,6 +1,7 @@
 <%# id để turbo_stream vẽ lại riêng bảng sau khi thêm/sửa/xoá cột. %>
 <div id="kanban_board" class="x-board x-scroll-thin" data-controller="kanban" data-kanban-target="board"
      data-kanban-move-url-value="<%= move_task_path(code: "__CODE__") %>"
+     data-kanban-move-project-url-value="<%= move_project_task_path(code: "__CODE__") %>"
      data-kanban-reorder-url-value="<%= reorder_project_board_columns_path(@project) %>">
   <% @columns.each do |column| %>
     <%# Đường dẫn đầy đủ: partial này còn được vẽ từ BoardColumnsController,
@@ -8,4 +9,5 @@
     <%= render "boards/column", column: column, tasks: (@tasks_by_column[column.id] || []) %>
   <% end %>
 
+  <%= render "boards/move_dialog" if @movable_projects.present? %>
 </div>

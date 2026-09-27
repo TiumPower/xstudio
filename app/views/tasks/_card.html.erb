@@ -1,10 +1,26 @@
-<div class="x-tcard" data-task-code="<%= task.code %>" data-position="<%= task.position %>"
+<div class="x-tcard group" data-task-code="<%= task.code %>" data-position="<%= task.position %>"
      data-action="click->kanban#openTask">
   <div class="flex items-center gap-2 mb-1.5">
     <span class="x-code"><%= task.code %></span>
     <span class="x-chip <%= { 'low' => '', 'medium' => 'x-chip-brand', 'high' => 'x-chip-warn', 'urgent' => 'x-chip-bad' }[task.priority] %> ml-auto">
       <%= task.priority_label %>
     </span>
+    <%# Máy bàn: chỉ lộ ra khi rê chuột, bảng vài chục thẻ mà thẻ nào cũng có nút
+        thì rối. Màn cảm ứng không có "rê chuột" nên để hiện sẵn — chạm vào thẻ
+        là mở chi tiết mất rồi. %>
+    <% if task.movable_to_other_project? %>
+      <button type="button" data-action="kanban#openMove" data-task-code="<%= task.code %>"
+              data-task-title="<%= task.title %>" title="Chuyển sang dự án khác"
+              aria-label="Chuyển <%= task.code %> sang dự án khác"
+              class="w-6 h-6 -mr-1 rounded-md grid place-items-center flex-none transition
+                     md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 hover:bg-[var(--bg)]"
+              style="color:var(--ink-3)">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+             stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M2 5.5h9M8.5 3l2.5 2.5L8.5 8M14 10.5H5M7.5 8l-2.5 2.5L7.5 13"/>
+        </svg>
+      </button>
+    <% end %>
   </div>
 
   <div class="text-[13.5px] font-medium leading-snug x-clamp-2 mb-2"><%= task.title %></div>

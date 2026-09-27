@@ -3,8 +3,9 @@ import { Controller } from "@hotwired/stimulus"
 // FR-TASK-05 — kéo–thả giữa cột và sắp xếp trong cột.
 // Cập nhật lạc quan: thẻ chuyển ngay, hoàn tác nếu server báo lỗi.
 export default class extends Controller {
-  static targets = ["list", "composer", "composerInput", "board"]
-  static values  = { moveUrl: String, reorderUrl: String }
+  static targets = ["list", "composer", "composerInput", "board",
+                    "moveDialog", "moveForm", "moveSelect", "moveSummary"]
+  static values  = { moveUrl: String, reorderUrl: String, moveProjectUrl: String }
 
   connect() {
     this.initColumnSorting()
@@ -26,6 +27,7 @@ export default class extends Controller {
 
   disconnect() {
     document.removeEventListener("turbo:before-stream-render", this.onStream)
+    if (this.onMoveKey) document.removeEventListener("keydown", this.onMoveKey)
     this.sortables?.forEach((s) => s.destroy())
     this.columnSortable?.destroy()
   }
@@ -150,6 +152,30 @@ export default class extends Controller {
     if (!frame) return window.Turbo.visit(`/cong-viec/${encodeURIComponent(code)}`)
     frame.src = `/cong-viec/${encodeURIComponent(code)}`
   }
+
+  // --- Chuyển thẻ sang dự án khác ---------------------------------------
+  // Một hộp dùng chung: mỗi lần mở chỉ trỏ action của form sang thẻ vừa bấm.
+  openMove(event) {
+    event.stopPropagation()
+    if (!this.hasMoveDialogTarget) return
+    const { taskCode, taskTitle } = event.currentTarget.dataset
+    this.moveFormTarget.action = this.moveProjectUrlValue.replace("__CODE__", encodeURIComponent(taskCode))
+    this.moveSummaryTarget.textContent = `${taskCode} · ${taskTitle}`
+    this.moveDialogTarget.classList.remove("hidden")
+    this.moveDialogTarget.classList.add("flex")
+    this.onMoveKey = (e) => { if (e.key === "Escape") this.closeMove() }
+    document.addEventListener("keydown", this.onMoveKey)
+    this.moveSelectTarget?.focus()
+  }
+
+  closeMove() {
+    if (!this.hasMoveDialogTarget) return
+    this.moveDialogTarget.classList.add("hidden")
+    this.moveDialogTarget.classList.remove("flex")
+    document.removeEventListener("keydown", this.onMoveKey)
+  }
+
+  backdropMove(event) { if (event.target === event.currentTarget) this.closeMove() }
 
   toast(message) {
     const box = document.createElement("div")

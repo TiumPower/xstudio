@@ -129,12 +129,14 @@ class TasksController < ApplicationController
                                                previous_assignee: result.dropped_assignee, actor: current_user)
 
     flash[:notice] = move_notice(result, target)
-    # Mã việc đổi theo dự án mới nên đường dẫn cũ không còn — luôn đi tới mã mới.
+    # Mã việc đổi theo dự án mới nên đường dẫn cũ không còn: đi tới mã mới, trừ
+    # khi chuyển từ bảng Kanban — ở đó người dùng muốn ở lại bảng đang xem.
+    destination = return_to_path(task_path(@task))
     if turbo_frame_request?
       render turbo_stream: [turbo_stream.update("modal", ""),
-                            turbo_stream.action(:redirect, task_path(@task))]
+                            turbo_stream.action(:redirect, destination)]
     else
-      redirect_to task_path(@task)
+      redirect_to destination
     end
   end
 

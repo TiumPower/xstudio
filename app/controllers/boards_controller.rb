@@ -6,6 +6,11 @@ class BoardsController < ApplicationController
   def show
     @tab = "kanban"
     load_board
+    # Danh sách cho hộp "chuyển sang dự án khác" trên thẻ; kèm cả dự án hiện tại
+    # để ô chọn mở ra là thấy việc đang ở đâu.
+    @movable_projects = visible_projects.where(archived_at: nil)
+                                        .or(visible_projects.where(id: @project.id))
+                                        .order(:name)
   end
 
   private

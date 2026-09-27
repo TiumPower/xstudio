@@ -1,0 +1,30 @@
+<%# Một hộp dùng chung cho mọi thẻ trên bảng, thay vì mỗi thẻ một menu riêng:
+    menu nằm trong cột có thanh cuộn sẽ bị cắt mất, mà nhân bản danh sách dự án
+    cho vài chục thẻ cũng chỉ phình DOM.
+
+    Form đổi `action` theo thẻ vừa bấm nên không dùng được token CSRF gắn theo
+    form (Rails tính token từ chính action đó) — phải lấy token chung. %>
+<div class="x-overlay hidden items-center justify-center p-4" data-kanban-target="moveDialog"
+     data-action="click->kanban#backdropMove">
+  <div class="x-card w-[440px] max-w-full p-5">
+    <h3 class="x-h3 mb-1">Chuyển sang dự án khác</h3>
+    <p class="x-muted mb-3.5" data-kanban-target="moveSummary"></p>
+
+    <%= form_with url: "#", method: :patch, authenticity_token: form_authenticity_token,
+                  data: { kanban_target: "moveForm" } do %>
+      <%= hidden_field_tag :return_to, request.fullpath %>
+      <label class="x-label block mb-1.5">Dự án đích</label>
+      <%= select_tag :project_code,
+                     options_from_collection_for_select(@movable_projects, :code,
+                                                        ->(p) { "#{p.code} · #{p.name}" }, @project.code),
+                     class: "x-select h-9 text-[13px]", data: { kanban_target: "moveSelect" } %>
+      <p class="x-hint mt-1.5 mb-3.5">
+        Mã việc sẽ đổi theo dự án mới. Người thực hiện và nhãn không thuộc dự án đó sẽ bị gỡ.
+      </p>
+      <div class="flex gap-2">
+        <button class="x-btn x-btn-primary x-btn-sm flex-1">Chuyển</button>
+        <button type="button" class="x-btn x-btn-ghost x-btn-sm" data-action="kanban#closeMove">Huỷ</button>
+      </div>
+    <% end %>
+  </div>
+</div>
