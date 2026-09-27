@@ -88,6 +88,30 @@
     <div class="x-card">
       <div class="x-card-head"><h2 class="x-h3 x-section-title">Thuộc tính</h2></div>
       <div class="p-4">
+        <%# Chuyển dự án là form riêng: đổi dự án kéo theo cột, nhãn và mã việc
+            nên không gộp chung với các trường sửa thường được. %>
+        <div class="mb-3.5">
+          <label class="x-label block mb-1.5">Dự án</label>
+          <% if @task.movable_to_other_project? && @movable_projects.present? %>
+            <%= form_with url: move_project_task_path(@task), method: :patch, class: "flex gap-2" do %>
+              <%= select_tag :project_code,
+                             options_from_collection_for_select(@movable_projects, :code,
+                                                                ->(p) { "#{p.code} · #{p.name}" }, @project.code),
+                             class: "x-select h-9 text-[13px]" %>
+              <button class="x-btn x-btn-ghost x-btn-sm flex-none"
+                      data-turbo-confirm="Chuyển <%= @task.code %> sang dự án khác? Mã việc sẽ đổi theo dự án mới, và người thực hiện hay nhãn không thuộc dự án đó sẽ bị gỡ.">
+                Chuyển
+              </button>
+            <% end %>
+          <% else %>
+            <div class="x-input h-9 text-[13px] flex items-center overflow-hidden" style="background:var(--bg);color:var(--ink-2)">
+              <span class="truncate"><%= @project.code %> · <%= @project.name %></span>
+            </div>
+            <p class="x-muted mt-1">Việc đã hoàn thành thì không chuyển dự án được.</p>
+          <% end %>
+        </div>
+        <div class="x-divider mb-3.5"></div>
+
         <%= form_with model: @task, url: task_path(@task), method: :patch, local: true, class: "space-y-3.5" do |f| %>
           <div>
             <label class="x-label block mb-1.5">Trạng thái (cột)</label>

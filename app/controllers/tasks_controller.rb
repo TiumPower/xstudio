@@ -1,6 +1,6 @@
 class TasksController < ApplicationController
   before_action :load_project, only: [:index, :create]
-  before_action :load_task,    only: [:show, :edit, :update, :destroy, :move, :quick_update]
+  before_action :load_task,    only: [:show, :edit, :update, :destroy, :move, :move_project, :quick_update]
 
   def index
     @tab = "tasks"
@@ -22,7 +22,14 @@ class TasksController < ApplicationController
     @tasks = @pagy.records
   end
 
-  def show; end
+  def show
+    # Chỉ liệt kê dự án còn hoạt động trong phạm vi người xem; kèm cả dự án
+    # hiện tại để ô chọn cho thấy việc đang nằm ở đâu.
+    return unless @task.movable_to_other_project?
+    @movable_projects = visible_projects.where(archived_at: nil)
+                                        .or(visible_projects.where(id: @task.project_id))
+                                        .order(:name)
+  end
 
   def new
     @task = Task.new(priority: :medium, project_id: params[:project_id])
@@ -103,6 +110,34 @@ class TasksController < ApplicationController
     render json: { error: { message: e.record.errors.full_messages.to_sentence } }, status: :unprocessable_entity
   end
 
+  # Chuyển công việc sang dự án khác (chỉ việc chưa hoàn thành).
+  def move_project
+    target = visible_projects.find_by(code: params[:project_code])
+    return redirect_back(fallback_location: task_path(@task),
+                         alert: "Không tìm thấy dự án đó trong phạm vi của bạn.") if target.nil?
+
+    result = Tasks::MoveToProject.new(@task, target).call
+    unless result.ok?
+      return redirect_back(fallback_location: task_path(@task), alert: result.error)
+    end
+
+    log_activity("moved", trackable: @task, project: target,
+                 summary: "đã chuyển #{result.previous_code} từ #{result.previous_project.code} sang #{target.code} (#{@task.code})",
+                 changes_payload: { from: result.previous_project.code, to: target.code,
+                                    from_code: result.previous_code, to_code: @task.code })
+    Notifications::Dispatch.task_moved_project(@task, from: result.previous_project,
+                                               previous_assignee: result.dropped_assignee, actor: current_user)
+
+    flash[:notice] = move_notice(result, target)
+    # Mã việc đổi theo dự án mới nên đường dẫn cũ không còn — luôn đi tới mã mới.
+    if turbo_frame_request?
+      render turbo_stream: [turbo_stream.update("modal", ""),
+                            turbo_stream.action(:redirect, task_path(@task))]
+    else
+      redirect_to task_path(@task)
+    end
+  end
+
   # Sửa nhanh một trường từ panel chi tiết.
   def quick_update
     if @task.update(task_params)
@@ -157,8 +192,10 @@ class TasksController < ApplicationController
   end
 
   def task_params
+    # Không nhận :project_id ở đây: đổi dự án còn phải đổi cột, nhãn và mã việc,
+    # nên phải đi qua move_project chứ không lọt qua form sửa thường được.
     params.require(:task).permit(:title, :description, :priority, :assignee_id, :board_column_id,
-                                 :start_date, :due_date, :estimated_hours, :status, :project_id, files: [])
+                                 :start_date, :due_date, :estimated_hours, :status, files: [])
   end
 
   def apply_labels
@@ -171,6 +208,15 @@ class TasksController < ApplicationController
   def notify_changes(previous)
     Notifications::Dispatch.task_assigned(@task, actor: current_user) if @task.assignee_id && previous[:assignee_id] != @task.assignee_id
     Notifications::Dispatch.task_status_changed(@task, actor: current_user) if previous[:status] != @task.status
+  end
+
+  # Nói thẳng những gì bị gỡ bỏ — người thực hiện và nhãn không theo việc sang
+  # dự án mới được, mà nhìn màn hình thì không thấy chúng biến mất.
+  def move_notice(result, target)
+    parts = ["Đã chuyển #{result.previous_code} sang #{target.code} · #{target.name}, mã mới là #{@task.code}."]
+    parts << "Bỏ người thực hiện #{result.dropped_assignee.display_name} vì chưa là thành viên dự án mới." if result.dropped_assignee
+    parts << "Gỡ #{result.dropped_labels.size} nhãn của dự án cũ." if result.dropped_labels.any?
+    parts.join(" ")
   end
 
   def authorize_owner_or_admin!(creator_id)

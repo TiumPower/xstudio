@@ -154,9 +154,10 @@ Ký hiệu: **[MVP]** = làm ngay · **[P2]** = giai đoạn 2.
 | FR-TASK-10 | **Task con (subtask)** dạng checklist đơn giản trong task cha. Hiển thị `3/5` trên thẻ. | MVP |
 | FR-TASK-11 | Trang/panel chi tiết task: toàn bộ thông tin + bình luận + tệp đính kèm + lịch sử thay đổi. | MVP |
 | FR-TASK-12 | Mã task tự sinh theo dự án: `<Mã dự án>-<số thứ tự>` (ví dụ `DX-004-17`). | MVP |
-| FR-TASK-13 | **"Việc của tôi"** — màn hình tổng hợp mọi task được gán cho người đang đăng nhập, gộp từ tất cả dự án, nhóm theo: Quá hạn / Hôm nay / Tuần này / Sau đó / Không có hạn. | MVP |
+| FR-TASK-13 | **"Công việc"** — màn hình tổng hợp mọi task đang mở, gộp từ tất cả dự án, nhóm theo: Quá hạn / Hôm nay / Tuần này / Sau đó / Không có hạn. Hai phạm vi: **Của tôi** (mặc định) và **Cả team** — phạm vi Cả team lọc thêm theo thành viên (kể cả "Chưa giao") và theo dự án, nhóm được theo hạn hoặc theo người. Luôn giới hạn trong những dự án người xem được phép thấy. | MVP |
 | FR-TASK-14 | Phụ thuộc giữa task (blocked by / blocks). | P2 |
 | FR-TASK-15 | Task lặp lại theo chu kỳ. | P2 |
+| FR-TASK-16 | **Chuyển task sang dự án khác** từ panel/trang chi tiết — chỉ với task **chưa hoàn thành**, và chỉ sang dự án còn hoạt động trong phạm vi người dùng được thấy. Xem BR-24. | MVP |
 
 ### 3.6. Bình luận (FR-CMT)
 
@@ -626,6 +627,7 @@ Thêm `daily_digest_enabled` (boolean) ở cấp user.
 | BR-21 | Mỗi người tối đa 30 lượt gọi AI gợi ý mỗi ngày (tính theo giờ Việt Nam, reset lúc 00:00). Lượt `failed` hoặc `cancelled` không tính. |
 | BR-22 | Ảnh chụp tự động chạy 23:00 hằng ngày, chỉ chạy khi cây có thay đổi trong ngày. Giữ 30 bản `auto` gần nhất; bản đặt tên thủ công giữ vĩnh viễn. |
 | BR-23 | Khôi phục một ảnh chụp sẽ **chụp lại trạng thái hiện tại trước** rồi mới ghi đè, để luôn quay lại được. |
+| BR-24 | Chuyển task sang dự án khác: task được **cấp mã mới** theo dự án đích (`<Mã dự án>-<số thứ tự>`, mã cũ không giữ lại); về cột cùng khoá ở dự án đích, không có thì về cột đầu và **không bao giờ vào cột hoàn thành**; **gỡ người thực hiện** nếu người đó chưa là thành viên dự án đích; **gỡ nhãn** thuộc dự án cũ. Việc con, bình luận, tệp đính kèm đi theo task. Task đã `done` thì không chuyển được. |
 
 ---
 

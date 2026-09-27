@@ -42,6 +42,10 @@ class Task < ApplicationRecord
 
   def subtask_summary = "#{done_subtasks_count}/#{subtasks_count}"
 
+  # Việc đã xong thì mã của nó đã đi vào báo cáo, nhật ký và thông báo —
+  # chuyển dự án lúc này chỉ làm sai lịch sử. Chỉ cho chuyển khi chưa xong.
+  def movable_to_other_project? = !status_done?
+
   def to_param = code
 
   # Chuyển task sang cột khác, giữ thứ tự bằng position kiểu decimal (mục 9.2).

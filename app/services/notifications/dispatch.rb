@@ -51,6 +51,17 @@ module Notifications
            url:   Rails.application.routes.url_helpers.task_path(task))
     end
 
+    # Người đang làm việc đó cần biết nó đã sang dự án khác — kể cả khi việc bị
+    # gỡ khỏi tay họ vì họ không thuộc dự án mới.
+    def task_moved_project(task, from:, previous_assignee: nil, actor:)
+      user = previous_assignee || task.assignee
+      return if user.blank? || user.id == actor&.id
+      push(user, "task_status_changed", actor: actor,
+           title: "#{task.title} đã chuyển sang dự án #{task.project.name}",
+           body:  "#{from.code} · #{task.code}" + (previous_assignee ? " — bạn không còn là người thực hiện" : ""),
+           url:   Rails.application.routes.url_helpers.task_path(task))
+    end
+
     def project_status_changed(project, actor:)
       user = project.owner
       return if user.blank? || user.id == actor&.id

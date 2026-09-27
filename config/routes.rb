@@ -44,6 +44,7 @@ Rails.application.routes.draw do
   resources :tasks, path: "cong-viec", param: :code, except: [:index] do
     member do
       patch :move
+      patch :move_project, path: "chuyen-du-an"
       patch :quick_update
     end
     collection { patch :bulk_update }
