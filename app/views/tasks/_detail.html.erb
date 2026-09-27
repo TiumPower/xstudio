@@ -92,6 +92,7 @@
       <label class="x-label block mb-1.5">Dự án</label>
       <% if @task.movable_to_other_project? && @movable_projects.present? %>
         <%= form_with url: move_project_task_path(@task), method: :patch, class: "flex gap-2" do %>
+          <%= hidden_field_tag :context, "detail" %>
           <%= select_tag :project_code,
                          options_from_collection_for_select(@movable_projects, :code,
                                                             ->(p) { "#{p.code} · #{p.name}" }, @project.code),

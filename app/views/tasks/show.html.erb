@@ -1,21 +1,7 @@
 <% if turbo_frame_request? %>
-  <%= turbo_frame_tag "modal" do %>
-    <%= render layout: "shared/panel",
-               locals: { title: @task.title,
-                         eyebrow: "#{@project.name} · #{@task.code}",
-                         full_page_path: task_path(@task) } do %>
-      <%= render "detail", compact: true %>
-    <% end %>
-  <% end %>
+  <%= render "tasks/modal_frame" %>
 <% else %>
   <% page_title "Công việc #{@task.code}" %>
   <% content_for :back_path, project_board_path(@project) %>
-
-  <nav class="flex items-center gap-2 text-[13px] mb-3" style="color:var(--ink-3)">
-    <%= link_to @project.name, project_path(@project), class: "font-semibold hover:underline", style: "color:var(--brand)" %>
-    <span>/</span>
-    <span class="x-code"><%= @task.code %></span>
-  </nav>
-
-  <%= render "detail", compact: false %>
+  <%= render "tasks/page" %>
 <% end %>

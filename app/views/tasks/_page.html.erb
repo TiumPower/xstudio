@@ -1,0 +1,11 @@
+<%# Ruột của trang công việc. Tách riêng để chuyển dự án xong vẽ lại được tại
+    chỗ — mã việc đổi nên breadcrumb và toàn bộ chi tiết đều phải vẽ lại. %>
+<div id="task_page">
+  <nav class="flex items-center gap-2 text-[13px] mb-3" style="color:var(--ink-3)">
+    <%= link_to @project.name, project_path(@project), class: "font-semibold hover:underline", style: "color:var(--brand)" %>
+    <span>/</span>
+    <span class="x-code"><%= @task.code %></span>
+  </nav>
+
+  <%= render "detail", compact: false %>
+</div>

@@ -12,8 +12,9 @@
     <p class="x-muted mb-3.5" data-move-task-target="summary"></p>
 
     <%= form_with url: "#", method: :patch, authenticity_token: form_authenticity_token,
-                  data: { move_task_target: "form" } do %>
+                  data: { move_task_target: "form", action: "turbo:submit-end->move-task#submitted" } do %>
       <%= hidden_field_tag :return_to, request.fullpath %>
+      <%= hidden_field_tag :context, local_assigns.fetch(:context, "list") %>
       <label class="x-label block mb-1.5">Dự án đích</label>
       <%= select_tag :project_code,
                      options_from_collection_for_select(projects, :code,

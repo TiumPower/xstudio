@@ -13,7 +13,7 @@
     <% end %>
   <% end %>
 
-  <h1 class="x-h3 flex-1 md:flex-none truncate md:max-w-[280px]"><%= content_for(:page_title).presence || t("nav.dashboard") %></h1>
+  <h1 id="page_title" class="x-h3 flex-1 md:flex-none truncate md:max-w-[280px]"><%= content_for(:page_title).presence || t("nav.dashboard") %></h1>
 
   <%# Ô tìm kiếm bị bóp còn một ký tự trên điện thoại — ẩn đi, đã có mục
       Tìm kiếm riêng khi cần. %>

@@ -50,7 +50,7 @@
           </thead>
           <tbody>
             <% @tasks.each do |task| %>
-              <tr>
+              <tr id="task_row_<%= task.code %>">
                 <td><%= check_box_tag "codes[]", task.code, false, class: "x-check", data: { action: "bulk#toggle", bulk_target: "box" } %></td>
                 <td>
                   <%= link_to task_path(task), class: "block", data: { turbo_frame: "modal" } do %>
@@ -97,5 +97,6 @@
     <% end %>
   <% end %>
 
-  <%= render "shared/move_task_dialog", projects: @movable_projects, current_code: @project.code if @movable_projects.present? %>
+  <%= render "shared/move_task_dialog", projects: @movable_projects, current_code: @project.code,
+             context: "list" if @movable_projects.present? %>
 </div>

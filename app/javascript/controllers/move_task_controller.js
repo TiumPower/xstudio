@@ -36,4 +36,10 @@ export default class extends Controller {
   }
 
   backdrop(event) { if (event.target === event.currentTarget) this.close() }
+
+  // Máy chủ trả về turbo_stream để cập nhật tại chỗ, nên hộp phải tự đóng;
+  // gửi hỏng thì giữ nguyên để người dùng sửa rồi gửi lại.
+  submitted(event) {
+    if (event.detail?.success) this.close()
+  }
 }

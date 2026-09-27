@@ -107,15 +107,16 @@ class TasksController < ApplicationController
   end
 
   # Chuyển công việc sang dự án khác (chỉ việc chưa hoàn thành).
+  #
+  # Trả lời bằng turbo_stream để người dùng ở nguyên màn đang đứng: thẻ/hàng của
+  # việc vừa chuyển biến mất, panel và trang chi tiết vẽ lại theo dự án mới, và
+  # có dòng báo kết quả. Chỉ khi không dùng được turbo_stream mới điều hướng.
   def move_project
     target = visible_projects.find_by(code: params[:project_code])
-    return redirect_back(fallback_location: task_path(@task),
-                         alert: "Không tìm thấy dự án đó trong phạm vi của bạn.") if target.nil?
+    return move_failed("Không tìm thấy dự án đó trong phạm vi của bạn.") if target.nil?
 
     result = Tasks::MoveToProject.new(@task, target).call
-    unless result.ok?
-      return redirect_back(fallback_location: task_path(@task), alert: result.error)
-    end
+    return move_failed(result.error) unless result.ok?
 
     log_activity("moved", trackable: @task, project: target,
                  summary: "đã chuyển #{result.previous_code} từ #{result.previous_project.code} sang #{target.code} (#{@task.code})",
@@ -124,15 +125,20 @@ class TasksController < ApplicationController
     Notifications::Dispatch.task_moved_project(@task, from: result.previous_project,
                                                previous_assignee: result.dropped_assignee, actor: current_user)
 
-    flash[:notice] = move_notice(result, target)
-    # Mã việc đổi theo dự án mới nên đường dẫn cũ không còn: đi tới mã mới, trừ
-    # khi chuyển từ bảng Kanban — ở đó người dùng muốn ở lại bảng đang xem.
-    destination = return_to_path(task_path(@task))
-    if turbo_frame_request?
-      render turbo_stream: [turbo_stream.update("modal", ""),
-                            turbo_stream.action(:redirect, destination)]
-    else
-      redirect_to destination
+    # Vẽ lại chi tiết theo dự án MỚI: cột, thành viên và nhãn trong màn chi tiết
+    # đều lấy từ @project.
+    @project = @task.project
+    @movable_projects = movable_projects_for(@project)
+    notice = move_notice(result, target)
+
+    respond_to do |format|
+      format.turbo_stream do
+        flash.now[:notice] = notice
+        render turbo_stream: move_streams(result.previous_code)
+      end
+      # Mã việc đổi theo dự án mới nên đường dẫn cũ không còn — đi tới mã mới,
+      # trừ khi nơi gửi đã nói rõ muốn quay về đâu.
+      format.html { redirect_to return_to_path(task_path(@task)), notice: notice }
     end
   end
 
@@ -212,6 +218,35 @@ class TasksController < ApplicationController
   def notify_changes(previous)
     Notifications::Dispatch.task_assigned(@task, actor: current_user) if @task.assignee_id && previous[:assignee_id] != @task.assignee_id
     Notifications::Dispatch.task_status_changed(@task, actor: current_user) if previous[:status] != @task.status
+  end
+
+  # Gỡ thẻ/hàng của mã cũ ở mọi nơi có thể đang hiển thị nó — turbo_stream bỏ
+  # qua đích không tồn tại nên gửi thừa cũng vô hại, mà panel mở từ bảng Kanban
+  # thì vừa vẽ lại panel vừa dọn cái thẻ phía sau.
+  def move_streams(previous_code)
+    streams = [turbo_stream.replace("flash", partial: "layouts/flash"),
+               turbo_stream.remove("task_card_#{previous_code}"),
+               turbo_stream.remove("task_row_#{previous_code}")]
+
+    if turbo_frame_request?
+      streams << turbo_stream.replace("modal", partial: "tasks/modal_frame")
+    elsif params[:context] == "detail"
+      streams << turbo_stream.replace("task_page", partial: "tasks/page")
+      streams << turbo_stream.update("page_title", "Công việc #{@task.code}")
+      streams << turbo_stream.action(:replace_url, task_path(@task))
+      streams << turbo_stream.action(:set_title, "Công việc #{@task.code} · #{current_workspace.name}")
+    end
+    streams
+  end
+
+  def move_failed(message)
+    respond_to do |format|
+      format.turbo_stream do
+        flash.now[:alert] = message
+        render turbo_stream: turbo_stream.replace("flash", partial: "layouts/flash")
+      end
+      format.html { redirect_back fallback_location: task_path(@task), alert: message }
+    end
   end
 
   # Nói thẳng những gì bị gỡ bỏ — người thực hiện và nhãn không theo việc sang

@@ -9,5 +9,6 @@
     <%= render "boards/column", column: column, tasks: (@tasks_by_column[column.id] || []) %>
   <% end %>
 
-  <%= render "shared/move_task_dialog", projects: @movable_projects, current_code: @project.code if @movable_projects.present? %>
+  <%= render "shared/move_task_dialog", projects: @movable_projects, current_code: @project.code,
+             context: "board" if @movable_projects.present? %>
 </div>

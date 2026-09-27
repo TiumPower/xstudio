@@ -1,0 +1,8 @@
+<%# Ruột của panel trượt. Tách riêng để sau khi chuyển dự án vẽ lại được bằng
+    turbo_stream, không phải nạp lại cả trang. %>
+<%= render layout: "shared/panel",
+           locals: { title: @task.title,
+                     eyebrow: "#{@project.name} · #{@task.code}",
+                     full_page_path: task_path(@task) } do %>
+  <%= render "detail", compact: true %>
+<% end %>
