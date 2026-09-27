@@ -19,8 +19,17 @@
                     class: (team ? "is-active" : "") %>
       </div>
 
+      <%# Lọc trạng thái dùng được ở cả hai phạm vi nên đứng ngoài nhánh team. %>
+      <% if @statuses.many? %>
+        <%= select_tag :status, options_for_select(@statuses, params[:status]),
+                       include_blank: "Mọi trạng thái", class: "x-select h-9 w-auto max-w-[170px] text-[13px]",
+                       onchange: "this.form.requestSubmit()" %>
+      <% end %>
+
       <% if team %>
         <%= hidden_field_tag :scope, "team", id: nil %>
+        <%# Giữ kiểu nhóm đang chọn khi đổi ô lọc, đừng bật ngược về mặc định. %>
+        <%= hidden_field_tag :group, params[:group], id: nil %>
         <%= select_tag :assignee_id,
                        options_from_collection_for_select(@members, :id, :display_name, params[:assignee_id]) +
                          options_for_select([[t("common.unassigned"), "none"]], params[:assignee_id]),
@@ -40,8 +49,8 @@
       <% end %>
 
       <div class="ml-auto flex items-center gap-2">
-        <% if team && params.values_at(:assignee_id, :project_id).any?(&:present?) %>
-          <%= link_to "Xoá lọc", my_tasks_path({ scope: "team", group: params[:group] }.compact_blank),
+        <% if params.values_at(:assignee_id, :project_id, :status).any?(&:present?) %>
+          <%= link_to "Xoá lọc", my_tasks_path({ scope: (team ? "team" : nil), group: params[:group] }.compact_blank),
                       class: "x-btn x-btn-ghost x-btn-sm" %>
         <% end %>
         <span class="x-muted whitespace-nowrap"><%= @total %> việc đang mở</span>

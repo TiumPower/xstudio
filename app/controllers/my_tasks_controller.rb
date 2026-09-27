@@ -16,7 +16,17 @@ class MyTasksController < ApplicationController
 
     scope = Task.kept.open_tasks.where(project_id: visible_project_ids)
                 .includes(:project, :board_column, :assignee)
-                .order(Arel.sql("due_date NULLS LAST"))
+                # Ghi rõ bảng: khi lọc theo trạng thái, Rails đổi includes thành
+                # LEFT JOIN nên projects.due_date cũng có mặt, "due_date" trần
+                # thành nhập nhằng và Postgres từ chối.
+                .order(Arel.sql("tasks.due_date NULLS LAST"))
+
+    # Trạng thái lọc theo TÊN cột, không theo id: mỗi dự án có bộ cột riêng, mà
+    # người dùng chọn cái tên mình nhìn thấy trên chip chứ không quan tâm cột
+    # đó thuộc dự án nào.
+    if params[:status].present?
+      scope = scope.joins(:board_column).where(board_columns: { name: params[:status] })
+    end
 
     if @scope == "mine"
       scope = scope.where(assignee_id: current_user.id)
@@ -31,6 +41,11 @@ class MyTasksController < ApplicationController
     tasks   = scope.to_a
     @total  = tasks.size
     @groups = @group_by == "assignee" ? assignee_groups(tasks) : due_groups(tasks)
+
+    # Cột "Hoàn thành" không bao giờ lọt vào đây (trang chỉ hiện việc đang mở)
+    # nên cũng không đưa vào ô lọc.
+    @statuses = BoardColumn.where(project_id: visible_project_ids, is_done_column: false)
+                           .group(:name).order(Arel.sql("MIN(position), name")).pluck(:name)
 
     return if @scope == "mine"
 
