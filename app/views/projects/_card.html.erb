@@ -15,7 +15,17 @@
     </div>
 
     <h3 class="x-h3 mb-1 x-clamp-2 leading-snug"><%= project.name %></h3>
-    <p class="x-muted mb-3.5 x-clamp-1"><%= project.client_name.presence || project.type_label %></p>
+    <p class="x-muted mb-2 x-clamp-1"><%= project.client_name.presence || project.type_label %></p>
+
+    <%# Ai chịu trách nhiệm dự án là thứ hay phải hỏi nhất khi lướt danh sách —
+        dãy avatar thành viên bên dưới không nói được điều đó. %>
+    <div class="flex items-center gap-1.5 mb-3.5 text-[12.5px] min-w-0">
+      <span class="flex-none" style="color:var(--ink-3)">Phụ trách</span>
+      <%= avatar_for project.owner, size: :sm %>
+      <span class="truncate font-medium" style="color:var(--ink)">
+        <%= project.owner&.display_name || "—" %>
+      </span>
+    </div>
 
     <div class="flex items-center justify-between mb-1.5">
       <span class="text-[12px]" style="color:var(--ink-3)">Tiến độ</span>
