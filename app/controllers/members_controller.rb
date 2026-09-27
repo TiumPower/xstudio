@@ -20,7 +20,7 @@ class MembersController < ApplicationController
 
   def show
     @projects = @member.projects.kept.order(:name)
-    @open_tasks = Task.kept.open_tasks.where(assignee_id: @member.id).includes(:project).order(Arel.sql("due_date NULLS LAST")).limit(20)
+    @open_tasks = Task.kept.open_tasks.where(assignee_id: @member.id).includes(:project, :board_column).order(Arel.sql("due_date NULLS LAST")).limit(20)
   end
 
   def invite
