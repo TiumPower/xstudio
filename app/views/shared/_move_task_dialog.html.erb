@@ -1,0 +1,31 @@
+<%# Hộp chọn dự án dùng chung cho bảng Kanban và danh sách công việc.
+    `projects` là các dự án chuyển được; `current_code` (tuỳ chọn) để ô chọn mở
+    ra đã đứng sẵn ở dự án hiện tại.
+
+    Form đổi `action` theo công việc vừa bấm nên không dùng được token CSRF gắn
+    theo form (Rails tính token từ chính action đó) — phải lấy token chung. %>
+<% current_code = local_assigns[:current_code] %>
+<div class="x-overlay hidden items-center justify-center p-4" data-move-task-target="dialog"
+     data-action="click->move-task#backdrop">
+  <div class="x-card w-[440px] max-w-full p-5">
+    <h3 class="x-h3 mb-1">Chuyển sang dự án khác</h3>
+    <p class="x-muted mb-3.5" data-move-task-target="summary"></p>
+
+    <%= form_with url: "#", method: :patch, authenticity_token: form_authenticity_token,
+                  data: { move_task_target: "form" } do %>
+      <%= hidden_field_tag :return_to, request.fullpath %>
+      <label class="x-label block mb-1.5">Dự án đích</label>
+      <%= select_tag :project_code,
+                     options_from_collection_for_select(projects, :code,
+                                                        ->(p) { "#{p.code} · #{p.name}" }, current_code),
+                     class: "x-select h-9 text-[13px]", data: { move_task_target: "select" } %>
+      <p class="x-hint mt-1.5 mb-3.5">
+        Mã việc sẽ đổi theo dự án mới. Người thực hiện và nhãn không thuộc dự án đó sẽ bị gỡ.
+      </p>
+      <div class="flex gap-2">
+        <button class="x-btn x-btn-primary x-btn-sm flex-1">Chuyển</button>
+        <button type="button" class="x-btn x-btn-ghost x-btn-sm" data-action="move-task#close">Huỷ</button>
+      </div>
+    <% end %>
+  </div>
+</div>

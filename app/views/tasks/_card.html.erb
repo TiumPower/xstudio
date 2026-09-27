@@ -9,7 +9,7 @@
         thì rối. Màn cảm ứng không có "rê chuột" nên để hiện sẵn — chạm vào thẻ
         là mở chi tiết mất rồi. %>
     <% if task.movable_to_other_project? %>
-      <button type="button" data-action="kanban#openMove" data-task-code="<%= task.code %>"
+      <button type="button" data-action="move-task#open" data-task-code="<%= task.code %>"
               data-task-title="<%= task.title %>" title="Chuyển sang dự án khác"
               aria-label="Chuyển <%= task.code %> sang dự án khác"
               class="w-6 h-6 -mr-1 rounded-md grid place-items-center flex-none transition

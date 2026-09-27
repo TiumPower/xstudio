@@ -11,6 +11,7 @@ class BoardsController < ApplicationController
     @movable_projects = visible_projects.where(archived_at: nil)
                                         .or(visible_projects.where(id: @project.id))
                                         .order(:name)
+
   end
 
   private

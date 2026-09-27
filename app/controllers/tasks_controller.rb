@@ -20,15 +20,11 @@ class TasksController < ApplicationController
 
     @pagy  = Pagination.new(@tasks, page: params[:page])
     @tasks = @pagy.records
+    @movable_projects = movable_projects_for(@project)
   end
 
   def show
-    # Chỉ liệt kê dự án còn hoạt động trong phạm vi người xem; kèm cả dự án
-    # hiện tại để ô chọn cho thấy việc đang nằm ở đâu.
-    return unless @task.movable_to_other_project?
-    @movable_projects = visible_projects.where(archived_at: nil)
-                                        .or(visible_projects.where(id: @task.project_id))
-                                        .order(:name)
+    @movable_projects = movable_projects_for(@project) if @task.movable_to_other_project?
   end
 
   def new
@@ -191,6 +187,12 @@ class TasksController < ApplicationController
     @task = Task.kept.includes(:project, :assignee, :labels, :subtasks, :comments).find_by!(code: params[:code])
     @project = @task.project
     authorize_project!(@project)
+  end
+
+  # Dự án chuyển được: còn hoạt động và trong phạm vi người xem, kèm cả dự án
+  # hiện tại để ô chọn cho thấy việc đang nằm ở đâu.
+  def movable_projects_for(project)
+    visible_projects.where(archived_at: nil).or(visible_projects.where(id: project.id)).order(:name)
   end
 
   def task_params
