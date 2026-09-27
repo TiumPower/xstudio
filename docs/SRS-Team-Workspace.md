@@ -154,7 +154,7 @@ Ký hiệu: **[MVP]** = làm ngay · **[P2]** = giai đoạn 2.
 | FR-TASK-10 | **Task con (subtask)** dạng checklist đơn giản trong task cha. Hiển thị `3/5` trên thẻ. | MVP |
 | FR-TASK-11 | Trang/panel chi tiết task: toàn bộ thông tin + bình luận + tệp đính kèm + lịch sử thay đổi. | MVP |
 | FR-TASK-12 | Mã task tự sinh theo dự án: `<Mã dự án>-<số thứ tự>` (ví dụ `DX-004-17`). | MVP |
-| FR-TASK-13 | **"Công việc"** — màn hình tổng hợp mọi task đang mở, gộp từ tất cả dự án, nhóm theo: Quá hạn / Hôm nay / Tuần này / Sau đó / Không có hạn. Hai phạm vi: **Của tôi** (mặc định) và **Cả team** — phạm vi Cả team lọc thêm theo thành viên (kể cả "Chưa giao") và theo dự án, nhóm được theo hạn hoặc theo người. Luôn giới hạn trong những dự án người xem được phép thấy. | MVP |
+| FR-TASK-13 | **"Công việc"** — màn hình tổng hợp mọi task đang mở, gộp từ tất cả dự án, nhóm theo: Quá hạn / Hôm nay / Tuần này / Sau đó / Không có hạn. Hai phạm vi: **Của tôi** (mặc định) và **Cả team** — phạm vi Cả team lọc thêm theo thành viên (kể cả "Chưa giao") và theo dự án, nhóm được theo người (mặc định ở phạm vi Cả team) hoặc theo hạn. Luôn giới hạn trong những dự án người xem được phép thấy. | MVP |
 | FR-TASK-14 | Phụ thuộc giữa task (blocked by / blocks). | P2 |
 | FR-TASK-15 | Task lặp lại theo chu kỳ. | P2 |
 | FR-TASK-16 | **Chuyển task sang dự án khác** — từ panel/trang chi tiết (ô "Dự án"), từ **thẻ trên bảng Kanban** và từ **danh sách công việc** (nút mở hộp chọn dự án; chuyển xong ở lại đúng màn đang xem). Chỉ với task **chưa hoàn thành**, và chỉ sang dự án còn hoạt động trong phạm vi người dùng được thấy. Xem BR-24. | MVP |

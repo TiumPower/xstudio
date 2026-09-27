@@ -10,7 +10,9 @@ class MyTasksController < ApplicationController
 
   def index
     @scope    = params[:scope].presence_in(SCOPES) || "mine"
-    @group_by = @scope == "team" ? (params[:group].presence_in(GROUP_BYS) || "due") : "due"
+    # Xem cả team thì câu hỏi đầu tiên là "ai đang ôm việc gì", nên mặc định
+    # nhóm theo người; xem việc của mình thì chỉ có một người, nhóm theo hạn.
+    @group_by = @scope == "team" ? (params[:group].presence_in(GROUP_BYS) || "assignee") : "due"
 
     scope = Task.kept.open_tasks.where(project_id: visible_project_ids)
                 .includes(:project, :board_column, :assignee)
