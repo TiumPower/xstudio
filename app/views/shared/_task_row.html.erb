@@ -1,10 +1,21 @@
-<% show_project = local_assigns.fetch(:show_project, false) %>
+<% show_project  = local_assigns.fetch(:show_project, false) %>
+<% show_assignee = local_assigns.fetch(:show_assignee, false) %>
 <%= link_to task_path(task), class: "flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[var(--bg)] group",
             data: { turbo_frame: "modal" } do %>
   <span class="w-4 h-4 rounded-[5px] border flex-none" style="border-color:var(--line)"></span>
   <span class="x-code w-[92px] flex-none hidden sm:block truncate"><%= task.code %></span>
   <span class="flex-1 min-w-0 truncate text-[13.5px] font-medium"><%= task.title %></span>
   <%= priority_chip(task) %>
+  <% if show_assignee %>
+    <%# Màn hẹp chỉ để avatar (đã có tooltip tên), đủ rộng mới hiện thêm tên
+        — tên công việc vẫn là thứ cần đọc được trước. %>
+    <span class="hidden sm:flex items-center gap-1.5 flex-none max-w-[150px]">
+      <%= avatar_for task.assignee, size: :sm, title: task.assignee&.display_name || t("common.unassigned") %>
+      <span class="hidden xl:block text-[12.5px] truncate" style="color:var(--ink-2)">
+        <%= task.assignee&.display_name || t("common.unassigned") %>
+      </span>
+    </span>
+  <% end %>
   <% if show_project %>
     <span class="hidden lg:block text-[12px] truncate max-w-[180px]" style="color:var(--ink-3)">
       <%= task.project.code %> · <%= task.project.client_name.presence || task.project.name %>

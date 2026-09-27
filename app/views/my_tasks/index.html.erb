@@ -1,33 +1,85 @@
 <% page_title t("nav.my_tasks") %>
+<% base = request.query_parameters %>
+<% team = @scope == "team" %>
 
 <div>
   <%= render "shared/page_header",
-             title: "Việc của tôi",
-             subtitle: "Mọi công việc đang mở được giao cho bạn, gộp từ tất cả dự án và xếp theo hạn." %>
+             title: team ? "Công việc của team" : "Việc của tôi",
+             subtitle: team ? "Mọi công việc đang mở của các thành viên, trong phạm vi những dự án bạn tham gia."
+                            : "Mọi công việc đang mở được giao cho bạn, gộp từ tất cả dự án và xếp theo hạn." %>
 </div>
 
 <div class="w-full space-y-4">
+  <div class="x-card p-3">
+    <%= form_with url: my_tasks_path, method: :get, class: "flex flex-wrap items-center gap-2" do %>
+      <div class="x-seg flex-none">
+        <%= link_to "Của tôi", my_tasks_path(base.except("scope", "assignee_id", "project_id", "group")),
+                    class: (team ? "" : "is-active") %>
+        <%= link_to "Cả team", my_tasks_path(base.merge(scope: "team")),
+                    class: (team ? "is-active" : "") %>
+      </div>
+
+      <% if team %>
+        <%= hidden_field_tag :scope, "team", id: nil %>
+        <%= select_tag :assignee_id,
+                       options_from_collection_for_select(@members, :id, :display_name, params[:assignee_id]) +
+                         options_for_select([[t("common.unassigned"), "none"]], params[:assignee_id]),
+                       include_blank: "Mọi thành viên", class: "x-select h-9 w-auto max-w-[180px] text-[13px]",
+                       onchange: "this.form.requestSubmit()" %>
+        <%= select_tag :project_id,
+                       options_from_collection_for_select(@projects, :id, ->(p) { "#{p.code} · #{p.name}" }, params[:project_id]),
+                       include_blank: "Mọi dự án", class: "x-select h-9 w-auto max-w-[200px] text-[13px]",
+                       onchange: "this.form.requestSubmit()" %>
+        <div class="x-seg flex-none">
+          <%= link_to "Theo hạn", my_tasks_path(base.merge(scope: "team").except("group")),
+                      class: (@group_by == "due" ? "is-active" : "") %>
+          <%= link_to "Theo người", my_tasks_path(base.merge(scope: "team", group: "assignee")),
+                      class: (@group_by == "assignee" ? "is-active" : "") %>
+        </div>
+      <% end %>
+
+      <div class="ml-auto flex items-center gap-2">
+        <% if team && params.values_at(:assignee_id, :project_id).any?(&:present?) %>
+          <%= link_to "Xoá lọc", my_tasks_path(scope: "team", group: params[:group]),
+                      class: "x-btn x-btn-ghost x-btn-sm" %>
+        <% end %>
+        <span class="x-muted whitespace-nowrap"><%= @total %> việc đang mở</span>
+      </div>
+    <% end %>
+  </div>
+
   <% if @groups.empty? %>
     <div class="x-card">
-      <%= render "shared/empty", icon: "✓", title: "Bạn không còn việc nào đang mở",
-                 body: "Tất cả công việc được giao cho bạn đã hoàn thành.",
-                 action_label: "Xem dự án", action_path: projects_path %>
+      <% if team %>
+        <%= render "shared/empty", icon: "✓", title: "Không có việc nào đang mở",
+                   body: "Không tìm thấy công việc đang mở nào khớp với bộ lọc hiện tại.",
+                   action_label: "Xem dự án", action_path: projects_path %>
+      <% else %>
+        <%= render "shared/empty", icon: "✓", title: "Bạn không còn việc nào đang mở",
+                   body: "Tất cả công việc được giao cho bạn đã hoàn thành.",
+                   action_label: "Xem dự án", action_path: projects_path %>
+      <% end %>
     </div>
   <% else %>
     <% colors = { "Quá hạn" => "var(--bad)", "Hôm nay" => "var(--warn)", "Tuần này" => "var(--brand)",
                   "Sau đó" => "var(--ink-3)", "Không có hạn" => "var(--ink-3)" } %>
-    <% @groups.each do |title, tasks| %>
+    <% @groups.each do |title, tasks, user| %>
       <div class="x-card">
         <div class="x-card-head">
           <h2 class="x-h3 flex items-center gap-2">
-            <i class="w-2 h-2 rounded-full" style="background:<%= colors[title] %>"></i>
+            <% if @group_by == "assignee" %>
+              <%= avatar_for user, size: :sm %>
+            <% else %>
+              <i class="w-2 h-2 rounded-full" style="background:<%= colors[title] %>"></i>
+            <% end %>
             <%= title %>
           </h2>
           <span class="x-num text-[13px] font-semibold" style="color:var(--ink-3)"><%= tasks.size %></span>
         </div>
         <div class="p-2">
           <% tasks.each do |task| %>
-            <%= render "shared/task_row", task: task, show_project: true %>
+            <%= render "shared/task_row", task: task, show_project: true,
+                       show_assignee: team && @group_by == "due" %>
           <% end %>
         </div>
       </div>
