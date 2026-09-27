@@ -2,7 +2,7 @@
   <%= turbo_frame_tag "modal" do %>
     <%= render layout: "shared/panel",
                locals: { title: @task.title,
-                         eyebrow: "#{@project.code} · #{@task.code}",
+                         eyebrow: "#{@project.name} · #{@task.code}",
                          full_page_path: task_path(@task) } do %>
       <%= render "detail", compact: true %>
     <% end %>
