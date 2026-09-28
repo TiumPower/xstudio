@@ -2,7 +2,7 @@
   <%= link_to root_path, class: "flex items-center gap-3 px-5 h-[68px] flex-none" do %>
     <div class="w-8 h-8 rounded-[9px] overflow-hidden flex-none">
       <% if current_workspace.logo.attached? %>
-        <%= image_tag current_workspace.logo.variant(resize_to_fill: [64, 64]), class: "w-full h-full object-cover" %>
+        <%= image_tag thumb_source(current_workspace.logo, [64, 64]), class: "w-full h-full object-cover" %>
       <% else %>
         <%= image_tag "logo.svg", alt: "Xstudio", class: "w-full h-full" %>
       <% end %>

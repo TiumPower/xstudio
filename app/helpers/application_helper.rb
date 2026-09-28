@@ -44,6 +44,15 @@ module ApplicationHelper
 
   def overdue_days(date) = date.present? ? (Date.current - date.to_date).to_i : 0
 
+  # ---- Ảnh đính kèm -----------------------------------------------------
+  # SVG không dựng biến thể được: `.variant` ném ActiveStorage::InvariableError
+  # chứ không trả về ảnh gốc. Logo nằm trên thanh bên của MỌI trang, nên một
+  # logo SVG là cả app trắng màn. SVG vốn co giãn tuỳ ý nên cứ chèn ảnh gốc,
+  # kích thước đã do CSS của ô chứa quyết định.
+  def thumb_source(attachment, size)
+    attachment.variable? ? attachment.variant(resize_to_fill: size) : attachment
+  end
+
   # ---- Avatar -----------------------------------------------------------
   AVATAR_SIZES = { sm: "x-avatar-sm", md: "", lg: "x-avatar-lg", xl: "x-avatar-xl" }.freeze
 
@@ -52,7 +61,7 @@ module ApplicationHelper
     klass = ["x-avatar", AVATAR_SIZES[size]].compact_blank
     if user.avatar.attached?
       tag.span(class: klass, title: title || user.display_name) do
-        image_tag(user.avatar.variant(resize_to_fill: [128, 128]), alt: user.display_name)
+        image_tag(thumb_source(user.avatar, [128, 128]), alt: user.display_name)
       end
     else
       tag.span(user.initials, class: klass, style: "background:#{user.avatar_color}",

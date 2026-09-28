@@ -31,6 +31,7 @@ class User < ApplicationRecord
   has_many :owned_nodes,         class_name: "StrategyNode", foreign_key: :owner_id,      dependent: :nullify
 
   validates :full_name, presence: true
+  validate  :avatar_is_an_image
   validate  :password_has_letter_and_digit, if: -> { password.present? }
 
   before_validation :assign_avatar_color, on: :create
@@ -138,6 +139,12 @@ class User < ApplicationRecord
   end
 
   private
+
+  def avatar_is_an_image
+    return unless avatar.attached?
+    return if avatar.blob.blank? || Attachments::IMAGE_TYPES.include?(avatar.blob.content_type)
+    errors.add(:avatar, "phải là ảnh (PNG, JPG, GIF, WEBP, SVG).")
+  end
 
   AVATAR_COLORS = %w[#2E6BC0 #6D3BD4 #0E7490 #0E7A46 #D98324 #C8322B #5A6B82 #B4479E].freeze
 
