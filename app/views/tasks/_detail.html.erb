@@ -9,9 +9,7 @@
         <h2 class="x-h3 x-section-title">Nội dung công việc</h2>
         <div class="flex items-center gap-2">
           <%= priority_chip(@task) %>
-          <span class="x-chip" style="background:<%= @task.board_column&.color || '#6B7A8F' %>1A;color:<%= @task.board_column&.color || '#6B7A8F' %>">
-            <%= @task.board_column&.name || "—" %>
-          </span>
+          <%= render "tasks/status_switcher", task: @task %>
         </div>
       </div>
       <div class="p-5">
@@ -115,10 +113,9 @@
       <div class="x-card-head"><h2 class="x-h3 x-section-title">Thuộc tính</h2></div>
       <div class="p-4">
         <%= form_with model: @task, url: task_path(@task), method: :patch, local: true, class: "space-y-3.5" do |f| %>
-          <div>
-            <label class="x-label block mb-1.5">Trạng thái (cột)</label>
-            <%= f.collection_select :board_column_id, @project.board_columns.ordered, :id, :name, {}, class: "x-select h-9 text-[13px]" %>
-          </div>
+          <%# Trạng thái không còn ở đây: đã có chip đổi nhanh ở đầu thẻ "Nội dung
+              công việc", lưu ngay khi chọn. Để cả hai thì cùng một trường có hai
+              chỗ sửa, một chỗ lưu ngay một chỗ phải bấm Lưu — rất dễ hiểu nhầm. %>
           <div>
             <label class="x-label block mb-1.5">Người thực hiện</label>
             <%= f.collection_select :assignee_id, @project.members, :id, :display_name,

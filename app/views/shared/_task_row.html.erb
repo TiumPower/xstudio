@@ -1,6 +1,9 @@
 <% show_project  = local_assigns.fetch(:show_project, false) %>
 <% show_assignee = local_assigns.fetch(:show_assignee, false) %>
-<%= link_to task_path(task), id: "task_row_#{task.code}",
+<%# Id mang theo biến thể đang vẽ: sau khi sửa việc, controller gửi cả hai biến
+    thể và turbo_stream chỉ thay đúng cái đang có trên trang. Nếu dùng chung một
+    id thì bản thay vào có thể thiếu mất cột người thực hiện. %>
+<%= link_to task_path(task), id: (show_assignee ? "task_row_a_#{task.code}" : "task_row_#{task.code}"),
             class: "flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[var(--bg)] group",
             data: { turbo_frame: "modal" } do %>
   <span class="w-4 h-4 rounded-[5px] border flex-none" style="border-color:var(--line)"></span>

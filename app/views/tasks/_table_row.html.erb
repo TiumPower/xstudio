@@ -1,0 +1,41 @@
+<%# Hàng bảng ở màn Công việc của dự án. Id khác với hàng danh sách
+    dạng dòng (shared/task_row) vì hai bên là hai kiểu markup khác nhau. %>
+<tr id="task_trow_<%= task.code %>">
+  <td><%= check_box_tag "codes[]", task.code, false, class: "x-check", data: { action: "bulk#toggle", bulk_target: "box" } %></td>
+  <td>
+    <%= link_to task_path(task), class: "block", data: { turbo_frame: "modal" } do %>
+      <div class="font-medium text-[13.5px]"><%= task.title %></div>
+      <div class="x-code"><%= task.code %></div>
+    <% end %>
+  </td>
+  <td>
+    <span class="x-chip" style="background:<%= task.board_column&.color || '#6B7A8F' %>1A;color:<%= task.board_column&.color || '#6B7A8F' %>">
+      <%= task.board_column&.name || "—" %>
+    </span>
+  </td>
+  <td>
+    <div class="flex items-center gap-2">
+      <%= avatar_for task.assignee, size: :sm %>
+      <span class="text-[13px] truncate"><%= task.assignee&.display_name || t("common.unassigned") %></span>
+    </div>
+  </td>
+  <td><%= priority_chip(task) %></td>
+  <td class="whitespace-nowrap">
+    <span class="x-num <%= 'x-out font-semibold' if task.overdue? %>"><%= task.due_date ? l(task.due_date) : "—" %></span>
+  </td>
+  <td class="x-num" style="color:var(--ink-3)"><%= task.subtasks_count.positive? ? task.subtask_summary : "—" %></td>
+  <td>
+    <% if task.movable_to_other_project? && local_assigns.fetch(:movable, false) %>
+      <button type="button" data-action="move-task#open" data-task-code="<%= task.code %>"
+              data-task-title="<%= task.title %>" title="Chuyển sang dự án khác"
+              aria-label="Chuyển <%= task.code %> sang dự án khác"
+              class="w-7 h-7 rounded-md grid place-items-center hover:bg-[var(--bg)]"
+              style="color:var(--ink-3)">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+             stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M2 5.5h9M8.5 3l2.5 2.5L8.5 8M14 10.5H5M7.5 8l-2.5 2.5L7.5 13"/>
+        </svg>
+      </button>
+    <% end %>
+  </td>
+</tr>

@@ -72,15 +72,26 @@ class TasksController < ApplicationController
       apply_labels
       log_activity("updated", trackable: @task, project: @task.project, summary: "đã cập nhật #{@task.code}")
       notify_changes(previous)
-      # Trong panel thì quay lại chính công việc đó (Turbo nạp lại vào panel),
-      # ngoài panel thì về nơi vừa bấm.
-      if turbo_frame_request?
-        redirect_to task_path(@task)
-      else
-        redirect_back fallback_location: task_path(@task), notice: "Đã lưu công việc #{@task.code}."
+      # Vẽ lại chi tiết (panel hoặc trang riêng) VÀ hàng/thẻ của việc đó ở màn
+      # phía sau. Trước đây chỉ nạp lại panel nên danh sách sau lưng vẫn hiện
+      # trạng thái cũ cho tới khi người dùng tự tải lại trang.
+      respond_to do |format|
+        format.turbo_stream do
+          flash.now[:notice] = "Đã lưu công việc #{@task.code}."
+          render turbo_stream: task_sync_streams(moved_column: previous[:board_column_id] != @task.board_column_id)
+        end
+        format.html { redirect_back fallback_location: task_path(@task), notice: "Đã lưu công việc #{@task.code}." }
       end
     else
-      redirect_back fallback_location: task_path(@task), alert: @task.errors.full_messages.to_sentence
+      message = @task.errors.full_messages.to_sentence
+      respond_to do |format|
+        # Trong panel mà redirect thì Turbo nạp trang đích vào chính cái panel.
+        format.turbo_stream do
+          flash.now[:alert] = message
+          render turbo_stream: turbo_stream.replace("flash", partial: "layouts/flash"), status: :unprocessable_entity
+        end
+        format.html { redirect_back fallback_location: task_path(@task), alert: message }
+      end
     end
   end
 
@@ -142,15 +153,34 @@ class TasksController < ApplicationController
     end
   end
 
-  # Sửa nhanh một trường từ panel chi tiết.
+  # Sửa nhanh một trường (chip đổi trạng thái ở đầu chi tiết, sửa nhanh từ panel).
+  # Ghi nhật ký và báo cho người liên quan y như lưu bằng form đầy đủ — đổi cột
+  # bằng chip hay bằng ô chọn thì với người đọc nhật ký vẫn là một việc.
   def quick_update
+    previous = { assignee_id: @task.assignee_id, board_column_id: @task.board_column_id, status: @task.status }
+
     if @task.update(task_params)
+      log_activity("updated", trackable: @task, project: @task.project, summary: "đã cập nhật #{@task.code}")
+      notify_changes(previous)
+
       respond_to do |format|
+        format.turbo_stream do
+          flash.now[:notice] = quick_update_notice(previous)
+          render turbo_stream: task_sync_streams(moved_column: previous[:board_column_id] != @task.board_column_id)
+        end
         format.json { render json: { ok: true } }
         format.html { redirect_back fallback_location: task_path(@task) }
       end
     else
-      render json: { error: { message: @task.errors.full_messages.to_sentence } }, status: :unprocessable_entity
+      message = @task.errors.full_messages.to_sentence
+      respond_to do |format|
+        format.turbo_stream do
+          flash.now[:alert] = message
+          render turbo_stream: turbo_stream.replace("flash", partial: "layouts/flash"), status: :unprocessable_entity
+        end
+        format.json { render json: { error: { message: message } }, status: :unprocessable_entity }
+        format.html { redirect_back fallback_location: task_path(@task), alert: message }
+      end
     end
   end
 
@@ -220,13 +250,56 @@ class TasksController < ApplicationController
     Notifications::Dispatch.task_status_changed(@task, actor: current_user) if previous[:status] != @task.status
   end
 
+  # Vẽ lại việc vừa sửa ở mọi chỗ đang hiển thị nó: panel (hoặc trang chi tiết),
+  # thẻ trên Kanban, hàng trong danh sách dạng dòng và hàng trong bảng.
+  # turbo_stream bỏ qua đích không có trên trang nên gửi thừa là vô hại — nhờ vậy
+  # controller không phải đoán người dùng đang đứng ở màn nào.
+  def task_sync_streams(moved_column: false)
+    # Trên Kanban, đổi cột thì thẻ phải SANG cột mới chứ không phải vẽ lại tại
+    # chỗ cũ. Cột không đổi thì thay tại chỗ để giữ nguyên thứ tự trong cột.
+    card = if moved_column
+             [turbo_stream.remove("task_card_#{@task.code}"),
+              turbo_stream.append("column_tasks_#{@task.board_column_id}",
+                                  partial: "tasks/card", locals: { task: @task })]
+           else
+             [turbo_stream.replace("task_card_#{@task.code}", partial: "tasks/card", locals: { task: @task })]
+           end
+
+    streams = [turbo_stream.replace("flash", partial: "layouts/flash"),
+               *card,
+               turbo_stream.replace("task_trow_#{@task.code}", partial: "tasks/table_row",
+                                    locals: { task: @task, movable: true }),
+               turbo_stream.replace("task_row_#{@task.code}", partial: "shared/task_row",
+                                    locals: { task: @task, show_project: true, show_assignee: false }),
+               turbo_stream.replace("task_row_a_#{@task.code}", partial: "shared/task_row",
+                                    locals: { task: @task, show_project: true, show_assignee: true })]
+
+    streams << if turbo_frame_request?
+                 turbo_stream.replace("modal", partial: "tasks/modal_frame")
+               else
+                 turbo_stream.replace("task_page", partial: "tasks/page")
+               end
+    streams
+  end
+
+  # Nói rõ vừa đổi gì, vì chip đổi trạng thái nằm xa dải thông báo.
+  def quick_update_notice(previous)
+    if previous[:board_column_id] != @task.board_column_id
+      "Đã chuyển #{@task.code} sang #{@task.board_column&.name}."
+    else
+      "Đã lưu công việc #{@task.code}."
+    end
+  end
+
   # Gỡ thẻ/hàng của mã cũ ở mọi nơi có thể đang hiển thị nó — turbo_stream bỏ
   # qua đích không tồn tại nên gửi thừa cũng vô hại, mà panel mở từ bảng Kanban
   # thì vừa vẽ lại panel vừa dọn cái thẻ phía sau.
   def move_streams(previous_code)
     streams = [turbo_stream.replace("flash", partial: "layouts/flash"),
                turbo_stream.remove("task_card_#{previous_code}"),
-               turbo_stream.remove("task_row_#{previous_code}")]
+               turbo_stream.remove("task_trow_#{previous_code}"),
+               turbo_stream.remove("task_row_#{previous_code}"),
+               turbo_stream.remove("task_row_a_#{previous_code}")]
 
     if turbo_frame_request?
       streams << turbo_stream.replace("modal", partial: "tasks/modal_frame")

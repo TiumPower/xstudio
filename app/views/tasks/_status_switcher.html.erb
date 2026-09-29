@@ -1,0 +1,32 @@
+<%# Đổi trạng thái ngay tại chỗ: bấm vào chip là ra danh sách cột, chọn một cột
+    là lưu luôn. Trước đây phải cuộn xuống thẻ Thuộc tính, chọn trong ô rồi bấm
+    "Lưu thay đổi" — ba thao tác cho thứ người ta đổi nhiều nhất trong ngày. %>
+<% column = task.board_column %>
+<% color  = column&.color.presence || "#6B7A8F" %>
+<div class="relative" data-controller="dropdown">
+  <button type="button" class="x-chip x-chip-dot" data-action="dropdown#toggle"
+          style="background:<%= color %>1A;color:<%= color %>"
+          title="Đổi trạng thái" aria-label="Đổi trạng thái công việc <%= task.code %>">
+    <%= column&.name || "Chưa có cột" %>
+    <svg width="9" height="9" viewBox="0 0 10 10" fill="none" stroke="currentColor"
+         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M2.5 4l2.5 2.5L7.5 4"/>
+    </svg>
+  </button>
+
+  <div class="absolute right-0 mt-1.5 w-[216px] x-card p-1.5 z-50" hidden data-dropdown-target="menu">
+    <div class="x-eyebrow px-2 pt-1 pb-1.5">Chuyển sang cột</div>
+    <% task.project.board_columns.ordered.each do |option| %>
+      <% here = option.id == task.board_column_id %>
+      <%= form_with url: quick_update_task_path(task), method: :patch, class: "contents" do %>
+        <%= hidden_field_tag "task[board_column_id]", option.id %>
+        <button class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[13px] text-left hover:bg-[var(--bg)] <%= "font-semibold" if here %>"
+                <%= "disabled" if here %>>
+          <i class="w-2 h-2 rounded-full flex-none" style="background:<%= option.color.presence || '#6B7A8F' %>"></i>
+          <span class="flex-1 truncate"><%= option.name %></span>
+          <% if here %><span style="color:var(--good)">✓</span><% end %>
+        </button>
+      <% end %>
+    <% end %>
+  </div>
+</div>
