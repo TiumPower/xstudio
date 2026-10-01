@@ -99,7 +99,20 @@ jobs:
       - name: cap production deploy
         env:
           REPO_URL: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-        run: bundle exec cap production deploy
+        run: |
+          set -o pipefail
+          bundle exec cap production deploy 2>&1 | tee /tmp/cap.log
+
+      # TẠM THỜI — annotation chỉ nói "exit code 1" mà không kèm lỗi của cap.
+      - name: Lỗi của cap (tạm thời)
+        if: failure()
+        run: |
+          {
+            echo "## cap production deploy — 60 dòng cuối"
+            echo '```'
+            tail -60 /tmp/cap.log 2>/dev/null || echo "(không có log)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       # Token nằm lại trong config của git mirror trên máy chủ. Nó chết ngay
       # khi lần chạy kết thúc, nhưng vẫn dọn — kể cả khi deploy hỏng.
