@@ -69,6 +69,30 @@ jobs:
           printf '%s\n' "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
+      # TẠM THỜI — chẩn đoán vì sao runner không SSH vào được. Vân tay khoá
+      # không phải bí mật; nội dung khoá không bao giờ được in ra.
+      - name: Chẩn đoán SSH (tạm thời)
+        if: always()
+        run: |
+          {
+            echo "## Chẩn đoán SSH"
+            echo "### Khoá trong agent"
+            echo '```'
+            ssh-add -l 2>&1 || echo "(agent rỗng hoặc không chạy)"
+            echo '```'
+            echo "### known_hosts"
+            echo '```'
+            awk '{print $1, $2}' ~/.ssh/known_hosts 2>&1 || echo "(không có file)"
+            echo '```'
+            echo "### Thử SSH trực tiếp"
+            echo '```'
+            ssh -o BatchMode=yes -o ConnectTimeout=15 -v \
+                deploy@103.116.38.152 'echo DANG_NHAP_OK; id -un' 2>&1 \
+              | grep -viE "debug1: (Reading|Rhosts|Remote protocol|compat|Local version|SSH2_MSG|kex|expecting|Server host key|Host .103|found|will attempt|Trying private)" \
+              | tail -30
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       # GITHUB_TOKEN được cấp tự động cho mỗi lần chạy và hết hạn khi lần chạy
       # kết thúc, nên không có bí mật dài hạn nào phải tạo hay xoay vòng.
       # Capistrano truyền URL này xuống máy chủ để nó tự fetch.
